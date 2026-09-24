@@ -1,0 +1,64 @@
+{
+  "freeze_date": "2026-08-26",
+  "ran_at": "2026-08-28T00:17:05.635154+00:00",
+  "z": [
+    0.8620778439267351,
+    0.6054466836276446,
+    0.6863872423702295
+  ],
+  "z_names": [
+    "level_imm",
+    "gradient_edu",
+    "level_internet"
+  ],
+  "sampling_variances": [
+    6.493708854884732e-05,
+    0.0018490277845434836,
+    0.0003233866033433465
+  ],
+  "delta": [
+    0.02,
+    0.05,
+    0.02
+  ],
+  "tau": 7.8147279032511765,
+  "finding_hm": "F-EMPTY",
+  "wave_kept": [
+    0
+  ],
+  "wave_I_stats": [
+    {
+      "min": 204.3477274079711,
+      "median": 1093.2174644568381,
+      "max": 1818.3449274955747
+    }
+  ],
+  "closest": {
+    "I": 204.3477274079711,
+    "c": {
+      "alpha": -0.5427404219563456,
+      "beta": 0.5700163243680046,
+      "gamma": 0.7211364502535792,
+      "kappa": 2.2931912761433044,
+      "sigma_eps": 0.21836825049765862
+    },
+    "M": [
+      0.6187861863719875,
+      0.05448039745686094,
+      0.6132577482645372
+    ]
+  },
+  "n_nroy": 0,
+  "param_names": [
+    "alpha",
+    "beta",
+    "gamma",
+    "kappa",
+    "sigma_eps"
+  ],
+  "notes": [
+    "F-EMPTY: no c in the frozen box C has I(c) \u2264 \u03c4. \u03c4 and \u03b4 were not touched. This rejects the pair (kernel, z), not a license to widen the box after seeing the waves.",
+    "Closest M vs z is a discrepancy report, not a calibrated world."
+  ],
+  "figure": "/Users/bonorinoa/Desktop/Github_Repositories/ecn593-poc-abm/figures/overlay.png"
+}

@@ -1,0 +1,14 @@
+{
+  "level_immunization_mean": 86.20778439267352,
+  "gradient_edu_corr": 0.6054466836276446,
+  "level_internet_mean": 68.63872423702296,
+  "_audit": {
+    "n_immunization": 231,
+    "n_completion": 233,
+    "n_overlap_gradient": 219,
+    "n_internet": 239,
+    "sd_immunization": 12.247639550045443,
+    "mean_completion": 76.72105831333356,
+    "sd_internet": 27.800970882158023
+  }
+}
