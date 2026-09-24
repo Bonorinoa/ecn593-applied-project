@@ -1,0 +1,83 @@
+{
+  "cut": 0.5,
+  "headline_cut": 0.25,
+  "image_built": true,
+  "Theta_exp_0.50": [
+    -3.042737324194966e-05,
+    0.015096059984838739
+  ],
+  "n_theta_sample": 400,
+  "image_note": "Theta_exp at cut 0.50 is the empirical [min, max] of delta_spill on 400 NROY rows sampled as in pipeline (SEED_HM+1, THETA_SAMPLE=400), REPS_ESTIMAND=200. survivors_with_any_merge=400.",
+  "hm_reproduced_frozen_nroy": true,
+  "hm_reproduction": {
+    "wave_kept": [
+      202,
+      416,
+      373
+    ],
+    "wave_kept_frozen": [
+      202,
+      416,
+      373
+    ],
+    "wave_kept_match": true,
+    "n_nroy": 991,
+    "n_nroy_frozen": 991,
+    "n_nroy_match": true,
+    "tau": 7.8147279032511765,
+    "tau_frozen": 7.8147279032511765,
+    "min_I_c_match": true,
+    "min_I_I": 0.0017342237484828825,
+    "min_I_I_frozen": 0.0017342237484828825,
+    "median_I_c_match": true,
+    "median_I_I": 2.020782700991986,
+    "median_I_I_frozen": 2.020782700991986
+  },
+  "headline_Theta_exp": [
+    -0.0005709671801974285,
+    0.026892538347452834
+  ],
+  "worlds": {
+    "min_I": {
+      "e2_ci": [
+        0.0018688169923259065,
+        0.006904622919907377
+      ],
+      "delta_spill": 0.0043867199561166415,
+      "merged_s0b": true,
+      "spill_true": 0.0036693404709601564,
+      "spill_merged_s0b": true,
+      "e2_oracle_ok": true,
+      "headline_label": "F-OVERCONF",
+      "headline_e2_ci": [
+        0.003376357147786025,
+        0.009011574041305903
+      ],
+      "label_vs_image_0.50": "F-OVERCONF",
+      "label_flipped": false
+    },
+    "median_I": {
+      "e2_ci": [
+        0.003283492134715339,
+        0.007688138054428705
+      ],
+      "delta_spill": 0.005485815094572022,
+      "merged_s0b": true,
+      "spill_true": 0.00474562895662547,
+      "spill_merged_s0b": true,
+      "e2_oracle_ok": true,
+      "headline_label": "F-OVERCONF",
+      "headline_e2_ci": [
+        0.005786708500446757,
+        0.010730600685799686
+      ],
+      "label_vs_image_0.50": "F-OVERCONF",
+      "label_flipped": false
+    }
+  },
+  "notes": [
+    "E2 intervals use simulate_panel(..., 'random', seed_offset=0), the same panel as run_foils. cut is passed to hajek_contrasts; run_foils itself does not accept cut.",
+    "Labels are classify_interval(e2_ci_0.50, Theta_exp_0.50). They are not judged against the headline Theta_exp (cut 0.25).",
+    "tau and delta were not loosened. config.py was not modified. poc_results.json was not overwritten."
+  ]
+}

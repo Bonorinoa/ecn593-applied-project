@@ -1,7 +1,7 @@
 % main.tex — formal write-up of the ECN 593 applied project.
 % Compile: xelatex main.tex
 % Not the freeze. SPECIFICATION.md wins if they disagree.
-% Draft for review, 2026-09-24. The 0.50 exposure-cut result is not in this draft.
+% Draft for review, 2026-09-24. Exposure-cut appendix is in this draft.
 \documentclass[11pt]{article}
 
 \usepackage[letterpaper,margin=22mm]{geometry}
@@ -837,6 +837,51 @@ which is unnamed (neither $\Theta_{\hm}\subseteq\Iols$ nor
 $\Iols\subset\interior(\Theta_{\hm})$).
 Not ``OLS failed under interference.''
 
+\subsection{Declared cut at $0.5$}
+\label{sec:cut}
+
+SPECIFICATION.md already required this check: recompute the exposure
+strata at threshold $0.5$, and report whether the E2 sticker flips.
+It was run on 24 September 2026. $\thr$ and $\delta$ were not touched.
+The cut changes the functional, so the interval is judged against a
+rebuilt image, not against the headline $\Theta_{\expset}$.
+
+History matching was re-run and reproduced the freeze: waves kept
+$202$, $416$, $373$, $|\NROY|=991$, and the same two $c_0$.
+On a fresh draw of $400$ survivors, the same sample rule as the
+headline image, $\delta_{\mathrm{spill}}$ at cut $0.5$ has image
+approximately $[-0.00003,\,0.015]$.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+object at cut $0.5$ & min $I$ world & median $I$ world \\
+\midrule
+$\delta_{\mathrm{spill}}(c_0)$ & $0.0037$ & $0.0047$ \\
+H\'ajek $\Ie$ & $[0.0019,\,0.0069]$ & $[0.0033,\,0.0077]$ \\
+$\Ie$ vs the $0.5$ image
+  & $\Ie\subset\interior(\Theta)$
+  & $\Ie\subset\interior(\Theta)$ \\
+oracle gate
+  & truth inside $\Ie$
+  & truth inside $\Ie$ \\
+$S_{0b}$ merged & yes & yes \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The sticker does not flip. At both $c_0$ the interval is still a strict
+subset of the interior of its own image, and the oracle truth at the
+new cut sits inside the interval. The code name remains F-OVERCONF.
+
+The cut is not innocuous. In all $400$ sampled worlds, and at both
+diagnostic worlds, $S_{0b}$ had fewer than $20$ agents, so the
+pre-registered merge of $S_{0b}$ into $S_{0c}$ fired. The no-flip
+result is a statement about that merged functional. It is not evidence
+that the strata were unchanged. Numbers are in
+\texttt{results/appendix\_cut\_0.50.json}.
+
 Oracle and noisy-survey scorings of $Y$ are admitted; the item that
 loads on baseline propensity is excluded, as designed. $\Theta_{\cv}$
 is a small scoring gap at a world, not a second NROY.
@@ -959,8 +1004,8 @@ $\theta_2(c^\star)=0.038$.
 Foil~1 estimator: OLS-HC1 (CausalForestDML did not import; not BCF).
 Overlay: \texttt{figures/overlay.png}.
 WB attempt archived as F-empty.
-Figures in this note are redrawn from those JSON files; waves were not
-re-run.
+Headline figures are redrawn from the planted JSON. The $0.5$ cut was
+recomputed on 24 September 2026; history matching reproduced the freeze.
 }
 
 \end{document}
