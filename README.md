@@ -2,7 +2,22 @@
 
 Not-ruled-out images of a named policy contrast, in a village agent-based model calibrated by history matching.
 
-This repository is the study packet. It is not a lab notebook. Lecture drafts, amendment memos, and agent files are not here.
+**What this is and why it exists.** This repository is the formal write-up packet
+for an ECN 593 M.S. Economics applied project (Phase A). The question: when a
+stochastic agent-based model is calibrated under uncertainty, which policy effects
+can we still *not rule out* given the data, and do one-world estimators overstate
+how much they know? This packet reports the results — non-ruled-out images of a
+policy contrast and the committed numbers behind them. The companion
+[ecn593-poc-abm](https://github.com/Bonorinoa/ecn593-poc-abm) repository is the
+pre-registered proof-of-concept this packet reports on.
+
+It is a study packet — **not** a lab notebook. Lecture drafts, amendment memos, and
+agent files are not here.
+
+**Status.** The pre-registered proof-of-concept (phases A1–A7) is complete. This
+packet is the formal write-up: current draft `writeup/main.pdf`, dated 24 September
+2026, pending review. The committed JSON results in `results/` are what actually
+ran.
 
 ## Read in this order
 
