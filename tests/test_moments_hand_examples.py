@@ -1,4 +1,4 @@
-"""Hand-example tests for the moment map and implausibility — METHODOLOGY §5–§6.
+"""Hand-example tests for the moment map and implausibility.
 
 Each docstring states the arithmetic. Run: pytest tests/test_moments_hand_examples.py -v
 """
@@ -15,6 +15,7 @@ from poc_abm.moments import (  # noqa: E402
     discrepancy,
     implausibility,
     load_frozen_z,
+    load_z,
     sampling_variances,
     simulate_moments,
 )
@@ -51,6 +52,33 @@ def test_planted_z_is_unit_interval_and_has_sampling_variances():
     assert np.all(v > 0)
     assert audit["source"] == "planted"
     assert audit["c_star"]["alpha"] == -1.5
+
+
+def test_worldbank_z_is_the_anchor_summary_rescaled_to_the_unit_interval():
+    """data/anchors.json holds percentages; z multiplies the two levels by 0.01.
+
+    Sampling variances (the archived F-EMPTY run used exactly these):
+      levels: (sd/100)^2 / n          (variance of a mean; sd as stored)
+      gradient: (1 - r^2)^2 / (n - 2)  (delta-method variance of a correlation)
+    Hand check for immunization: sd 12.2476, n 231 -> 0.122476^2 / 231 = 6.4937e-05.
+    """
+    z, audit = load_z("worldbank")
+    assert audit["source"] == "worldbank"
+    assert abs(z[0] - 0.8620778439267352) < 1e-15
+    assert abs(z[1] - 0.6054466836276446) < 1e-15
+    assert abs(z[2] - 0.6863872423702296) < 1e-15
+    v = sampling_variances(audit)
+    assert abs(v[0] - 6.493708854884732e-05) < 1e-18
+    assert abs(v[1] - 0.0018490277845434836) < 1e-16
+    assert abs(v[2] - 0.0003233866033433465) < 1e-17
+
+
+def test_load_z_planted_is_load_frozen_z():
+    """The two planted loaders agree exactly."""
+    z1, a1 = load_z("planted")
+    z2, a2 = load_frozen_z()
+    assert np.array_equal(z1, z2)
+    assert np.array_equal(sampling_variances(a1), sampling_variances(a2))
 
 
 def test_discrepancy_budget_is_frozen_delta_squared():

@@ -63,14 +63,14 @@ def clip_box(lo: np.ndarray, hi: np.ndarray, names) -> dict:
 
 
 def _collapsed(nroy: np.ndarray, names) -> bool:
-    """F-SINGLETON: every axis span is < 5% of the original box span."""
+    """F-SINGLETON: every axis span is < SINGLETON_SPAN_FRACTION of the original box span."""
     for j, name in enumerate(names):
         orig_lo, orig_hi = config.PARAM_BOX[name]
         orig_span = orig_hi - orig_lo
         span = float(nroy[:, j].max() - nroy[:, j].min())
         if orig_span <= 0:
             continue
-        if span >= 0.05 * orig_span:
+        if span >= config.SINGLETON_SPAN_FRACTION * orig_span:
             return False
     return True
 

@@ -3,7 +3,10 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 *.pyc
-locks/
+# private study material (sessions, old decks, the Tamer talk): local only, never pushed
+study/
+# scratch outputs of the check scripts; regenerate with scripts/check_*.py, scripts/plant_z.py
+results/checks/
 writeup/*.aux
 writeup/*.log
 writeup/*.out

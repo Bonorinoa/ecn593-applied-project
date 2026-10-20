@@ -318,19 +318,24 @@ def evaluate_spill(world: World, c: dict, reps: int | None = None, cut=None) -> 
         any_merge = any_merge or d["merged_s0b"]
     spills = np.asarray(spills, dtype=float)
     dirs_ = np.asarray(dirs_, dtype=float)
+    ok = spills[np.isfinite(spills)]
     return {
         "delta_spill": float(np.nanmean(spills)),
         "delta_dir": float(np.nanmean(dirs_)),
+        "se_spill": float(np.std(ok, ddof=1) / np.sqrt(ok.size)) if ok.size > 1 else float("nan"),
         "merged_s0b": any_merge,
     }
 
 
-def sample_nroy_rows(nroy: np.ndarray, n_sample: int, rng) -> np.ndarray:
-    """Uniform sample of survivor rows. If |NROY| ≤ n_sample, take all."""
-    n = nroy.shape[0]
-    if n == 0:
-        return nroy
+def sample_nroy_index(n: int, n_sample: int, rng) -> np.ndarray:
+    """Row indices of a uniform NROY sample without replacement. If n ≤ n_sample, all rows."""
     if n <= n_sample:
+        return np.arange(n)
+    return rng.choice(n, size=n_sample, replace=False)
+
+
+def sample_nroy_rows(nroy: np.ndarray, n_sample: int, rng) -> np.ndarray:
+    """Uniform sample of NROY rows. If |NROY| ≤ n_sample, take all."""
+    if nroy.shape[0] == 0:
         return nroy
-    idx = rng.choice(n, size=n_sample, replace=False)
-    return nroy[idx]
+    return nroy[sample_nroy_index(nroy.shape[0], n_sample, rng)]

@@ -17,7 +17,6 @@ from poc_abm.kernel import (  # noqa: E402
     World,
     logistic,
     assign,
-    simulate,
     simulate_panel,
     stream_seed,
 )
@@ -84,9 +83,9 @@ def test_determinism_same_inputs_same_output():
     """Same (rule, seed_offset) -> identical run. Required for paired contrasts."""
     w = World()
     c = {"alpha": -1.0, "beta": 0.3, "gamma": 0.4, "kappa": 1.0, "sigma_eps": 0.1}
-    a = simulate(w, c, "random", seed_offset=42)
-    b = simulate(w, c, "random", seed_offset=42)
-    assert a == b
+    ya, da = simulate_panel(w, c, "random", seed_offset=42)
+    yb, db = simulate_panel(w, c, "random", seed_offset=42)
+    assert np.array_equal(ya, yb) and np.array_equal(da, db)
 
 
 def test_stream_seed_is_crc32_of_length_prefixed_key():

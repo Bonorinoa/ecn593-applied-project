@@ -1,7 +1,10 @@
-"""Moment map M(c) and implausibility I(c) — METHODOLOGY §5–§6.
+"""Moment map M(c), the targets z, and implausibility I(c).
 
-Read this next to METHODOLOGY.md; the three simulated moments mirror the three
-external anchors one-for-one, which is what makes the calibration interpretable.
+The three simulated moments mirror the three World Bank anchors one-for-one.
+Two sources of z exist:
+  planted   : z = M̂(c*) (data/planted.json, written by scripts/plant_z.py). The main run.
+  worldbank : z from data/anchors.json (written by scripts/fetch_anchors.py).
+              The archived run; it ends in F-EMPTY.
 """
 import json
 
@@ -12,6 +15,43 @@ from .kernel import World, simulate_panel
 
 # moment order is part of the frozen spec:
 MOMENT_NAMES = ("level_imm", "gradient_edu", "level_internet")
+
+
+def load_z(source: str = "planted"):
+    """z and its audit dict for one source ("planted" or "worldbank")."""
+    if source == "planted":
+        return load_frozen_z()
+    if source == "worldbank":
+        return load_worldbank_z()
+    raise ValueError(f"unknown z source: {source!r}")
+
+
+def load_worldbank_z(path=None):
+    """z from the World Bank anchor summary, on the scale of the moments.
+
+    Levels are country means in percent; z uses level / 100. The gradient is a
+    cross-country correlation and is used as is. Sampling variances:
+      levels   : (sd/100)^2 / n   with sd as stored (numpy default, ddof = 0)
+      gradient : (1 - r^2)^2 / (n - 2), the delta-method variance of a correlation
+    These treat the spread across countries as sampling noise in a village
+    target. That is a modelling choice, stated in the docs.
+    """
+    path = config.DATA_DIR / "anchors.json" if path is None else path
+    raw = json.loads(path.read_text())
+    a = raw["_audit"]
+    r = float(raw["gradient_edu_corr"])
+    z = np.array([
+        raw["level_immunization_mean"] * config.ANCHOR_LEVEL_SCALE,
+        r,
+        raw["level_internet_mean"] * config.ANCHOR_LEVEL_SCALE,
+    ], dtype=float)
+    v = np.array([
+        (a["sd_immunization"] * config.ANCHOR_LEVEL_SCALE) ** 2 / a["n_immunization"],
+        (1.0 - r ** 2) ** 2 / (a["n_overlap_gradient"] - 2),
+        (a["sd_internet"] * config.ANCHOR_LEVEL_SCALE) ** 2 / a["n_internet"],
+    ], dtype=float)
+    audit = {"source": "worldbank", "anchors": raw, "sampling_variances": v}
+    return z, audit
 
 
 def load_frozen_z():

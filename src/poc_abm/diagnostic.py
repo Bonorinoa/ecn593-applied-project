@@ -1,13 +1,21 @@
-"""Diagnostic overlay: two foils, two worlds.
+"""Diagnostic overlay: two foils, two diagnostic points (min-I, median-I).
 
-Foil 1 is a SUTVA one-world interval (the ruler for one-world practice).
-This pin: OLS-HC1 (CausalForestDML does not import). Report that name;
-do not call it BCF. Foil 2 is exposure-mapped Hájek on π₁. Each interval
-is judged against ITS OWN image. Foil 1 is not a candidate for Θ_hm.
+Foil 1 (degree arm) is the whole-village policy estimate of a SUTVA analyst:
+OLS-HC1 of Y on [1, D, X] gives beta-hat, and with no interference
+theta_2 = (k/N) x (effect on the seeded), so the analyst reports (k/N) x beta-hat
+and (k/N) x its interval. It is NOT an identified estimator of theta_2 under the
+kernel's interference; that failure is the finding (PLAN item 10, verifier
+t_2b7a8d8c). Compared with Theta_hm.
 
-Both foils use the true outcome Y. The measurement layer (scored outcomes
-m1-m3, admission, Θ_cv) is parked until the core results are settled;
-restore from commit ebed7ce (PLAN item 13).
+Foil 2 (random arm) is the exposure-mapped Hajek spillover contrast with the
+Aronow-Samii variance (estimand.hajek_contrasts). Compared with Theta_exp.
+
+Each interval is judged against its own image (classify_interval) and gets a
+reported covers_truth flag. Neither flag stops the run: the check on the
+Foil 2 code is scripts/check_foil2_coverage.py (PLAN items 11, 14).
+
+Both foils use the true outcome Y. The measurement layer (m1-m3, admission,
+Theta_cv) is parked; restore from commit ebed7ce (PLAN item 13).
 """
 from scipy.stats import norm
 
@@ -23,7 +31,7 @@ def classify_interval(interval, image):
 
     F-HONEST: I covers [L, U].
     F-OVERCONF: I is a strict subset of the interior of Θ.
-    Anything else is unnamed — we do not add a finding after the freeze.
+    Anything else is no verdict (None).
     """
     lo, hi = interval
     L, U = image
@@ -36,17 +44,18 @@ def classify_interval(interval, image):
     return None
 
 
-def oracle_gate(point: float, ci: tuple, truth: float) -> bool:
-    """True iff truth lies inside the CI (harness OK). Point is unused."""
+def covers_truth(ci, truth: float) -> bool:
+    """True iff the simulator's true value lies inside the interval. Reported, never a stop."""
     lo, hi = ci
     return bool(np.isfinite(truth) and lo <= truth <= hi)
 
 
 def ols_ate_hc1(y, D, X) -> dict:
-    """SUTVA OLS of s on D given X, HC1 interval. Fallback Foil 1.
+    """OLS of y on [1, D, X]; the D coefficient with an HC1 interval.
 
-    Design matrix [1, D, X]. The D coefficient is the ATE under SUTVA
-    and unconfoundedness given X. HC1 = n/(n-k) sandwich.
+    HC1 = n/(n-k) sandwich. Read as an effect only under SUTVA,
+    exchangeability and positivity given X, and a correct additive
+    constant-effect model.
     """
     y = np.asarray(y, dtype=float)
     D = np.asarray(D, dtype=float)
@@ -66,42 +75,92 @@ def ols_ate_hc1(y, D, X) -> dict:
     return {"ate": ate, "ci": (ate - zcrit * se, ate + zcrit * se), "estimator": "OLS-HC1"}
 
 
-def fit_forest(X, D, s, seed: int) -> dict:
-    """Foil 1: CausalForestDML if importable, else OLS-HC1 (AMENDMENT-02)."""
-    try:
-        from econml.dml import CausalForestDML
+def foil1_policy(world: World, y, D) -> dict:
+    """Foil 1: the SUTVA analyst's village-level policy interval, (k/N) x OLS-HC1.
 
-        est = CausalForestDML(
-            n_estimators=config.CF_N_ESTIMATORS,
-            min_samples_leaf=config.CF_MIN_SAMPLES_LEAF,
-            honest=True,
-            discrete_treatment=True,
-            random_state=seed,
-        )
-        T = np.asarray(D, dtype=int)
-        Xx = np.asarray(X, dtype=float)
-        est.fit(Y=np.asarray(s, dtype=float), T=T, X=Xx)
-        ate = float(np.mean(est.effect(Xx)))
-        lo, hi = est.ate_interval(Xx)
-        return {"ate": ate, "ci": (float(lo), float(hi)), "estimator": "CausalForestDML"}
-    except Exception:
-        return ols_ate_hc1(s, D, X)
+    share = k/N is read from the panel (number seeded / N). Scaling both
+    endpoints by a known positive constant keeps the analyst's own coverage
+    statement; it does not repair the analyst's assumptions.
+    """
+    D = np.asarray(D, dtype=float)
+    ols = ols_ate_hc1(y, D, world.X)
+    share = float(D.sum()) / world.n
+    lo, hi = ols["ci"]
+    return {
+        "beta": ols["ate"],
+        "ci_beta": ols["ci"],
+        "share": share,
+        "estimate": share * ols["ate"],
+        "ci": (share * lo, share * hi),
+        "estimator": "OLS-HC1 x k/N (SUTVA policy estimate)",
+    }
+
+
+def policy_gap_decomposition(world: World, c: dict, reps: int | None = None,
+                             displayed_beta: float = float("nan")) -> dict:
+    """Why (k/N) x beta-hat differs from theta_2: an exact split with paired streams.
+
+    For each rep r, the control and degree panels share Y(0) and every shock, so
+    y2 - y0 is each person's policy effect in that rep. With S the seeded set:
+        theta_2         = (1/N) sum_i (y2 - y0)
+        seeded_part     = (1/N) sum_{i in S} (y2 - y0)
+        unseeded_part   = (1/N) sum_{i not in S} (y2 - y0)   (zero under SUTVA)
+    selected_policy_contrast = mean over S of (y2 - y0). Under interference this
+    is the seeded people's policy contrast, NOT a SUTVA own-treatment ATT.
+    mean_beta averages the OLS coefficient over the same reps.
+
+    Two gaps are reported and must not be mixed up (verifier t_2b7a8d8c):
+    the gap for the 200-rep mean beta, and the gap for the displayed one-panel
+    beta (displayed_beta, the Foil 1 fit at FOIL_PANEL_OFFSET).
+    """
+    reps = config.REPS_ESTIMAND if reps is None else reps
+    n = world.n
+    theta2, seeded, unseeded, sel, betas, base_gap = [], [], [], [], [], []
+    share = float("nan")
+    for r in range(reps):
+        y0, _ = simulate_panel(world, c, "control", r)
+        y2, d2 = simulate_panel(world, c, "degree", r)
+        S = d2 > 0.5
+        diff = y2 - y0
+        share = float(S.sum()) / n
+        theta2.append(diff.mean())
+        seeded.append(diff[S].sum() / n)
+        unseeded.append(diff[~S].sum() / n)
+        sel.append(diff[S].mean())
+        betas.append(ols_ate_hc1(y2, d2, world.X)["ate"])
+        base_gap.append(y0[S].mean() - y0[~S].mean())
+    out = {
+        "reps": reps,
+        "share": share,
+        "theta2": float(np.mean(theta2)),
+        "seeded_part": float(np.mean(seeded)),
+        "unseeded_part": float(np.mean(unseeded)),
+        "selected_policy_contrast": float(np.mean(sel)),
+        "mean_beta": float(np.mean(betas)),
+        "baseline_gap_seeded_minus_unseeded": float(np.mean(base_gap)),
+    }
+    out["gap_mean_beta"] = out["theta2"] - share * out["mean_beta"]
+    out["ols_error_part_mean_beta"] = share * (out["selected_policy_contrast"] - out["mean_beta"])
+    out["unseeded_share_of_gap_mean_beta"] = out["unseeded_part"] / out["gap_mean_beta"]
+    out["displayed_beta"] = float(displayed_beta)
+    out["gap_displayed"] = out["theta2"] - share * float(displayed_beta)
+    out["unseeded_share_of_gap_displayed"] = out["unseeded_part"] / out["gap_displayed"]
+    return out
 
 
 def run_foils(world: World, c: dict, theta2_true: float, spill_true: float) -> dict:
-    """Fit both foils at one diagnostic world. Foil 1 on π₂; E2 on π₁. Outcome: true Y."""
-    y2, d2 = simulate_panel(world, c, "degree", seed_offset=0)
-    y1, d1 = simulate_panel(world, c, "random", seed_offset=0)
+    """Both foils at one diagnostic point, on one panel each (offset FOIL_PANEL_OFFSET).
 
-    foil1 = fit_forest(world.X, d2, y2, seed=config.SEED_CF)
-
-    e2 = hajek_contrasts(world, y1, d1)
-    e2_oracle_ok = oracle_gate(e2["delta_spill"], e2["ci_spill"], spill_true)
-
+    Foil 1 on the degree arm, Foil 2 on the random arm. Outcome: true Y.
+    """
+    off = config.FOIL_PANEL_OFFSET
+    y2, d2 = simulate_panel(world, c, "degree", seed_offset=off)
+    y1, d1 = simulate_panel(world, c, "random", seed_offset=off)
+    foil1 = foil1_policy(world, y2, d2)
+    foil2 = hajek_contrasts(world, y1, d1)
     return {
-        "forest": foil1,  # key kept for overlay payload; estimator name is inside
-        "e2": e2,
-        "e2_oracle_ok": e2_oracle_ok,
-        "theta2_true": theta2_true,
-        "spill_true": spill_true,
+        "foil1": foil1,
+        "foil2": foil2,
+        "foil1_covers_truth": covers_truth(foil1["ci"], theta2_true),
+        "foil2_covers_truth": covers_truth(foil2["ci_spill"], spill_true),
     }

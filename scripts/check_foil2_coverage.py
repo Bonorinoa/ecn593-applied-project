@@ -151,9 +151,9 @@ def kernel_result(world, name, c):
 
 
 def main():
-    run_path = ROOT / "results" / "poc_results.json"
+    run_path = ROOT / "results" / "planted" / "poc_results.json"
     if not run_path.exists():
-        sys.exit("results/poc_results.json not found: run the pipeline first "
+        sys.exit("results/planted/poc_results.json not found: run the pipeline first "
                  "(the min-I and median-I points come from that run).")
     run = json.loads(run_path.read_text())
     points = {

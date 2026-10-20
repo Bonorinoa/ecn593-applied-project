@@ -15,16 +15,16 @@ def test_overlay_writes_a_png(tmp_path):
                 "Theta_exp": (-0.05, 0.15),
                 "theta2_true": 0.08,
                 "spill_true": 0.04,
-                "forest_ci": (0.07, 0.09),
-                "e2_ci": (0.02, 0.06),
+                "foil1_ci": (0.07, 0.09),
+                "foil2_ci": (0.02, 0.06),
             },
             "median_I": {
                 "Theta_hm": (0.0, 0.2),
                 "Theta_exp": (-0.05, 0.15),
                 "theta2_true": 0.10,
                 "spill_true": 0.05,
-                "forest_ci": (0.09, 0.12),
-                "e2_ci": (0.00, 0.08),
+                "foil1_ci": (0.09, 0.12),
+                "foil2_ci": (0.00, 0.08),
             },
         }
     }

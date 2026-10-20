@@ -1,23 +1,26 @@
-"""Frozen constants. Every number here is stated in SPECIFICATION.md
-and reported in writeup/main.tex.
+"""Constants of the run. Every number the code uses is defined here.
 
-Nothing in this packet may hardcode a constant that is not defined here.
-If this file and the write-up disagree, the JSON in results/ is what ran.
-Freeze date: 2026-08-26, amended 2026-08-27 (AMENDMENT-02).
+The code is law: the docs describe this file, not the other way round.
+A rerun with the same code and environment reproduces every number exactly
+(all random streams are seeded below or by crc32 keys in kernel.stream_seed).
 """
 from pathlib import Path
 
 # ---- reproducibility -------------------------------------------------------
 SEED_GRAPH = 20260812          # graph draw
 SEED_X = 20260813              # covariates
-SEED_HM = 20260814             # history-matching designs
-SEED_RUN_BASE = 20260815       # simulation noise streams (offset per rep)
-SEED_CF = 20260816             # causal forest (Foil 1)
+SEED_HM = 20260814             # history-matching designs (one Generator for all waves)
+SEED_THETA_SAMPLE = SEED_HM + 1  # = 20260815: the 400 NROY points mapped to the images
 SEED_FOIL2_MC = 20260817       # Foil 2: simulated assignments for joint exposure probabilities
+# Simulation noise and assignment streams are not seeded here: they use
+# kernel.stream_seed(label, rep) = crc32 of a length-prefixed key.
 
 # ---- population ------------------------------------------------------------
 N_AGENTS = 800
-EDGE_P = 4.0 / N_AGENTS        # ER graph, mean degree ≈ 4
+# Edge rule (kernel.World): draw A_ij ~ Bernoulli(EDGE_P) for every ordered pair,
+# then symmetrize A | A.T. So P(i~j) = 1 - (1 - EDGE_P)^2 ≈ 2·EDGE_P and the
+# expected degree is (N-1)(1 - (1 - EDGE_P)^2) ≈ 7.97 (measured: 8.085).
+EDGE_P = 4.0 / N_AGENTS
 N_COVARIATES = 3
 
 # ---- dynamics ---------------------------------------------------------------
@@ -34,18 +37,18 @@ PARAM_BOX = {
 }
 ETA_FIXED = (0.05, 0.10, 0.02)  # literacy, resources, baseline-propensity weights
 
-# planted world = center of C (AMENDMENT-02). Midpoint of each frozen interval.
+# planted point c* = center of C. Midpoint of each interval.
 C_STAR = {name: 0.5 * (lo + hi) for name, (lo, hi) in PARAM_BOX.items()}
 
 # ---- assignment rules -------------------------------------------------------
-SEED_FRACTION = 0.10           # 10% of N
+SEED_FRACTION = 0.10           # k = ceil(0.10 · N) people seeded in the random and degree arms
 
 # ---- Monte Carlo ------------------------------------------------------------
-REPS_ESTIMAND = 200            # reps per arm when evaluating theta(c)
+REPS_ESTIMAND = 200            # reps per arm when evaluating theta(c), delta_spill(c)
 REPS_MOMENT = 30               # reps per arm when evaluating M(c)
-REPS_Z = REPS_ESTIMAND          # z := M̂(c*) at estimand precision (AMENDMENT-02)
+REPS_Z = REPS_ESTIMAND         # z := M̂(c*) at estimand precision (scripts/plant_z.py)
 
-# ---- World Bank anchors -----------------------------------------------------
+# ---- World Bank anchors (scripts/fetch_anchors.py; the archived F-EMPTY run) --
 WB_BASE = "https://api.worldbank.org/v2"
 WB_INDICATORS = {
     "immunization": "SH.IMM.IDPT",       # z1: preventive behavior level
@@ -56,33 +59,26 @@ AGGREGATE_NAMES_EXCLUDED = {"World", "Euro area", "European Union",
                             "OECD members", "High income", "Low income",
                             "Upper middle income", "Lower middle income",
                             "Least developed countries: UN classification"}
-# API returns percentage points for levels; match in [0,1] (METHODOLOGY §5).
-ANCHOR_LEVEL_SCALE = 0.01
+ANCHOR_LEVEL_SCALE = 0.01      # the API gives levels in percent; z is on [0, 1]
 
-# discrepancy budget, same units as z: levels in [0,1], corr unitless
+# discrepancy delta, same units as z: levels in [0,1], corr unitless
 DELTA = {"level_imm": 0.02, "gradient_edu": 0.05, "level_internet": 0.02}
 N_MOMENTS = 3
-HM_CONFIDENCE = 0.95           # tau quantile of chi2 with df = N_MOMENTS
+HM_CONFIDENCE = 0.95           # tau = chi2 quantile (df = N_MOMENTS); also the CI level of both foils
 
 # ---- history matching ---------------------------------------------------------
 WAVE_POINTS = 1000             # LHS points per wave
 WAVES = 3
-BOX_INFLATION = 0.20           # next-wave box = survivor bbox inflated 20%
-THETA_SAMPLE = 400             # survivors sampled for Theta mapping
-
-# ---- diagnostic worlds (functions of I only) --------------------------------
-C0_RULES = ("min_I", "median_I")
+BOX_INFLATION = 0.20           # next-wave box = NROY bounding box, span widened by 20% (10% per side)
+SINGLETON_SPAN_FRACTION = 0.05 # F-SINGLETON flag: every NROY axis span < 5% of the box span
+THETA_SAMPLE = 400             # NROY points sampled for the images
 
 # ---- measurement layer: parked 2026-10-20 (PLAN item 13; restore from ebed7ce) --
 
-# ---- Foil 1 forest hyperparameters (implementation freeze, before waves) ------
-CF_N_ESTIMATORS = 100          # honest forest; N=800 panel
-CF_MIN_SAMPLES_LEAF = 5
-
-# ---- Foil 2 exposure map (AMENDMENT-01) --------------------------------------
-EXPOSURE_SHARE_CUT = 0.25      # S0b vs S0c
-EXPOSURE_SHARE_CUT_APPENDIX = 0.50
-STRATUM_MIN_N = 20             # merge S0b into S0c if any cell thinner
+# ---- foils ---------------------------------------------------------------------
+FOIL_PANEL_OFFSET = 0          # the one panel each foil sees (rep offset for stream_seed)
+EXPOSURE_SHARE_CUT = 0.25      # Foil 2 strata: S0b vs S0c
+STRATUM_MIN_N = 20             # merge S0b into S0c if any cell thinner (decided per panel)
 EXPOSURE_MC_DRAWS = 10_000     # Foil 2 variance: simulated random-arm assignments
 
 # ---- paths -------------------------------------------------------------------

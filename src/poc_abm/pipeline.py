@@ -1,6 +1,12 @@
-"""End-to-end PoC runner — A1 through A7, or F-EMPTY if the box cannot hit z.
+"""End-to-end run: history matching, the two images, the two foils.
 
-Empty NROY is a finding. τ and δ are never loosened.
+Steps: load z -> waves -> NROY -> 400 sampled points -> Theta_hm, Theta_exp ->
+the two diagnostic points (min-I, median-I) -> both foils.
+An empty NROY is a finding (F-EMPTY). tau and delta are never loosened.
+
+Usage:  python -m poc_abm.pipeline [planted|worldbank]     (default: planted)
+Outputs, per source S: results/S/poc_results.json, results/S/image_points.json,
+figures/S/{waves,overlay,image_points,empty}.png, locks/freeze-S.txt.
 """
 from __future__ import annotations
 
@@ -19,13 +25,13 @@ from poc_abm.estimand import (
     evaluate_thetas,
     interval_image,
     row_to_c,
-    sample_nroy_rows,
+    sample_nroy_index,
 )
-from poc_abm.figures import draw_empty, draw_overlay
+from poc_abm.figures import draw_empty, draw_image_points, draw_overlay, draw_waves
 from poc_abm.history_matching import run_waves, tau_threshold
 from poc_abm.kernel import World
-from poc_abm.moments import MOMENT_NAMES, load_frozen_z, sampling_variances
-from poc_abm.diagnostic import classify_interval, run_foils
+from poc_abm.moments import MOMENT_NAMES, load_z, sampling_variances
+from poc_abm.diagnostic import classify_interval, policy_gap_decomposition, run_foils
 
 
 def _jsonable(obj):
@@ -52,11 +58,25 @@ def _write_lock(tag: str) -> Path:
     return path
 
 
-def run_poc() -> dict:
-    config.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+def _git_commit() -> str:
+    """HEAD sha, with '+dirty' if tracked files differ from it."""
+    sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=config.ROOT, text=True).strip()
+    dirty = subprocess.run(["git", "diff", "--quiet", "HEAD"], cwd=config.ROOT).returncode != 0
+    return sha + ("+dirty" if dirty else "")
 
-    z, audit = load_frozen_z()
+
+SOURCES = ("planted", "worldbank")
+
+
+def run_poc(source: str = "planted") -> dict:
+    if source not in SOURCES:
+        raise ValueError(f"source must be one of {SOURCES}, got {source!r}")
+    res_dir = config.RESULTS_DIR / source
+    fig_dir = config.FIGURES_DIR / source
+    res_dir.mkdir(parents=True, exist_ok=True)
+    fig_dir.mkdir(parents=True, exist_ok=True)
+
+    z, audit = load_z(source)
     sampling = sampling_variances(audit)
     tau = tau_threshold()
     world = World()
@@ -65,8 +85,9 @@ def run_poc() -> dict:
 
     hm = run_waves(world, z, sampling)
     payload = {
-        "freeze_date": "2026-08-26 / AMENDMENT-02 2026-08-27",
+        "git_commit": _git_commit(),
         "ran_at": datetime.now(timezone.utc).isoformat(),
+        "z_source": source,
         "z": z.tolist(),
         "z_names": list(MOMENT_NAMES),
         "sampling_variances": sampling.tolist(),
@@ -83,6 +104,8 @@ def run_poc() -> dict:
         "spill_star": sp_star,
         "notes": [],
     }
+    payload["figures"] = [_rel(draw_waves(hm["wave_kept"], hm["wave_I_stats"], tau, source,
+                                          fig_dir / "waves.png"))]
 
     if hm["finding"] == "F-EMPTY":
         payload["notes"].append(
@@ -100,32 +123,45 @@ def run_poc() -> dict:
                 "closest": hm["closest"],
                 "wave_I_stats": hm["wave_I_stats"],
             },
-            config.FIGURES_DIR / "overlay.png",
+            fig_dir / "empty.png",
         )
-        payload["figure"] = str(fig)
-        _dump(payload)
+        payload["figures"].append(_rel(fig))
+        _dump(payload, res_dir, source)
         return payload
 
-    rng = np.random.default_rng(config.SEED_HM + 1)
-    sample = sample_nroy_rows(hm["nroy"], config.THETA_SAMPLE, rng)
-    # I values for the sampled rows: match by scanning (NROY is small enough)
-    # For the sample we recompute nothing about I; pair by taking the same
-    # indices when we subsampled from the full NROY.
-    # sample_nroy_rows doesn't return indices — evaluate θ on the sample, and
-    # pick c0 from FULL NROY via I.
-    theta2s = []
-    spills = []
-    for row in sample:
-        c = row_to_c(row, hm["param_names"])
+    rng = np.random.default_rng(config.SEED_THETA_SAMPLE)
+    idx = sample_nroy_index(hm["nroy"].shape[0], config.THETA_SAMPLE, rng)
+    image_points = []
+    for i in idx:
+        c = row_to_c(hm["nroy"][i], hm["param_names"])
         th = evaluate_thetas(world, c, reps=config.REPS_ESTIMAND)
         sp = evaluate_spill(world, c, reps=config.REPS_ESTIMAND)
-        theta2s.append(th["theta2"])
-        spills.append(sp["delta_spill"])
-    Theta_hm = interval_image(np.array(theta2s))
-    Theta_exp = interval_image(np.array(spills))
+        image_points.append({
+            "nroy_index": int(i),
+            "I": float(hm["I"][i]),
+            "c": c,
+            "theta2": th["theta2"],
+            "se_theta2": th["se_theta2"],
+            "delta_spill": sp["delta_spill"],
+            "se_spill": sp["se_spill"],
+        })
+    theta2s = np.array([p["theta2"] for p in image_points])
+    spills = np.array([p["delta_spill"] for p in image_points])
+    Theta_hm = interval_image(theta2s)
+    Theta_exp = interval_image(spills)
     payload["Theta_hm"] = list(Theta_hm)
     payload["Theta_exp"] = list(Theta_exp)
-    payload["n_theta_sample"] = int(sample.shape[0])
+    payload["n_theta_sample"] = len(image_points)
+    # Monte Carlo SE of each endpoint = SE of the point that attains it.
+    payload["image_endpoint_se"] = {
+        "Theta_hm": [image_points[int(np.nanargmin(theta2s))]["se_theta2"],
+                     image_points[int(np.nanargmax(theta2s))]["se_theta2"]],
+        "Theta_exp": [image_points[int(np.nanargmin(spills))]["se_spill"],
+                      image_points[int(np.nanargmax(spills))]["se_spill"]],
+    }
+    _dump_json(res_dir / "image_points.json", image_points)
+    payload["figures"].append(_rel(draw_image_points(image_points, Theta_hm, Theta_exp,
+                                                     fig_dir / "image_points.png")))
 
     worlds = diagnostic_worlds(hm["nroy"], hm["I"])
     overlay = {"worlds": {}}
@@ -136,61 +172,73 @@ def run_poc() -> dict:
         th = evaluate_thetas(world, c, reps=config.REPS_ESTIMAND)
         sp = evaluate_spill(world, c, reps=config.REPS_ESTIMAND)
         foils = run_foils(world, c, th["theta2"], sp["delta_spill"])
-        foil1 = foils["forest"]
-        foil1_ci = foil1["ci"]
-        foil1_name = foil1["estimator"]
-        e2_ci = foils["e2"]["ci_spill"]
+        foil1, foil2 = foils["foil1"], foils["foil2"]
+        decomp = policy_gap_decomposition(world, c, displayed_beta=foil1["beta"])
         findings[key] = {
-            "foil1_estimator": foil1_name,
-            "forest_vs_Theta_hm": classify_interval(foil1_ci, Theta_hm),
-            "e2_vs_Theta_exp": classify_interval(e2_ci, Theta_exp),
-            "e2_oracle_ok": foils["e2_oracle_ok"],
             "I": worlds[key]["I"],
+            "nroy_index": worlds[key]["index"],
             "c": c,
             "theta2_true": th["theta2"],
+            "se_theta2": th["se_theta2"],
             "spill_true": sp["delta_spill"],
-            "foil1_ci": list(foil1_ci),
-            "forest_ci": list(foil1_ci),
-            "e2_ci": list(e2_ci),
+            "se_spill": sp["se_spill"],
+            "foil1_estimator": foil1["estimator"],
+            "foil1_beta": foil1["beta"],
+            "foil1_ci_beta": list(foil1["ci_beta"]),
+            "foil1_share": foil1["share"],
+            "foil1_ci": list(foil1["ci"]),
+            "foil1_vs_Theta_hm": classify_interval(foil1["ci"], Theta_hm),
+            "foil1_covers_truth": foils["foil1_covers_truth"],
+            "foil1_gap_decomposition": decomp,
+            "foil2_estimate": foil2["spill"],
+            "foil2_se": foil2["se_spill"],
+            "foil2_merged_s0b": foil2["merged_s0b"],
+            "foil2_ci": list(foil2["ci_spill"]),
+            "foil2_vs_Theta_exp": classify_interval(foil2["ci_spill"], Theta_exp),
+            "foil2_covers_truth": foils["foil2_covers_truth"],
         }
         overlay["worlds"][key] = {
             "Theta_hm": Theta_hm,
             "Theta_exp": Theta_exp,
             "theta2_true": th["theta2"],
             "spill_true": sp["delta_spill"],
-            "foil1_ci": foil1_ci,
-            "foil1_label": foil1_name,
-            "forest_ci": foil1_ci,
-            "e2_ci": e2_ci,
+            "foil1_ci": foil1["ci"],
+            "foil1_label": "Foil 1: (k/N) x OLS-HC1",
+            "foil2_ci": foil2["ci_spill"],
             "theta2_star": th_star["theta2"],
             "spill_star": sp_star["delta_spill"],
         }
-        if not foils["e2_oracle_ok"]:
-            payload["notes"].append(
-                f"ORACLE GATE FAILED at {key}: E2 CI missed δ_spill,true. "
-                "Harness broken — findings at this world do not count."
-            )
     payload["findings"] = findings
-    fig = draw_overlay(overlay, config.FIGURES_DIR / "overlay.png")
-    payload["figure"] = str(fig)
-    _dump(payload)
+    payload["notes"].append(
+        "covers_truth is reported, never a stop: a correct 95% interval misses "
+        "the truth 5% of the time. The check on the Foil 2 code is "
+        "scripts/check_foil2_coverage.py (PLAN items 11, 14)."
+    )
+    payload["figures"].append(_rel(draw_overlay(overlay, fig_dir / "overlay.png")))
+    _dump(payload, res_dir, source)
     return payload
 
 
-def _dump(payload: dict) -> None:
-    path = config.RESULTS_DIR / "poc_results.json"
-    path.write_text(json.dumps(_jsonable(payload), indent=2))
-    try:
-        lock = _write_lock("A3")
-        print(f"lock file {lock}")
-    except Exception as exc:
-        print(f"lock skipped: {exc}")
+def _rel(path: Path) -> str:
+    return str(Path(path).relative_to(config.ROOT))
+
+
+def _dump_json(path: Path, obj) -> Path:
+    path.write_text(json.dumps(_jsonable(obj), indent=2))
     print(f"wrote {path}")
+    return path
+
+
+def _dump(payload: dict, res_dir: Path, source: str) -> None:
+    _dump_json(res_dir / "poc_results.json", payload)
+    lock = _write_lock(source)
+    print(f"lock file {lock}")
 
 
 def main():
     sys.path.insert(0, str(config.ROOT / "src"))
-    payload = run_poc()
+    source = sys.argv[1] if len(sys.argv) > 1 else "planted"
+    payload = run_poc(source)
     print(json.dumps({k: payload[k] for k in ("finding_hm", "n_nroy", "tau", "notes") if k in payload}, indent=2))
 
 

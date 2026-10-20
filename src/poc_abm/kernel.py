@@ -116,9 +116,3 @@ def simulate_panel(world, c: dict, rule: str, seed_offset: int):
         Y = logistic(z)
 
     return Y.copy(), D.copy()
-
-
-def simulate(world, c: dict, rule: str, seed_offset: int) -> float:
-    """Same dynamics as simulate_panel; return the population mean Ȳ_T."""
-    Y, _ = simulate_panel(world, c, rule, seed_offset)
-    return float(Y.mean())
