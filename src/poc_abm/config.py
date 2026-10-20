@@ -13,7 +13,7 @@ SEED_X = 20260813              # covariates
 SEED_HM = 20260814             # history-matching designs
 SEED_RUN_BASE = 20260815       # simulation noise streams (offset per rep)
 SEED_CF = 20260816             # causal forest (Foil 1)
-SEED_E2 = 20260817             # exposure-mapped estimator (Foil 2)
+SEED_FOIL2_MC = 20260817       # Foil 2: simulated assignments for joint exposure probabilities
 
 # ---- population ------------------------------------------------------------
 N_AGENTS = 800
@@ -73,11 +73,7 @@ THETA_SAMPLE = 400             # survivors sampled for Theta mapping
 # ---- diagnostic worlds (functions of I only) --------------------------------
 C0_RULES = ("min_I", "median_I")
 
-# ---- measurement layer --------------------------------------------------------
-SURVEY_NOISE_SD = 0.15         # m2
-BAD_ITEM_X_LOAD = 0.5          # m3 loading on x3 (treatment channel)
-BAD_ITEM_NOISE_SD = 0.10
-ADMISSION_CORR_THRESHOLD = 0.5 # restriction: |corr(s3, x3)| must be BELOW this
+# ---- measurement layer: parked 2026-10-20 (PLAN item 13; restore from ebed7ce) --
 
 # ---- Foil 1 forest hyperparameters (implementation freeze, before waves) ------
 CF_N_ESTIMATORS = 100          # honest forest; N=800 panel
@@ -87,6 +83,7 @@ CF_MIN_SAMPLES_LEAF = 5
 EXPOSURE_SHARE_CUT = 0.25      # S0b vs S0c
 EXPOSURE_SHARE_CUT_APPENDIX = 0.50
 STRATUM_MIN_N = 20             # merge S0b into S0c if any cell thinner
+EXPOSURE_MC_DRAWS = 10_000     # Foil 2 variance: simulated random-arm assignments
 
 # ---- paths -------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[2]   # repo root (src/poc_abm/config.py)

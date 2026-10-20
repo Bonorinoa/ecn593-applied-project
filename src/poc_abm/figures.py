@@ -19,7 +19,7 @@ def _interval_h(ax, y, lo, hi, color, label, lw=2.5):
 def draw_overlay(payload: dict, path: Path | None = None) -> Path:
     """payload keys: worlds.min_I / median_I each with
     Theta_hm (L,U), Theta_exp (L,U), theta2_true, spill_true,
-    foil1_ci or forest_ci (lo,hi), e2_ci (lo,hi), Theta_cv (L,U) optional.
+    foil1_ci or forest_ci (lo,hi), e2_ci (lo,hi).
     foil1_label: legend for the SUTVA interval (this run: OLS-HC1).
     """
     import matplotlib.pyplot as plt
@@ -41,8 +41,6 @@ def draw_overlay(payload: dict, path: Path | None = None) -> Path:
         ax.plot(w["theta2_true"], 0, "k*", markersize=10, label=r"$\theta_2(c_0)$")
         if w.get("theta2_star") is not None:
             ax.plot(w["theta2_star"], 0.35, "k^", markersize=8, label=r"$\theta_2(c^\star)$")
-        if w.get("Theta_cv") is not None and np.isfinite(w["Theta_cv"][0]):
-            _interval_h(ax, 2, *w["Theta_cv"], "#54A24B", r"$\Theta_{\mathrm{cv}}$", lw=2)
         ax.set_yticks([])
         ax.set_title(f"{title}  —  policy contrast")
         ax.set_xlabel(r"$\theta_2$")

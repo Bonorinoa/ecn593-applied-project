@@ -1,9 +1,13 @@
-"""Diagnostic overlay: two foils, two worlds — METHODOLOGY §9–§10.
+"""Diagnostic overlay: two foils, two worlds.
 
 Foil 1 is a SUTVA one-world interval (the ruler for one-world practice).
 This pin: OLS-HC1 (CausalForestDML does not import). Report that name;
 do not call it BCF. Foil 2 is exposure-mapped Hájek on π₁. Each interval
 is judged against ITS OWN image. Foil 1 is not a candidate for Θ_hm.
+
+Both foils use the true outcome Y. The measurement layer (scored outcomes
+m1-m3, admission, Θ_cv) is parked until the core results are settled;
+restore from commit ebed7ce (PLAN item 13).
 """
 from scipy.stats import norm
 
@@ -11,8 +15,7 @@ import numpy as np
 
 from . import config
 from .estimand import hajek_contrasts
-from .kernel import World, simulate_panel, stream_seed
-from .measures import admit, apply_measure, theta2_from_scores
+from .kernel import World, simulate_panel
 
 
 def classify_interval(interval, image):
@@ -85,38 +88,12 @@ def fit_forest(X, D, s, seed: int) -> dict:
         return ols_ate_hc1(s, D, X)
 
 
-def measure_image_theta2(world: World, c: dict, seed_offset: int) -> dict:
-    """Θ_cv(c₀) = image of θ₂ over admissible scorings at this world."""
-    rng = np.random.default_rng(stream_seed("measure", seed_offset))
-    y0, _ = simulate_panel(world, c, "control", seed_offset)
-    y2, _ = simulate_panel(world, c, "degree", seed_offset)
-    values = {}
-    admitted = []
-    for name in ("m1", "m2", "m3"):
-        s0 = apply_measure(y0, world.X, name, rng)
-        s2 = apply_measure(y2, world.X, name, rng)
-        ok = admit(s2, world.X)
-        values[name] = {"theta2": theta2_from_scores(s0, s2), "admitted": ok}
-        if ok:
-            admitted.append(values[name]["theta2"])
-    L, U = (float(min(admitted)), float(max(admitted))) if admitted else (float("nan"), float("nan"))
-    return {
-        "per_measure": values,
-        "Theta_cv": (L, U),
-        "admitted_names": tuple(k for k, v in values.items() if v["admitted"]),
-    }
-
-
 def run_foils(world: World, c: dict, theta2_true: float, spill_true: float) -> dict:
-    """Fit both foils at one diagnostic world. Foil 1 on π₂; E2 on π₁."""
+    """Fit both foils at one diagnostic world. Foil 1 on π₂; E2 on π₁. Outcome: true Y."""
     y2, d2 = simulate_panel(world, c, "degree", seed_offset=0)
     y1, d1 = simulate_panel(world, c, "random", seed_offset=0)
 
-    foil1 = {}
-    rng_m = np.random.default_rng(stream_seed("measure", 0))
-    for mname in ("m1", "m2"):
-        s = apply_measure(y2, world.X, mname, rng_m)
-        foil1[mname] = fit_forest(world.X, d2, s, seed=config.SEED_CF)
+    foil1 = fit_forest(world.X, d2, y2, seed=config.SEED_CF)
 
     e2 = hajek_contrasts(world, y1, d1)
     e2_oracle_ok = oracle_gate(e2["delta_spill"], e2["ci_spill"], spill_true)

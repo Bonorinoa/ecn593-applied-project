@@ -4,6 +4,8 @@
 over NROY, reported as empirical [L, U]. Θ_exp is the image of δ_spill.
 Neither is a posterior.
 """
+import hashlib
+
 from scipy.stats import hypergeom, norm
 
 import numpy as np
@@ -152,32 +154,107 @@ def hajek_mean(y: np.ndarray, in_set: np.ndarray, p: np.ndarray) -> float:
     return float((w * y).sum() / denom)
 
 
-def conservative_hajek_var(y: np.ndarray, in_set: np.ndarray, p: np.ndarray) -> float:
-    """Linearized Hájek variance, first-order (Bernoulli) terms only.
+def exposure_indicators(world: World, D_rows: np.ndarray, cut: float, merged: bool) -> dict:
+    """Exposure of every person under many assignments at once (one row per assignment).
 
-    Dropping second-order (without-replacement) covariances is conservative
-    for a contrast of two nearly-partition strata whose covariance is
-    typically negative.
+    The same map as stratum_labels, vectorized. Returns boolean (rows, n) arrays
+    for S1 (treated), S0a (untreated, no treated neighbor) and S0c (untreated,
+    treated share >= cut). If merged, S0b joins S0c, as in maybe_merge_s0b.
     """
-    p = np.clip(np.asarray(p, dtype=float), 1e-12, None)
-    in_set = np.asarray(in_set, dtype=float)
-    mu = hajek_mean(y, in_set, p)
-    if not np.isfinite(mu):
-        return float("nan")
-    w = in_set / p
-    denom = w.sum()
-    if denom <= 0:
-        return float("nan")
-    # influence of unit i on the Hajek mean
-    u = in_set * (y - mu) / p
-    # Bernoulli: Var(1_i) = p_i (1-p_i), so Var(u_i) = (1-p_i)/p_i * 1{...} (y-mu)^2
-    # Using the realized indicator: sum_i ((1-p_i)/p_i) * 1_i (y_i-mu)^2 / denom^2
-    num = (((1.0 - p) / p) * in_set * (y - mu) ** 2).sum()
-    return float(num / (denom ** 2))
+    D_rows = np.atleast_2d(np.asarray(D_rows, dtype=float))
+    share = (D_rows @ world.adjacency.T) / world.degrees
+    treated = D_rows > 0.5
+    untreated = ~treated
+    s0c = untreated & (share >= cut)
+    if merged:
+        s0c = s0c | (untreated & (share > 0.0) & (share < cut))
+    return {"S1": treated, "S0a": untreated & (share == 0.0), "S0c": s0c}
+
+
+def joint_probs(ind: dict) -> dict:
+    """First- and second-order exposure probabilities from equally likely assignments.
+
+    p[k][i]        = share of assignments in which person i has exposure k.
+    pi[(k, l)][i,j] = share in which i has exposure k AND j has exposure l.
+    With every assignment listed, these are exact. With simulated draws they are
+    the Monte Carlo estimates of Aronow and Samii (2017, section 5).
+    """
+    names = tuple(ind.keys())
+    F = {k: np.asarray(ind[k], dtype=float) for k in names}
+    m = next(iter(F.values())).shape[0]
+    p = {k: F[k].mean(axis=0) for k in names}
+    pi = {}
+    for a, k in enumerate(names):
+        for l in names[a:]:
+            pi[(k, l)] = (F[k].T @ F[l]) / m
+            pi[(l, k)] = pi[(k, l)].T
+    return {"p": p, "pi": pi}
+
+
+def exposure_mc(world: World, k_treat: int, cut: float, merged: bool, draws=None, seed=None) -> dict:
+    """Simulate the random arm's design (choose k_treat of N without replacement)
+    `draws` times and return joint_probs of the exposures."""
+    draws = config.EXPOSURE_MC_DRAWS if draws is None else draws
+    seed = config.SEED_FOIL2_MC if seed is None else seed
+    rng = np.random.default_rng(seed)
+    rows = np.zeros((draws, world.n))
+    for m in range(draws):
+        rows[m, rng.choice(world.n, size=k_treat, replace=False)] = 1.0
+    return joint_probs(exposure_indicators(world, rows, cut, merged))
+
+
+_EXPOSURE_MC_CACHE: dict = {}
+
+
+def _exposure_mc_cached(world: World, k_treat: int, cut: float, merged: bool) -> dict:
+    """The design depends only on the graph, k, the cut and the merge; compute it once.
+
+    The key hashes the adjacency CONTENTS, so a changed graph (or a reused
+    object id) can never receive another graph's probabilities.
+    """
+    graph = hashlib.sha256(np.ascontiguousarray(world.adjacency, dtype=float).tobytes()).hexdigest()
+    key = (graph, world.n, k_treat, float(cut), bool(merged),
+           config.EXPOSURE_MC_DRAWS, config.SEED_FOIL2_MC)
+    if key not in _EXPOSURE_MC_CACHE:
+        _EXPOSURE_MC_CACHE[key] = exposure_mc(world, k_treat, cut, merged)
+    return _EXPOSURE_MC_CACHE[key]
+
+
+def ht_cov(a_k, a_l, p_k, p_l, pi_kl, same: bool) -> float:
+    """Aronow-Samii (2017) estimate of Cov(T_k, T_l), with T = sum_i a_i / p_i.
+
+    a_k is zero outside exposure k (a_i = 1_i(k) * e_i). same=True gives Var(T_k).
+    Pairs that can be seen together (pi_ij > 0):
+        sum_ij (pi_ij - p_i p_j) / pi_ij * a_i a_j / (p_i p_j).
+    Pairs that can never be seen together (pi_ij = 0) get Young's inequality:
+        variance:   + sum_{pi_ij = 0} [a_i^2 / (2 p_i) + a_j^2 / (2 p_j)]
+        covariance: - the same sum.
+    Both signs make Var(T_k - T_l) = V_k + V_l - 2 C_kl conservative.
+    """
+    a_k = np.asarray(a_k, dtype=float)
+    a_l = np.asarray(a_l, dtype=float)
+    p_k = np.asarray(p_k, dtype=float)
+    p_l = np.asarray(p_l, dtype=float)
+    pi_kl = np.asarray(pi_kl, dtype=float)
+    safe_k = np.where(p_k > 0, p_k, 1.0)
+    safe_l = np.where(p_l > 0, p_l, 1.0)
+    pos = pi_kl > 0
+    W = np.zeros_like(pi_kl)
+    W[pos] = (pi_kl[pos] - np.outer(p_k, p_l)[pos]) / pi_kl[pos]
+    main = float((a_k / safe_k) @ W @ (a_l / safe_l))
+    zero = ~pos
+    young = 0.5 * float((a_k ** 2 / safe_k) @ zero.sum(axis=1) + (a_l ** 2 / safe_l) @ zero.sum(axis=0))
+    return main + young if same else main - young
 
 
 def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
-    """Foil 2 on one π₁ panel: Hájek δ_dir, δ_spill and conservative CIs."""
+    """Foil 2 on one random-arm panel: Hajek delta_dir, delta_spill and their intervals.
+
+    Point estimates weight each person by 1 / P(exposure), with exact first-order
+    probabilities (exposure_probs). Variances linearize the Hajek means
+    (e_i = y_i - mean of the exposure) and apply ht_cov with joint probabilities
+    from exposure_mc. Var(delta) = V(a) + V(b) - 2 Cov(a, b).
+    """
     cut = config.EXPOSURE_SHARE_CUT if cut is None else cut
     min_n = config.STRATUM_MIN_N if min_n is None else min_n
     s = exposure_share(world, D)
@@ -190,17 +267,28 @@ def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
         p = dict(p)
         p["S0c"] = p["S0c"] + p["S0b"]
         p["S0b"] = np.zeros_like(p["S0b"])
+    pi = _exposure_mc_cached(world, k, cut, merged)["pi"]
+    Y = np.asarray(Y, dtype=float)
+    ind = {name: (lab == name) for name in ("S1", "S0a", "S0c")}
+    mu = {name: hajek_mean(Y, ind[name], p[name]) for name in ind}
+    n_hat = {name: float((ind[name] / np.where(p[name] > 0, p[name], 1.0)).sum()) for name in ind}
+    a = {name: ind[name] * (Y - mu[name]) for name in ind}
 
-    def _est(name):
-        return hajek_mean(Y, lab == name, p[name])
+    def _pi(k1, k2):
+        m = pi[(k1, k2)]
+        if k1 == k2:  # the diagonal is the first-order probability; use the exact one
+            m = m.copy()
+            np.fill_diagonal(m, p[k1])
+        return m
 
-    def _var(name):
-        return conservative_hajek_var(Y, lab == name, p[name])
+    def _cov(k1, k2):
+        c = ht_cov(a[k1], a[k2], p[k1], p[k2], _pi(k1, k2), same=(k1 == k2))
+        return c / (n_hat[k1] * n_hat[k2])
 
-    d_dir = _est("S1") - _est("S0a")
-    d_sp = _est("S0c") - _est("S0a")
-    se_dir = float(np.sqrt(max(_var("S1"), 0.0) + max(_var("S0a"), 0.0)))
-    se_sp = float(np.sqrt(max(_var("S0c"), 0.0) + max(_var("S0a"), 0.0)))
+    d_dir = mu["S1"] - mu["S0a"]
+    d_sp = mu["S0c"] - mu["S0a"]
+    se_dir = float(np.sqrt(max(_cov("S1", "S1") + _cov("S0a", "S0a") - 2 * _cov("S1", "S0a"), 0.0)))
+    se_sp = float(np.sqrt(max(_cov("S0c", "S0c") + _cov("S0a", "S0a") - 2 * _cov("S0c", "S0a"), 0.0)))
     # two-sided interval at HM_CONFIDENCE: Φ^{-1}((1+p)/2)
     z = float(norm.ppf(0.5 + 0.5 * config.HM_CONFIDENCE))
     return {
@@ -211,6 +299,7 @@ def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
         "se_dir": se_dir,
         "se_spill": se_sp,
         "merged_s0b": merged,
+        "variance": f"Aronow-Samii 2017, joint exposure probabilities from {config.EXPOSURE_MC_DRAWS} draws",
     }
 
 

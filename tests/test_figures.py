@@ -17,7 +17,6 @@ def test_overlay_writes_a_png(tmp_path):
                 "spill_true": 0.04,
                 "forest_ci": (0.07, 0.09),
                 "e2_ci": (0.02, 0.06),
-                "Theta_cv": (0.07, 0.085),
             },
             "median_I": {
                 "Theta_hm": (0.0, 0.2),
@@ -26,7 +25,6 @@ def test_overlay_writes_a_png(tmp_path):
                 "spill_true": 0.05,
                 "forest_ci": (0.09, 0.12),
                 "e2_ci": (0.00, 0.08),
-                "Theta_cv": (0.09, 0.11),
             },
         }
     }

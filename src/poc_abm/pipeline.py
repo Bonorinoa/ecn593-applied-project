@@ -25,7 +25,7 @@ from poc_abm.figures import draw_empty, draw_overlay
 from poc_abm.history_matching import run_waves, tau_threshold
 from poc_abm.kernel import World
 from poc_abm.moments import MOMENT_NAMES, load_frozen_z, sampling_variances
-from poc_abm.diagnostic import classify_interval, measure_image_theta2, run_foils
+from poc_abm.diagnostic import classify_interval, run_foils
 
 
 def _jsonable(obj):
@@ -136,8 +136,7 @@ def run_poc() -> dict:
         th = evaluate_thetas(world, c, reps=config.REPS_ESTIMAND)
         sp = evaluate_spill(world, c, reps=config.REPS_ESTIMAND)
         foils = run_foils(world, c, th["theta2"], sp["delta_spill"])
-        cv = measure_image_theta2(world, c, seed_offset=0)
-        foil1 = foils["forest"]["m1"]
+        foil1 = foils["forest"]
         foil1_ci = foil1["ci"]
         foil1_name = foil1["estimator"]
         e2_ci = foils["e2"]["ci_spill"]
@@ -153,8 +152,6 @@ def run_poc() -> dict:
             "foil1_ci": list(foil1_ci),
             "forest_ci": list(foil1_ci),
             "e2_ci": list(e2_ci),
-            "Theta_cv": list(cv["Theta_cv"]),
-            "admitted_measures": list(cv["admitted_names"]),
         }
         overlay["worlds"][key] = {
             "Theta_hm": Theta_hm,
@@ -165,7 +162,6 @@ def run_poc() -> dict:
             "foil1_label": foil1_name,
             "forest_ci": foil1_ci,
             "e2_ci": e2_ci,
-            "Theta_cv": cv["Theta_cv"],
             "theta2_star": th_star["theta2"],
             "spill_star": sp_star["delta_spill"],
         }
