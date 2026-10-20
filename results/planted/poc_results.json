@@ -1,0 +1,227 @@
+{
+  "git_commit": "41cb76e9fbeb931be579836d42cfd9a4cc21a5a1",
+  "ran_at": "2026-10-20T21:12:46.444615+00:00",
+  "z_source": "planted",
+  "z": [
+    0.26378600572583033,
+    0.05000924361619115,
+    0.2618375074427115
+  ],
+  "z_names": [
+    "level_imm",
+    "gradient_edu",
+    "level_internet"
+  ],
+  "sampling_variances": [
+    1.0347916953273147e-08,
+    8.163459622818978e-07,
+    1.0089244661437434e-08
+  ],
+  "delta": [
+    0.02,
+    0.05,
+    0.02
+  ],
+  "tau": 7.8147279032511765,
+  "finding_hm": null,
+  "wave_kept": [
+    202,
+    416,
+    373
+  ],
+  "wave_I_stats": [
+    {
+      "min": 0.0017342237484828825,
+      "median": 50.368405938702296,
+      "max": 623.5844223230486
+    },
+    {
+      "min": 0.004965466452812369,
+      "median": 11.892743209067437,
+      "max": 149.7591901170927
+    },
+    {
+      "min": 0.007089888320192431,
+      "median": 13.593094594336488,
+      "max": 176.82416320098034
+    }
+  ],
+  "closest": {
+    "I": 0.0017342237484828825,
+    "c": {
+      "alpha": -1.487131306550042,
+      "beta": 0.3989893544333011,
+      "gamma": 0.3300666019450859,
+      "kappa": 1.344558646155918,
+      "sigma_eps": 0.19836796119526576
+    },
+    "M": [
+      0.26403874163549906,
+      0.0495268639142683,
+      0.2626074267725247
+    ]
+  },
+  "n_nroy": 991,
+  "param_names": [
+    "alpha",
+    "beta",
+    "gamma",
+    "kappa",
+    "sigma_eps"
+  ],
+  "c_star": {
+    "alpha": -1.5,
+    "beta": 0.325,
+    "gamma": 0.42500000000000004,
+    "kappa": 1.375,
+    "sigma_eps": 0.20500000000000002
+  },
+  "theta_star": {
+    "theta1": 0.036314229791821334,
+    "theta2": 0.03826272807494016,
+    "premium": 0.0019484982831188269,
+    "se_theta2": 1.3153515398411354e-05,
+    "se_theta1": 1.474209071541148e-05
+  },
+  "spill_star": {
+    "delta_spill": 0.007921687736219114,
+    "delta_dir": 0.3378891490156115,
+    "se_spill": 0.00031807876238736126,
+    "merged_s0b": false
+  },
+  "notes": [
+    "covers_truth is reported, never a stop: a correct 95% interval misses the truth 5% of the time. The check on the Foil 2 code is scripts/check_foil2_coverage.py (PLAN items 11, 14)."
+  ],
+  "figures": [
+    "figures/planted/waves.png",
+    "figures/planted/image_points.png",
+    "figures/planted/overlay.png"
+  ],
+  "Theta_hm": [
+    0.005870005684574131,
+    0.07324972678683644
+  ],
+  "Theta_exp": [
+    -0.0005709671801974285,
+    0.026892538347452834
+  ],
+  "n_theta_sample": 400,
+  "image_endpoint_se": {
+    "Theta_hm": [
+      3.7723651874530645e-06,
+      5.6074464035771926e-06
+    ],
+    "Theta_exp": [
+      0.0005018382337524699,
+      0.00025908651987391275
+    ]
+  },
+  "findings": {
+    "min_I": {
+      "I": 0.0017342237484828825,
+      "nroy_index": 121,
+      "c": {
+        "alpha": -1.487131306550042,
+        "beta": 0.3989893544333011,
+        "gamma": 0.3300666019450859,
+        "kappa": 1.344558646155918,
+        "sigma_eps": 0.19836796119526576
+      },
+      "theta2_true": 0.03707819703784815,
+      "se_theta2": 1.2483302510730945e-05,
+      "spill_true": 0.006129285419336761,
+      "se_spill": 0.0003075895788896133,
+      "foil1_estimator": "OLS-HC1 x k/N (SUTVA policy estimate)",
+      "foil1_beta": 0.33620553383177076,
+      "foil1_ci_beta": [
+        0.3259236501619582,
+        0.34648741750158335
+      ],
+      "foil1_share": 0.1,
+      "foil1_ci": [
+        0.03259236501619582,
+        0.034648741750158335
+      ],
+      "foil1_vs_Theta_hm": "F-OVERCONF",
+      "foil1_covers_truth": false,
+      "foil1_gap_decomposition": {
+        "reps": 200,
+        "share": 0.1,
+        "theta2": 0.037078197037848135,
+        "seeded_part": 0.033744316716315365,
+        "unseeded_part": 0.003333880321532766,
+        "selected_policy_contrast": 0.3374431671631537,
+        "mean_beta": 0.3338792160703076,
+        "baseline_gap_seeded_minus_unseeded": 0.000713809193316766,
+        "gap_mean_beta": 0.0036902754308173677,
+        "ols_error_part_mean_beta": 0.0003563951092846074,
+        "unseeded_share_of_gap_mean_beta": 0.9034231682794304,
+        "displayed_beta": 0.33620553383177076,
+        "gap_displayed": 0.0034576436546710568,
+        "unseeded_share_of_gap_displayed": 0.9642058738554234
+      },
+      "foil2_estimate": 0.006193965594545964,
+      "foil2_se": 0.004702199233681188,
+      "foil2_merged_s0b": false,
+      "foil2_ci": [
+        -0.0030221755516010064,
+        0.015410106740692934
+      ],
+      "foil2_vs_Theta_exp": null,
+      "foil2_covers_truth": true
+    },
+    "median_I": {
+      "I": 2.020782700991986,
+      "nroy_index": 418,
+      "c": {
+        "alpha": -1.5108049595466801,
+        "beta": 0.4453509728526435,
+        "gamma": 0.24255547204904943,
+        "kappa": 2.4654483508652474,
+        "sigma_eps": 0.17644871954745486
+      },
+      "theta2_true": 0.06346013510390686,
+      "se_theta2": 4.684538140640677e-06,
+      "spill_true": 0.008089303314279617,
+      "se_spill": 0.000270243218364572,
+      "foil1_estimator": "OLS-HC1 x k/N (SUTVA policy estimate)",
+      "foil1_beta": 0.5890450630804246,
+      "foil1_ci_beta": [
+        0.5831507226799679,
+        0.5949394034808813
+      ],
+      "foil1_share": 0.1,
+      "foil1_ci": [
+        0.058315072267996794,
+        0.05949394034808813
+      ],
+      "foil1_vs_Theta_hm": "F-OVERCONF",
+      "foil1_covers_truth": false,
+      "foil1_gap_decomposition": {
+        "reps": 200,
+        "share": 0.1,
+        "theta2": 0.06346013510390687,
+        "seeded_part": 0.05925262137930385,
+        "unseeded_part": 0.00420751372460301,
+        "selected_policy_contrast": 0.5925262137930386,
+        "mean_beta": 0.5879927578732065,
+        "baseline_gap_seeded_minus_unseeded": 0.0006748716653547057,
+        "gap_mean_beta": 0.004660859316586219,
+        "ols_error_part_mean_beta": 0.0004533455919832119,
+        "unseeded_share_of_gap_mean_beta": 0.9027334744110544,
+        "displayed_beta": 0.5890450630804246,
+        "gap_displayed": 0.004555628795864408,
+        "unseeded_share_of_gap_displayed": 0.9235857250754459
+      },
+      "foil2_estimate": 0.008258654593123221,
+      "foil2_se": 0.004156640917226727,
+      "foil2_merged_s0b": false,
+      "foil2_ci": [
+        0.00011178809869329988,
+        0.016405521087553145
+      ],
+      "foil2_vs_Theta_exp": "F-OVERCONF",
+      "foil2_covers_truth": true
+    }
+  }
+}
