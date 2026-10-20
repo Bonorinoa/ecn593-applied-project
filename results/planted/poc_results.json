@@ -1,6 +1,6 @@
 {
-  "git_commit": "41cb76e9fbeb931be579836d42cfd9a4cc21a5a1",
-  "ran_at": "2026-10-20T21:12:46.444615+00:00",
+  "git_commit": "7a14420caa99614dc98760c668de8ee1af8262b6+dirty",
+  "ran_at": "2026-10-20T21:24:28.954532+00:00",
   "z_source": "planted",
   "z": [
     0.26378600572583033,
@@ -90,7 +90,7 @@
     "merged_s0b": false
   },
   "notes": [
-    "covers_truth is reported, never a stop: a correct 95% interval misses the truth 5% of the time. The check on the Foil 2 code is scripts/check_foil2_coverage.py (PLAN items 11, 14)."
+    "At each diagnostic point, covers_truth reports whether the displayed interval contains the simulator truth. It is a descriptive containment indicator for that realized panel, not an estimate of repeated-sampling coverage and not a validity gate. Foil 2 is checked separately by the pre-declared repeated-assignment calibration in scripts/check_foil2_coverage.py."
   ],
   "figures": [
     "figures/planted/waves.png",
@@ -106,14 +106,49 @@
     0.026892538347452834
   ],
   "n_theta_sample": 400,
-  "image_endpoint_se": {
-    "Theta_hm": [
-      3.7723651874530645e-06,
-      5.6074464035771926e-06
+  "endpoint_recheck": {
+    "reps": 200,
+    "stream_offsets": [
+      100000,
+      100199
     ],
-    "Theta_exp": [
-      0.0005018382337524699,
-      0.00025908651987391275
+    "candidates": [
+      {
+        "image": "Theta_hm",
+        "endpoint": "lower",
+        "nroy_index": 877,
+        "pilot_value": 0.005870005684574131,
+        "pilot_pointwise_se": 3.7723651874530645e-06,
+        "fresh_value": 0.0058707384186063305,
+        "fresh_pointwise_se": 3.4047147845250597e-06
+      },
+      {
+        "image": "Theta_hm",
+        "endpoint": "upper",
+        "nroy_index": 802,
+        "pilot_value": 0.07324972678683644,
+        "pilot_pointwise_se": 5.6074464035771926e-06,
+        "fresh_value": 0.07325454953803653,
+        "fresh_pointwise_se": 5.748301088600596e-06
+      },
+      {
+        "image": "Theta_exp",
+        "endpoint": "lower",
+        "nroy_index": 944,
+        "pilot_value": -0.0005709671801974285,
+        "pilot_pointwise_se": 0.0005018382337524699,
+        "fresh_value": 0.00020068792299050606,
+        "fresh_pointwise_se": 0.0004912379669854973
+      },
+      {
+        "image": "Theta_exp",
+        "endpoint": "upper",
+        "nroy_index": 904,
+        "pilot_value": 0.026892538347452834,
+        "pilot_pointwise_se": 0.00025908651987391275,
+        "fresh_value": 0.027273842826509825,
+        "fresh_pointwise_se": 0.0002627894843590408
+      }
     ]
   },
   "findings": {

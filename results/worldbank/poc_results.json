@@ -1,6 +1,6 @@
 {
-  "git_commit": "41cb76e9fbeb931be579836d42cfd9a4cc21a5a1",
-  "ran_at": "2026-10-20T21:10:31.842478+00:00",
+  "git_commit": "7a14420caa99614dc98760c668de8ee1af8262b6",
+  "ran_at": "2026-10-20T21:22:16.643058+00:00",
   "z_source": "worldbank",
   "z": [
     0.8620778439267351,
@@ -78,9 +78,11 @@
     "merged_s0b": false
   },
   "notes": [
+    "The World Bank sensitivity run reproduces a historical F-EMPTY calculation. Its diagonal weights are legacy heuristic cross-entity dispersion terms, not design-based sampling variances or village-level measurement-error variances. The source includes overlapping regional/income aggregates, uses ddof=0 for level dispersion, and uses an asymptotic n-2 correlation convention.",
     "F-EMPTY: no c in the frozen box C has I(c) \u2264 \u03c4. \u03c4 and \u03b4 were not touched. This rejects the pair (kernel, z), not a license to widen the box after seeing the waves.",
     "Closest M vs z is a discrepancy report, not a calibrated world."
   ],
+  "variance_label": "legacy heuristic cross-entity dispersion weights",
   "figures": [
     "figures/worldbank/waves.png",
     "figures/worldbank/empty.png"
