@@ -46,16 +46,19 @@ def row_to_c(row: np.ndarray, names) -> dict:
     return {name: float(v) for name, v in zip(names, row)}
 
 
-def evaluate_thetas(world: World, c: dict, reps: int | None = None) -> dict:
-    """Monte Carlo θ₁, θ₂, τ at one c. Paired reps share the state stream."""
+def evaluate_thetas(world: World, c: dict, reps: int | None = None, offset0: int = 0) -> dict:
+    """Monte Carlo θ₁, θ₂, premium at one c. Paired reps share the state stream.
+
+    Uses stream offsets offset0, ..., offset0 + reps - 1.
+    """
     reps = config.REPS_ESTIMAND if reps is None else reps
     y0 = np.empty(reps)
     y1 = np.empty(reps)
     y2 = np.empty(reps)
-    for r in range(reps):
-        y0[r] = simulate_panel(world, c, "control", r)[0].mean()
-        y1[r] = simulate_panel(world, c, "random", r)[0].mean()
-        y2[r] = simulate_panel(world, c, "degree", r)[0].mean()
+    for j, r in enumerate(range(offset0, offset0 + reps)):
+        y0[j] = simulate_panel(world, c, "control", r)[0].mean()
+        y1[j] = simulate_panel(world, c, "random", r)[0].mean()
+        y2[j] = simulate_panel(world, c, "degree", r)[0].mean()
     t1, t2, prem = thetas_from_means(float(y0.mean()), float(y1.mean()), float(y2.mean()))
     return {
         "theta1": t1,
@@ -303,14 +306,14 @@ def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
     }
 
 
-def evaluate_spill(world: World, c: dict, reps: int | None = None, cut=None) -> dict:
+def evaluate_spill(world: World, c: dict, reps: int | None = None, cut=None, offset0: int = 0) -> dict:
     """MC truth of δ_spill, δ_dir at c under π₁ (oracle Y)."""
     reps = config.REPS_ESTIMAND if reps is None else reps
     cut = config.EXPOSURE_SHARE_CUT if cut is None else cut
     spills = []
     dirs_ = []
     any_merge = False
-    for r in range(reps):
+    for r in range(offset0, offset0 + reps):
         Y, D = simulate_panel(world, c, "random", r)
         d = true_spill_from_panel(world, Y, D, cut=cut)
         spills.append(d["delta_spill"])

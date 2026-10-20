@@ -140,3 +140,15 @@ def test_hand_built_world_uses_supplied_graph():
     w = World.from_arrays(A, X)
     assert w.n == 4
     np.testing.assert_array_equal(w.degrees, np.array([1.0, 2.0, 2.0, 1.0]))
+
+
+def test_evaluate_offset0_default_is_unchanged_and_fresh_block_differs():
+    """offset0 = 0 is the old behaviour bit for bit; another block draws new noise."""
+    from poc_abm.estimand import evaluate_thetas
+    w = World()
+    c = {"alpha": -1.0, "beta": 0.3, "gamma": 0.4, "kappa": 1.0, "sigma_eps": 0.1}
+    a = evaluate_thetas(w, c, reps=3)
+    b = evaluate_thetas(w, c, reps=3, offset0=0)
+    f = evaluate_thetas(w, c, reps=3, offset0=config.RECHECK_OFFSET)
+    assert a == b
+    assert f["theta2"] != a["theta2"]

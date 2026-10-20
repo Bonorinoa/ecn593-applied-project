@@ -32,6 +32,10 @@ def test_planted_run_writes_every_output(monkeypatch, tmp_path):
         assert (tmp_path / fig).exists()
     if payload["finding_hm"] != "F-EMPTY":
         points = json.loads((tmp_path / "results/planted/image_points.json").read_text())
+        rc = saved["endpoint_recheck"]
+        assert rc["stream_offsets"][0] == config.RECHECK_OFFSET
+        assert {(c["image"], c["endpoint"]) for c in rc["candidates"]} == {
+            ("Theta_hm", "lower"), ("Theta_hm", "upper"), ("Theta_exp", "lower"), ("Theta_exp", "upper")}
         assert len(points) == saved["n_theta_sample"]
         for key in ("min_I", "median_I"):
             f = saved["findings"][key]
@@ -45,4 +49,5 @@ def test_worldbank_run_is_f_empty(monkeypatch, tmp_path):
     _tiny(monkeypatch, tmp_path)
     payload = pipeline.run_poc("worldbank")
     assert payload["finding_hm"] == "F-EMPTY"
+    assert payload["variance_label"].startswith("legacy heuristic")
     assert (tmp_path / "figures/worldbank/empty.png").exists()

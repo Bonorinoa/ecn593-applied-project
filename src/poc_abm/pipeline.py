@@ -105,6 +105,15 @@ def run_poc(source: str = "planted") -> dict:
         "spill_star": sp_star,
         "notes": [],
     }
+    if source == "worldbank":
+        payload["variance_label"] = audit["variance_label"]
+        payload["notes"].append(
+            "The World Bank sensitivity run reproduces a historical F-EMPTY calculation. "
+            "Its diagonal weights are legacy heuristic cross-entity dispersion terms, not "
+            "design-based sampling variances or village-level measurement-error variances. "
+            "The source includes overlapping regional/income aggregates, uses ddof=0 for "
+            "level dispersion, and uses an asymptotic n-2 correlation convention."
+        )
     payload["figures"] = []
 
     if hm["finding"] == "F-EMPTY":
@@ -143,13 +152,7 @@ def run_poc(source: str = "planted") -> dict:
     payload["Theta_hm"] = list(Theta_hm)
     payload["Theta_exp"] = list(Theta_exp)
     payload["n_theta_sample"] = len(image_points)
-    # Monte Carlo SE of each endpoint = SE of the point that attains it.
-    payload["image_endpoint_se"] = {
-        "Theta_hm": [image_points[int(np.nanargmin(theta2s))]["se_theta2"],
-                     image_points[int(np.nanargmax(theta2s))]["se_theta2"]],
-        "Theta_exp": [image_points[int(np.nanargmin(spills))]["se_spill"],
-                      image_points[int(np.nanargmax(spills))]["se_spill"]],
-    }
+    payload["endpoint_recheck"] = recheck_extremizers(world, image_points)
     _dump_json(res_dir / "image_points.json", image_points)
 
     worlds = diagnostic_worlds(hm["nroy"], hm["I"])
@@ -187,9 +190,11 @@ def run_poc(source: str = "planted") -> dict:
         }
     payload["findings"] = findings
     payload["notes"].append(
-        "covers_truth is reported, never a stop: a correct 95% interval misses "
-        "the truth 5% of the time. The check on the Foil 2 code is "
-        "scripts/check_foil2_coverage.py (PLAN items 11, 14)."
+        "At each diagnostic point, covers_truth reports whether the displayed interval "
+        "contains the simulator truth. It is a descriptive containment indicator for that "
+        "realized panel, not an estimate of repeated-sampling coverage and not a validity "
+        "gate. Foil 2 is checked separately by the pre-declared repeated-assignment "
+        "calibration in scripts/check_foil2_coverage.py."
     )
     payload["figures"] = draw_figures(_jsonable(payload), image_points, fig_dir)
     _dump(payload, res_dir, source)
@@ -221,6 +226,36 @@ def draw_figures(payload: dict, image_points: list | None, fig_dir: Path) -> lis
             "spill_star": payload["spill_star"]["delta_spill"],
         }
     out.append(_rel(draw_overlay(overlay, fig_dir / "overlay.png")))
+    return out
+
+
+def recheck_extremizers(world: World, image_points: list) -> dict:
+    """Independent recheck of the pilot-selected endpoint candidates.
+
+    The image endpoints are the min and max of 400 noisy estimates, so the
+    estimate at the winning point is biased outward (it won partly on noise).
+    Each distinct winner is re-evaluated with fresh reps on a disjoint stream
+    block. This removes reuse-of-noise bias at those points. It is NOT a
+    confidence interval for the true extrema, and it does not show that the
+    pilot picked the true extremizer (verifier t_1f00fc3b, item 5).
+    """
+    reps = config.REPS_ESTIMAND
+    lo, hi = config.RECHECK_OFFSET, config.RECHECK_OFFSET + reps - 1
+    out = {"reps": reps, "stream_offsets": [lo, hi], "candidates": []}
+    for est, key, se_key in (("Theta_hm", "theta2", "se_theta2"),
+                             ("Theta_exp", "delta_spill", "se_spill")):
+        vals = np.array([p[key] for p in image_points])
+        for end, j in (("lower", int(np.nanargmin(vals))), ("upper", int(np.nanargmax(vals)))):
+            p = image_points[j]
+            if est == "Theta_hm":
+                fresh = evaluate_thetas(world, p["c"], reps=reps, offset0=lo)
+            else:
+                fresh = evaluate_spill(world, p["c"], reps=reps, offset0=lo)
+            out["candidates"].append({
+                "image": est, "endpoint": end, "nroy_index": p["nroy_index"],
+                "pilot_value": p[key], "pilot_pointwise_se": p[se_key],
+                "fresh_value": fresh[key], "fresh_pointwise_se": fresh[se_key],
+            })
     return out
 
 

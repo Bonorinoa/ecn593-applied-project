@@ -11,8 +11,9 @@ Foil 2 (random arm) is the exposure-mapped Hajek spillover contrast with the
 Aronow-Samii variance (estimand.hajek_contrasts). Compared with Theta_exp.
 
 Each interval is judged against its own image (classify_interval) and gets a
-reported covers_truth flag. Neither flag stops the run: the check on the
-Foil 2 code is scripts/check_foil2_coverage.py (PLAN items 11, 14).
+covers_truth flag: a descriptive containment indicator for that one panel, not
+repeated-sampling coverage and not a validity gate. Foil 2 is checked
+separately by scripts/check_foil2_coverage.py (PLAN items 11, 14).
 
 Both foils use the true outcome Y. The measurement layer (m1-m3, admission,
 Theta_cv) is parked; restore from commit ebed7ce (PLAN item 13).
@@ -45,7 +46,7 @@ def classify_interval(interval, image):
 
 
 def covers_truth(ci, truth: float) -> bool:
-    """True iff the simulator's true value lies inside the interval. Reported, never a stop."""
+    """True iff the truth lies inside this one realized interval. Not coverage; never a stop."""
     lo, hi = ci
     return bool(np.isfinite(truth) and lo <= truth <= hi)
 

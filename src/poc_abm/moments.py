@@ -4,7 +4,8 @@ The three simulated moments mirror the three World Bank anchors one-for-one.
 Two sources of z exist:
   planted   : z = M̂(c*) (data/planted.json, written by scripts/plant_z.py). The main run.
   worldbank : z from data/anchors.json (written by scripts/fetch_anchors.py).
-              The archived run; it ends in F-EMPTY.
+              A historical sensitivity run; it ends in F-EMPTY. Its variance
+              terms are legacy heuristic weights (see load_worldbank_z).
 """
 import json
 
@@ -27,14 +28,19 @@ def load_z(source: str = "planted"):
 
 
 def load_worldbank_z(path=None):
-    """z from the World Bank anchor summary, on the scale of the moments.
+    """z from the World Bank anchor summary, and legacy heuristic weights.
 
-    Levels are country means in percent; z uses level / 100. The gradient is a
-    cross-country correlation and is used as is. Sampling variances:
-      levels   : (sd/100)^2 / n   with sd as stored (numpy default, ddof = 0)
-      gradient : (1 - r^2)^2 / (n - 2), the delta-method variance of a correlation
-    These treat the spread across countries as sampling noise in a village
-    target. That is a modelling choice, stated in the docs.
+    z: levels are cross-entity means in percent, used as level / 100; the
+    gradient is a cross-entity correlation, used as is.
+
+    The diagonal terms returned in audit["sampling_variances"] are LEGACY
+    HEURISTIC cross-entity dispersion weights, kept only so the historical
+    F-EMPTY run reproduces exactly (verifier t_1f00fc3b, item 4):
+      levels   : (sd/100)^2 / n, with sd stored at ddof = 0
+      gradient : (1 - r^2)^2 / (n - 2), an asymptotic convention
+    They are not design-based sampling variances and not village-level
+    measurement-error variances. The entity set also includes overlapping
+    regional and income aggregates (the 9-name filter misses about 39 of them).
     """
     path = config.DATA_DIR / "anchors.json" if path is None else path
     raw = json.loads(path.read_text())
@@ -50,7 +56,8 @@ def load_worldbank_z(path=None):
         (1.0 - r ** 2) ** 2 / (a["n_overlap_gradient"] - 2),
         (a["sd_internet"] * config.ANCHOR_LEVEL_SCALE) ** 2 / a["n_internet"],
     ], dtype=float)
-    audit = {"source": "worldbank", "anchors": raw, "sampling_variances": v}
+    audit = {"source": "worldbank", "anchors": raw, "sampling_variances": v,
+             "variance_label": "legacy heuristic cross-entity dispersion weights"}
     return z, audit
 
 

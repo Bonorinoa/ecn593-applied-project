@@ -72,6 +72,10 @@ WAVES = 3
 BOX_INFLATION = 0.20           # next-wave box = NROY bounding box, span widened by 20% (10% per side)
 SINGLETON_SPAN_FRACTION = 0.05 # F-SINGLETON flag: every NROY axis span < 5% of the box span
 THETA_SAMPLE = 400             # NROY points sampled for the images
+# Independent recheck of the points that set each image endpoint (verifier t_1f00fc3b
+# item 5): fresh REPS_ESTIMAND reps on stream offsets RECHECK_OFFSET, RECHECK_OFFSET+1, ...
+# Disjoint from the image reps (0..199), the foil panel (0) and the Foil 2 gate (1,000,000+).
+RECHECK_OFFSET = 100_000
 
 # ---- measurement layer: parked 2026-10-20 (PLAN item 13; restore from ebed7ce) --
 
