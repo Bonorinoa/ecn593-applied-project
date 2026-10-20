@@ -60,8 +60,9 @@ def _write_lock(tag: str) -> Path:
 
 def _git_commit() -> str:
     """HEAD sha, with '+dirty' if tracked files differ from it."""
-    sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=config.ROOT, text=True).strip()
-    dirty = subprocess.run(["git", "diff", "--quiet", "HEAD"], cwd=config.ROOT).returncode != 0
+    repo = Path(__file__).resolve().parents[2]
+    sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
+    dirty = subprocess.run(["git", "diff", "--quiet", "HEAD"], cwd=repo).returncode != 0
     return sha + ("+dirty" if dirty else "")
 
 
@@ -190,7 +191,7 @@ def run_poc(source: str = "planted") -> dict:
             "foil1_vs_Theta_hm": classify_interval(foil1["ci"], Theta_hm),
             "foil1_covers_truth": foils["foil1_covers_truth"],
             "foil1_gap_decomposition": decomp,
-            "foil2_estimate": foil2["spill"],
+            "foil2_estimate": foil2["delta_spill"],
             "foil2_se": foil2["se_spill"],
             "foil2_merged_s0b": foil2["merged_s0b"],
             "foil2_ci": list(foil2["ci_spill"]),
