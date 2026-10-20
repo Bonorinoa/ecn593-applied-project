@@ -57,9 +57,10 @@ def test_planted_z_is_unit_interval_and_has_sampling_variances():
 def test_worldbank_z_is_the_anchor_summary_rescaled_to_the_unit_interval():
     """data/anchors.json holds percentages; z multiplies the two levels by 0.01.
 
-    Sampling variances (the archived F-EMPTY run used exactly these):
-      levels: (sd/100)^2 / n          (variance of a mean; sd as stored)
-      gradient: (1 - r^2)^2 / (n - 2)  (delta-method variance of a correlation)
+    Legacy heuristic cross-entity dispersion weights (NOT sampling variances for a
+    village target; the archived F-EMPTY run used exactly these):
+      levels: (sd/100)^2 / n          (sd as stored, ddof = 0)
+      gradient: (1 - r^2)^2 / (n - 2)  (an asymptotic convention)
     Hand check for immunization: sd 12.2476, n 231 -> 0.122476^2 / 231 = 6.4937e-05.
     """
     z, audit = load_z("worldbank")
