@@ -26,7 +26,7 @@ def draw_overlay(payload: dict, path: Path) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    fig, axes = plt.subplots(2, 2, figsize=(9.5, 5.5), sharex=False)
+    fig, axes = plt.subplots(2, 2, figsize=(9.5, 5.5), sharex="col")
     row_names = (("min_I", r"$c_0^{\min I}$ (best match)"), ("median_I", r"$c_0^{\mathrm{med} I}$"))
     for r, (key, title) in enumerate(row_names):
         w = payload["worlds"][key]
@@ -39,6 +39,7 @@ def draw_overlay(payload: dict, path: Path) -> Path:
         if w.get("theta2_star") is not None:
             ax.plot(w["theta2_star"], 0.35, "k^", markersize=8, label=r"$\theta_2(c^\star)$")
         ax.set_yticks([])
+        ax.set_ylim(-0.4, 1.5)
         ax.set_title(f"{title}  —  policy contrast")
         ax.set_xlabel(r"$\theta_2$")
         if r == 0:
@@ -53,6 +54,7 @@ def draw_overlay(payload: dict, path: Path) -> Path:
         if w.get("spill_star") is not None:
             ax.plot(w["spill_star"], 0.35, "k^", markersize=8, label=r"$\delta_{\mathrm{spill}}(c^\star)$")
         ax.set_yticks([])
+        ax.set_ylim(-0.4, 1.5)
         ax.set_title(f"{title}  —  spillover")
         ax.set_xlabel(r"$\delta_{\mathrm{spill}}$")
         if r == 0:
@@ -94,11 +96,12 @@ def draw_empty(info: dict, path: Path) -> Path:
     ax.axhline(tau, color="#54A24B", lw=2, label=fr"$\tau = {tau:.3f}$")
     ax.plot([0, 1, 2], [stats["min"], stats["median"], stats["max"]], "o-", color="#E45756")
     ax.set_xticks([0, 1, 2], ["min I", "median I", "max I"])
-    ax.set_ylabel("implausibility I(c)")
+    ax.set_yscale("log")
+    ax.set_ylabel("implausibility I(c) (log scale)")
     ax.set_title("wave-1 I(c) vs frozen τ  (F-EMPTY)")
     ax.legend(frameon=False, fontsize=8)
 
-    fig.suptitle("F-EMPTY: no calibration in C is not-ruled-out  (τ not loosened)", fontsize=11)
+    fig.suptitle("F-EMPTY: every point in C is ruled out  (τ not loosened)", fontsize=11)
     fig.tight_layout()
     fig.savefig(path, dpi=140)
     plt.close(fig)
@@ -165,7 +168,9 @@ def draw_image_points(points: list, Theta_hm, Theta_exp, path: Path) -> Path:
             ax.axhline(v, color="k", lw=0.8, ls="--")
         ax.set_xlabel("$I(c)$")
         ax.set_ylabel(name)
-        ax.set_title(f"{name} over {len(points)} NROY points (±1.96 MC SE)")
+        tiny = bool(np.nanmax(1.96 * se) < 0.005 * (np.nanmax(y) - np.nanmin(y)))
+        note = "; bars smaller than the dots" if tiny else ""
+        ax.set_title(f"{name}, {len(points)} NROY points (±1.96 MC SE{note})", fontsize=10)
         ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
     fig.savefig(path, dpi=140)

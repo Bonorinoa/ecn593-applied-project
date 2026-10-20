@@ -105,8 +105,7 @@ def run_poc(source: str = "planted") -> dict:
         "spill_star": sp_star,
         "notes": [],
     }
-    payload["figures"] = [_rel(draw_waves(hm["wave_kept"], hm["wave_I_stats"], tau, source,
-                                          fig_dir / "waves.png"))]
+    payload["figures"] = []
 
     if hm["finding"] == "F-EMPTY":
         payload["notes"].append(
@@ -117,16 +116,7 @@ def run_poc(source: str = "planted") -> dict:
         payload["notes"].append(
             "Closest M vs z is a discrepancy report, not a calibrated world."
         )
-        fig = draw_empty(
-            {
-                "z": z.tolist(),
-                "tau": tau,
-                "closest": hm["closest"],
-                "wave_I_stats": hm["wave_I_stats"],
-            },
-            fig_dir / "empty.png",
-        )
-        payload["figures"].append(_rel(fig))
+        payload["figures"] = draw_figures(payload, None, fig_dir)
         _dump(payload, res_dir, source)
         return payload
 
@@ -161,11 +151,8 @@ def run_poc(source: str = "planted") -> dict:
                       image_points[int(np.nanargmax(spills))]["se_spill"]],
     }
     _dump_json(res_dir / "image_points.json", image_points)
-    payload["figures"].append(_rel(draw_image_points(image_points, Theta_hm, Theta_exp,
-                                                     fig_dir / "image_points.png")))
 
     worlds = diagnostic_worlds(hm["nroy"], hm["I"])
-    overlay = {"worlds": {}}
     findings = {}
     for key in ("min_I", "median_I"):
         row = worlds[key]["c_row"]
@@ -198,26 +185,43 @@ def run_poc(source: str = "planted") -> dict:
             "foil2_vs_Theta_exp": classify_interval(foil2["ci_spill"], Theta_exp),
             "foil2_covers_truth": foils["foil2_covers_truth"],
         }
-        overlay["worlds"][key] = {
-            "Theta_hm": Theta_hm,
-            "Theta_exp": Theta_exp,
-            "theta2_true": th["theta2"],
-            "spill_true": sp["delta_spill"],
-            "foil1_ci": foil1["ci"],
-            "foil1_label": "Foil 1: (k/N) x OLS-HC1",
-            "foil2_ci": foil2["ci_spill"],
-            "theta2_star": th_star["theta2"],
-            "spill_star": sp_star["delta_spill"],
-        }
     payload["findings"] = findings
     payload["notes"].append(
         "covers_truth is reported, never a stop: a correct 95% interval misses "
         "the truth 5% of the time. The check on the Foil 2 code is "
         "scripts/check_foil2_coverage.py (PLAN items 11, 14)."
     )
-    payload["figures"].append(_rel(draw_overlay(overlay, fig_dir / "overlay.png")))
+    payload["figures"] = draw_figures(_jsonable(payload), image_points, fig_dir)
     _dump(payload, res_dir, source)
     return payload
+
+
+def draw_figures(payload: dict, image_points: list | None, fig_dir: Path) -> list:
+    """Every figure of a run, built only from saved results. Used by the pipeline
+    and by scripts/draw_figures.py, so a figure never needs a rerun to be redrawn."""
+    out = [_rel(draw_waves(payload["wave_kept"], payload["wave_I_stats"], payload["tau"],
+                           payload["z_source"], fig_dir / "waves.png"))]
+    if payload["finding_hm"] == "F-EMPTY":
+        info = {k: payload[k] for k in ("z", "tau", "closest", "wave_I_stats")}
+        out.append(_rel(draw_empty(info, fig_dir / "empty.png")))
+        return out
+    out.append(_rel(draw_image_points(image_points, payload["Theta_hm"], payload["Theta_exp"],
+                                      fig_dir / "image_points.png")))
+    overlay = {"worlds": {}}
+    for key, f in payload["findings"].items():
+        overlay["worlds"][key] = {
+            "Theta_hm": payload["Theta_hm"],
+            "Theta_exp": payload["Theta_exp"],
+            "theta2_true": f["theta2_true"],
+            "spill_true": f["spill_true"],
+            "foil1_ci": f["foil1_ci"],
+            "foil1_label": r"Foil 1: $(k/N)\times$OLS-HC1",
+            "foil2_ci": f["foil2_ci"],
+            "theta2_star": payload["theta_star"]["theta2"],
+            "spill_star": payload["spill_star"]["delta_spill"],
+        }
+    out.append(_rel(draw_overlay(overlay, fig_dir / "overlay.png")))
+    return out
 
 
 def _rel(path: Path) -> str:
