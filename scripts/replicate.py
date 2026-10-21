@@ -37,10 +37,12 @@ RUN_STAMPS = {"ran_at", "git_commit"}   # fields that differ on every run by des
 
 
 def step(n, name, cmd, cwd=ROOT):
-    print(f"[{n}/9] {name:<16} {' '.join(str(c) for c in cmd)}", flush=True)
+    shown = " ".join("python" if c == PY else str(c) for c in cmd)
+    print(f"[{n}/9] {name:<16} {shown}", flush=True)
     t0 = time.time()
     proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
-    last = (proc.stdout.strip().splitlines() or [""])[-1]
+    lines = [l for l in proc.stdout.strip().splitlines() if l.strip() not in "{}[]"]
+    last = lines[-1] if lines else ""
     print(f"      {'ok' if proc.returncode == 0 else 'FAILED'} in {time.time() - t0:.0f} s   {last[:100]}", flush=True)
     if proc.returncode != 0:
         print(proc.stdout[-3000:], proc.stderr[-3000:], sep="\n")

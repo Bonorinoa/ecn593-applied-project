@@ -1,6 +1,6 @@
 # Specification
 
-This document describes the code in this repo, on the branch `main`. If the document and the code disagree, the code is what ran, and the document has an error. The code is law. Main-pipeline constants are in `src/poc_abm/config.py`. The Foil 2 check defines its check-specific constants in `scripts/check_foil2_coverage.py`. Run outputs below come from the committed results in `results/`. Run constants come from the cited code. Paths are relative to the repo root. Code identifiers appear in code font.
+This document describes the code in this repo, on the branch `main`. If the document and the code disagree, the code is what ran, and the document has an error. The code is law. Every exogenous parameter is in `config/world.toml` (the simulated village and the policy question) or `config/design.toml` (the analyst's choices, including the Foil 2 check in section `[foil2_check]`). `src/poc_abm/config.py` loads them and states two derived rules: `EDGE_P` = `edge_rate` / N, and c* = the center of C. Endogenous quantities are never in config. Run outputs below come from the committed results in `results/`. Run constants come from the cited code. Paths are relative to the repo root. Code identifiers appear in code font.
 
 Sections 1 to 5 cover the model, the targets, the images and foils, the non-claims, and the World Bank run. Section 6 lists the outputs of each script and the environment.
 
@@ -354,10 +354,13 @@ Required note:
 | `python scripts/run_poc.py planted` | `data/planted.json` | `results/planted/poc_results.json`, `results/planted/image_points.json`, `figures/planted/waves.png`, `figures/planted/image_points.png`, `figures/planted/overlay.png`, `locks/freeze-planted.txt` |
 | `python scripts/run_poc.py worldbank` | the stored World Bank file in `data/` | `results/worldbank/poc_results.json`, `figures/worldbank/waves.png`, `figures/worldbank/empty.png`, `locks/freeze-worldbank.txt` |
 | `python scripts/check_foil2_coverage.py` | `results/planted/poc_results.json` | `results/checks/foil2_coverage.json` |
+| `python scripts/replicate.py [--quick]` | everything below | all the outputs below, then a report comparing each result file with git HEAD. `--quick` skips the Foil 2 check. |
+| `python scripts/sync_writeup_figures.py` | `figures/` | `writeup/figures/` (byte copies of the four paper figures) |
+| `python scripts/write_numbers.py` | `config/`, `results/`, the drawn graph | `writeup/numbers.tex` (every number in the paper, as a LaTeX macro) |
 | `python scripts/draw_figures.py planted` | `results/planted/poc_results.json`, `results/planted/image_points.json` | the figures of that run. It runs no simulation. |
 
 The file `poc_results.json` has these keys: `git_commit`, `ran_at`, `z_source`, `z`, `z_names`, `sampling_variances`, `delta`, `tau`, `finding_hm`, `wave_kept`, `wave_I_stats`, `closest`, `n_nroy`, `param_names`, `c_star`, `theta_star`, `spill_star`, `notes` and `figures`. The planted run adds `Theta_hm`, `Theta_exp`, `n_theta_sample`, `endpoint_recheck` and `findings` (the keys `min_I` and `median_I`). The World Bank run adds `variance_label`. The key `git_commit` is the HEAD hash of the code, with `+dirty` if `src/`, `scripts/`, `data/` or the requirements files differ from it.
 
 The planted run also stores `theta_star` and `spill_star`, the truth at $c^*$: theta1 = 0.03631, theta2 = 0.03826, premium = 0.00195, and delta_spill = 0.00792.
 
-The pins are Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2. The pipeline calls `uv pip freeze` to write `locks/freeze-*.txt`, so `uv` must be on the path. The tests are in `tests/`. There are 51 of them.
+The pins are Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2. The pipeline calls `uv pip freeze` to write `locks/freeze-*.txt`, so `uv` must be on the path. The tests are in `tests/`. There are 52 of them.

@@ -55,23 +55,35 @@ Foil 2 calibration check: the nominal 95% interval covered 93.4% of assignments 
 
 ## How to replicate
 
+One-time setup, then one command:
+
 ```bash
 uv venv .venv --python 3.11
-source .venv/bin/activate
-uv pip install -r requirements.txt -r requirements-dev.txt
-pytest tests -q                                  # 51 tests, about 20 s on a fresh install
+uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt
+.venv/bin/python scripts/replicate.py            # everything, about 1-2 hours
+.venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check, about 5-8 minutes
+```
+
+`replicate.py` runs the tests, checks z, runs both pipelines and the Foil 2 check, copies the figures into `writeup/`, writes the paper's numbers (`writeup/numbers.tex`), and builds the PDF. It ends with a report that compares every result file with the committed one. The paper types no result: every number in it is a macro from `numbers.tex`. The PDF build needs TeX Live with `latexmk`; without it, upload `writeup/` to Overleaf.
+
+The steps, one at a time:
+
+```bash
 python scripts/plant_z.py                        # check: data/planted.json reproduces byte for byte
 python scripts/run_poc.py planted                # main run -> results/planted/, figures/planted/
 python scripts/run_poc.py worldbank              # historical run -> results/worldbank/ (F-EMPTY)
 python scripts/check_foil2_coverage.py           # Foil 2 calibration check -> results/checks/foil2_coverage.json
 python scripts/draw_figures.py planted           # redraw figures from saved results (no simulation)
+python scripts/sync_writeup_figures.py           # copy the figures into writeup/figures/
+python scripts/write_numbers.py                  # write writeup/numbers.tex from config/ and results/
 ```
 
 Measured runtimes on an Apple-silicon laptop, from a fresh clone:
 
 - `pytest tests -q` takes about 20 s.
 - `run_poc.py worldbank` takes 33 s.
-- `run_poc.py planted` takes 270 s (about 4.5 min).
+- `run_poc.py planted` takes 270-400 s (about 4.5-7 min, depending on machine load).
+- `replicate.py --quick` took 454 s in total.
 - `check_foil2_coverage.py` takes about 1–2 hours.
 
 A fresh clone gave the committed results. Every result field matches the earlier run except `ran_at` and `git_commit`. The files `image_points.json` and `overlay.png` are byte-identical. A rerun reproduces every number, because every random stream is seeded.
@@ -82,14 +94,15 @@ Two cautions. `run_poc.py` calls `uv` and overwrites the committed results, figu
 
 ## Repository layout
 
-- `src/poc_abm/`: the code. The kernel, the moments, history matching, the estimands, the foils, the pipeline and the figures. Main-pipeline constants are in `config.py`. The Foil 2 check defines its check-specific constants in that script.
-- `scripts/`: the four scripts used above, plus the World Bank fetcher.
-- `tests/`: 51 tests. Most of them check hand-computed examples.
+- `config/`: every exogenous parameter, chosen before any run. `world.toml` is the simulated village and the policy question. `design.toml` is the analyst's choices, including the Foil 2 check. Endogenous quantities are never in config: they live in `data/planted.json` and `results/`.
+- `src/poc_abm/`: the code. The kernel, the moments, history matching, the estimands, the foils, the pipeline and the figures. `config.py` only loads the two TOML files.
+- `scripts/`: `replicate.py` and the steps it runs, plus `draw_figures.py` and the World Bank fetcher.
+- `tests/`: 52 tests. Most of them check hand-computed examples.
 - `data/`: the targets z (`planted.json`) and the stored inputs of the World Bank run.
 - `results/`: the committed JSON of each run, and the Foil 2 calibration check.
 - `figures/`: the figures of each run (`planted/` and `worldbank/`).
 - `locks/`: the frozen package list of each run.
-- `writeup/`: the paper as a self-contained Overleaf project: `main.tex`, `cover.tex`, `latexmkrc` (XeLaTeX), figure copies and the compiled `main.pdf`. Run `scripts/sync_writeup_figures.py` after redrawing figures. A test checks that the copies match.
+- `writeup/`: the paper as a self-contained Overleaf project: `main.tex`, `cover.tex`, `numbers.tex` (generated), `latexmkrc` (XeLaTeX, reproducible PDF), figure copies and the compiled `main.pdf`. Tests check that the figure copies and `numbers.tex` match the results.
 
 `SPECIFICATION.md` describes the code in detail. If the two disagree, the code is what ran.
 
