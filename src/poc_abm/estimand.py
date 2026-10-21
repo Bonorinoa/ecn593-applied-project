@@ -207,20 +207,35 @@ def exposure_mc(world: World, k_treat: int, cut: float, merged: bool, draws=None
 
 
 _EXPOSURE_MC_CACHE: dict = {}
+_EXPOSURE_PROBS_CACHE: dict = {}
+
+
+def _graph_key(world: World) -> str:
+    """Hash of the adjacency CONTENTS, so a changed graph (or a reused object id)
+    can never receive another graph's probabilities."""
+    return hashlib.sha256(np.ascontiguousarray(world.adjacency, dtype=float).tobytes()).hexdigest()
 
 
 def _exposure_mc_cached(world: World, k_treat: int, cut: float, merged: bool) -> dict:
-    """The design depends only on the graph, k, the cut and the merge; compute it once.
-
-    The key hashes the adjacency CONTENTS, so a changed graph (or a reused
-    object id) can never receive another graph's probabilities.
-    """
-    graph = hashlib.sha256(np.ascontiguousarray(world.adjacency, dtype=float).tobytes()).hexdigest()
-    key = (graph, world.n, k_treat, float(cut), bool(merged),
+    """The joint probabilities depend only on the graph, k, the cut and the merge; compute them once."""
+    key = (_graph_key(world), world.n, k_treat, float(cut), bool(merged),
            config.EXPOSURE_MC_DRAWS, config.SEED_FOIL2_MC)
     if key not in _EXPOSURE_MC_CACHE:
         _EXPOSURE_MC_CACHE[key] = exposure_mc(world, k_treat, cut, merged)
     return _EXPOSURE_MC_CACHE[key]
+
+
+def _exposure_probs_cached(world: World, k_treat: int, cut: float) -> dict:
+    """The first-order probabilities depend only on the graph, k and the cut; compute them once.
+
+    Exact (hypergeometric), so caching changes no number, only the runtime:
+    without it the Foil 2 check recomputed the same 800 distributions on every
+    one of its ~11,500 calls. Callers must not modify the returned arrays.
+    """
+    key = (_graph_key(world), world.n, k_treat, float(cut))
+    if key not in _EXPOSURE_PROBS_CACHE:
+        _EXPOSURE_PROBS_CACHE[key] = exposure_probs(world, k_treat, cut)
+    return _EXPOSURE_PROBS_CACHE[key]
 
 
 def ht_cov(a_k, a_l, p_k, p_l, pi_kl, same: bool) -> float:
@@ -264,7 +279,7 @@ def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
     lab = stratum_labels(D, s, cut)
     lab, merged = maybe_merge_s0b(lab, min_n)
     k = n_treated(world.n)
-    p = exposure_probs(world, k, cut)
+    p = _exposure_probs_cached(world, k, cut)
     if merged:
         # S0b probability mass travels with the merge
         p = dict(p)
