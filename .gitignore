@@ -11,6 +11,9 @@ writeup/*.aux
 writeup/*.log
 writeup/*.out
 writeup/*.toc
+writeup/*.fdb_latexmk
+writeup/*.fls
+writeup/*.xdv
 
 # --- model weights & raw data (never commit: large, and re-downloads may differ) ---
 # Small deliberate fixtures stay tracked (a few-KB anchor table, a test shard).

@@ -27,7 +27,7 @@ def draw_overlay(payload: dict, path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
 
     fig, axes = plt.subplots(2, 2, figsize=(9.5, 5.5), sharex="col")
-    row_names = (("min_I", r"$c_0^{\min I}$ (best match)"), ("median_I", r"$c_0^{\mathrm{med} I}$"))
+    row_names = (("min_I", "min-I point"), ("median_I", "median-I point"))
     for r, (key, title) in enumerate(row_names):
         w = payload["worlds"][key]
         # left: policy
@@ -60,7 +60,7 @@ def draw_overlay(payload: dict, path: Path) -> Path:
         if r == 0:
             ax.legend(loc="upper right", fontsize=8, frameon=False)
 
-    fig.suptitle("Not-ruled-out images vs one-world intervals  (two pre-declared $c_0$)", fontsize=11)
+    fig.suptitle("Images over NROY (bands) vs one-world foil intervals (lines), at two diagnostic points", fontsize=10.5)
     fig.tight_layout()
     fig.savefig(path, dpi=140)
     plt.close(fig)
