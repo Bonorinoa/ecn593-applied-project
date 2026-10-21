@@ -1,0 +1,41 @@
+# THE WORLD: the simulated village and the policy question.
+#
+# Everything here is EXOGENOUS: we choose it before any run. Nothing in this
+# file is computed by the model. The endogenous quantities (the targets z, the
+# NROY points, the images, the foil intervals, the verdicts) are computed by
+# the code and live only in data/planted.json and results/.
+# Loaded by src/poc_abm/config.py, which also states the two derived rules
+# (EDGE_P and the planted point c*).
+
+[population]
+n_agents = 800
+# Edge rule (kernel.World): draw A_ij ~ Bernoulli(EDGE_P) for every ordered
+# pair, then symmetrize A | A.T. EDGE_P = edge_rate / n_agents = 0.005, so
+# P(i~j) = 1 - (1 - EDGE_P)^2 and the expected degree is about 7.97
+# (measured on the drawn graph: 8.085).
+edge_rate = 4.0
+n_covariates = 3                 # literacy, resources, baseline propensity
+
+[dynamics]
+horizon = 20                     # T
+intervention_time = 0            # t*
+# eta: fixed weights on the covariates (literacy, resources, baseline propensity)
+eta_fixed = [0.05, 0.10, 0.02]
+
+# The parameter box C: the class of kernels {f(.; c) : c in C}.
+# The order of the rows is the order of the Latin-hypercube axes.
+# The planted point c* is the center of C (computed in config.py).
+[param_box]
+alpha     = [-2.5, -0.5]
+beta      = [0.05, 0.60]
+gamma     = [0.05, 0.80]
+kappa     = [0.25, 2.50]
+sigma_eps = [0.01, 0.40]
+
+[policy]
+# k = ceil(seed_fraction * N) people are seeded in the random and degree arms.
+seed_fraction = 0.10
+
+[seeds]
+graph = 20260812                 # the one drawn graph
+covariates = 20260813            # the one drawn X

@@ -61,13 +61,13 @@ def _write_lock(tag: str) -> Path:
 def _git_commit() -> str:
     """HEAD sha, with '+dirty' if code or inputs differ from it.
 
-    Only src/, scripts/, data/ and requirements*.txt count. Outputs (results/,
-    figures/, locks/) are ignored, so running one source after another does
-    not mark the second run dirty.
+    Only config/, src/, scripts/, data/ and requirements*.txt count. Outputs
+    (results/, figures/, locks/, writeup/) are ignored, so running one source
+    after another does not mark the second run dirty.
     """
     repo = Path(__file__).resolve().parents[2]
     sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
-    paths = ["src", "scripts", "data", "requirements.txt", "requirements-dev.txt"]
+    paths = ["config", "src", "scripts", "data", "requirements.txt", "requirements-dev.txt"]
     dirty = subprocess.run(["git", "diff", "--quiet", "HEAD", "--", *paths], cwd=repo).returncode != 0
     return sha + ("+dirty" if dirty else "")
 

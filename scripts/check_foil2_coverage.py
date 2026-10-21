@@ -45,12 +45,14 @@ from poc_abm.estimand import (  # noqa: E402
 )
 from poc_abm.kernel import World, assign, logistic, simulate_panel, stream_seed  # noqa: E402
 
-R = 200            # kernel panels per point (reported result)
-R_DESIGN = 300     # assignment-only redraws per point (reported result)
-R_GATE = 10_000    # map-consistent assignments for the gate
-GATE_SEED = 1_000_000  # fresh block, declared before first use (PLAN item 11)
-GATE_EFFECT_S1, GATE_EFFECT_S0C = 0.05, 0.03
-BOOT_REPS, BOOT_SEED = 1_000, 20261020
+# The check's constants are in config/design.toml, section [foil2_check].
+_check = config.FOIL2_CHECK
+R = _check["kernel_panels"]                  # kernel panels per point (reported result)
+R_DESIGN = _check["design_redraws"]          # assignment-only redraws per point (reported result)
+R_GATE = _check["gate_assignments"]          # map-consistent assignments for the gate
+GATE_SEED = _check["gate_seed"]              # fresh seed block, declared before first use (PLAN item 11)
+GATE_EFFECT_S1, GATE_EFFECT_S0C = _check["gate_effect_s1"], _check["gate_effect_s0c"]
+BOOT_REPS, BOOT_SEED = _check["bootstrap_reps"], _check["bootstrap_seed"]
 
 
 def _design_panel(world, c, state_offset, assign_seed):
