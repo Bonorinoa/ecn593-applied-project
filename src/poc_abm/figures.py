@@ -84,7 +84,7 @@ def draw_empty(info: dict, path: Path) -> Path:
     ax = axes[0]
     x = np.arange(3)
     ax.scatter(x, z, marker="D", s=50, color="#4C78A8", label="anchor z (rescaled)")
-    ax.scatter(x, m, marker="o", s=50, color="#E45756", label="closest M(c) in C")
+    ax.scatter(x, m, marker="o", s=50, color="#E45756", label="closest sampled M(c)")
     ax.set_xticks(x, names)
     ax.set_ylim(0, 1)
     ax.set_ylabel("moment (unit interval)")
@@ -101,7 +101,7 @@ def draw_empty(info: dict, path: Path) -> Path:
     ax.set_title("wave-1 I(c) vs frozen τ  (F-EMPTY)")
     ax.legend(frameon=False, fontsize=8)
 
-    fig.suptitle("F-EMPTY: every point in C is ruled out  (τ not loosened)", fontsize=11)
+    fig.suptitle("F-EMPTY: all sampled wave-1 points are ruled out  (τ not loosened)", fontsize=11)
     fig.tight_layout()
     fig.savefig(path, dpi=140)
     plt.close(fig)
