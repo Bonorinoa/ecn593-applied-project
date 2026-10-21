@@ -1,7 +1,7 @@
 """Replicate every result and the paper with one command.
 
 Usage, from the repo root (after the one-time setup in README.md):
-    .venv/bin/python scripts/replicate.py           # full: about 1-2 hours
+    .venv/bin/python scripts/replicate.py           # full: about 13 minutes
     .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check: about 8 minutes
 
 Steps, in order. The script stops at the first step that fails.

@@ -60,7 +60,7 @@ One-time setup, then one command:
 ```bash
 uv venv .venv --python 3.11
 uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt
-.venv/bin/python scripts/replicate.py            # everything, about 1-2 hours
+.venv/bin/python scripts/replicate.py            # everything, about 13 minutes
 .venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check, about 5-8 minutes
 ```
 
@@ -80,11 +80,10 @@ python scripts/write_numbers.py                  # write writeup/numbers.tex fro
 
 Measured runtimes on an Apple-silicon laptop, from a fresh clone:
 
-- `pytest tests -q` takes about 20 s.
-- `run_poc.py worldbank` takes 33 s.
-- `run_poc.py planted` takes 270-400 s (about 4.5-7 min, depending on machine load).
-- `replicate.py --quick` took 454 s in one run (about 8 minutes).
-- `check_foil2_coverage.py` takes about 1–2 hours.
+- The full `replicate.py`, from a fresh clone at commit `c075b5a`, took 787 s (about 13 minutes): tests 27 s, World Bank run 44 s, planted run 362 s, Foil 2 check 350 s, the paper steps under 5 s.
+- The planted run varies with machine load: 270-400 s in our runs.
+- `replicate.py --quick` skips the Foil 2 check and takes about 7-8 minutes.
+- Before commit `c075b5a` cached its exposure probabilities, the Foil 2 check took about 52 minutes. The results are identical.
 
 A fresh clone gave the committed results. Every result field matches the earlier run except `ran_at` and `git_commit`. The files `image_points.json` and `overlay.png` are byte-identical. A rerun reproduces every number, because every random stream is seeded.
 
