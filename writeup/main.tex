@@ -37,6 +37,8 @@
 \usepackage[hidelinks]{hyperref}
 
 \graphicspath{{figures/}}
+% Every result number is a macro from numbers.tex (scripts/write_numbers.py).
+\input{numbers}
 
 \definecolor{ink}{HTML}{111111}
 \definecolor{rule}{HTML}{222222}
@@ -103,8 +105,8 @@ inside the image and misses the truth. The analyst who models exposure
 passes the predeclared average-variance gate, but its interval is wide
 and gets no robust verdict.
 
-The model is a village of 800 people on a fixed random graph. Each
-person has a preventive-behavior level in $(0,1)$. A campaign seeds 10\%
+The model is a village of \NAgents{} people on a fixed random graph. Each
+person has a preventive-behavior level in $(0,1)$. A campaign seeds \SeedSharePct\%
 of the people. Section~\ref{sec:results} gives the numbers.
 
 %----------------------------------------------------------------
@@ -157,7 +159,7 @@ One run of the kernel gives one panel,
   \bigl\{(Y_{iT},\,D_i,\,X_i,\,A_{i\cdot})\bigr\}_{i=1}^{N}.
 \end{equation}
 A parameter point is not a panel. One panel is one draw of $\omega$.
-The kernel truth $\theta(c)$ uses $R=200$ paired reps. A one-world
+The kernel truth $\theta(c)$ uses $R=\RepsEstimand$ paired reps. A one-world
 analyst sees one panel.
 
 \paragraph{Box.}
@@ -180,11 +182,11 @@ estimands:
   &= \theta_2(c)-\theta_1(c)
   \quad\text{(the premium)}.
 \end{align}
-The arm $\pi_0$ seeds no one (control). The arm $\pi_1$ seeds 80 people
-at random (random arm). The arm $\pi_2$ seeds the 80 people with the
+The arm $\pi_0$ seeds no one (control). The arm $\pi_1$ seeds \KSeeded{} people
+at random (random arm). The arm $\pi_2$ seeds the \KSeeded{} people with the
 highest degree (degree arm). The expectation is over simulation noise
 and over the random assignment in $\pi_1$. The code replaces each
-expectation with a mean over 200 paired reps. We define $\theta$ on the
+expectation with a mean over \RepsEstimand{} paired reps. We define $\theta$ on the
 terminal mean $\bar Y_T$, not on the path.
 
 Two exposure contrasts, $\dspill(c)$ and $\ddir(c)$, are defined with
@@ -228,7 +230,7 @@ posterior.
   \Theta_{\expset}
   &= \{\dspill(c):c\in\mathcal S\},
 \end{align}
-where $\mathcal S$ is a declared uniform sample of 400 NROY points. The
+where $\mathcal S$ is a declared uniform sample of \ThetaSample{} NROY points. The
 code reports each image as the range $[L,U]$ over $\mathcal S$: the
 declared empirical image. The range is not a distribution. Different NROY
 points can give different values of $\theta_2$, but they need not.
@@ -305,7 +307,7 @@ The order matters. If $\theta$ decides which $c$ to keep, the image is a fit, no
         the kept points. NROY is the union of the kept points.
         An empty NROY is a finding: the pair $(f,z)$ is rejected.
         Never move $\tau$ or $\delta$.
-  \item Leg~A. Sample 400 NROY points. Compute $\theta_2(c)$ and
+  \item Leg~A. Sample \ThetaSample{} NROY points. Compute $\theta_2(c)$ and
         $\dspill(c)$ at each. Report $\Theta_{\hm}$ and
         $\Theta_{\expset}$ as ranges. Evaluate the endpoint candidates
         again with fresh reps.
@@ -341,7 +343,7 @@ The order matters. If $\theta$ decides which $c$ to keep, the image is a fit, no
     {\textbf{4~~Leg A: image}\\[0.25em]
      $\Theta_{\hm}=\{\theta_2(c)\}$\\
      $\Theta_{\expset}=\{\dspill(c)\}$\\
-     over 400 NROY points\\
+     over \ThetaSample{} NROY points\\
      endpoint recheck};
   \node[col] (B) at (3.35,-4.55)
     {\textbf{5~~Leg B: one-world analysts}\\[0.25em]
@@ -375,13 +377,13 @@ run. The later Foil~1 rescaling is post hoc and is disclosed in the
 results.
 
 \subsection{Threshold \texorpdfstring{$\tau$}{tau}}
-The code uses the 0.95 quantile of $\chi^2$ with three degrees of
-freedom, $\tau=7.8147$, as its design threshold. This choice does not
+The code uses the \Confidence{} quantile of $\chi^2$ with three degrees of
+freedom, $\tau=\Tau$, as its design threshold. This choice does not
 assert that the implemented $I(c)$ has an exact $\chi^2$ sampling law
-or define a credible region. It is a rule for ruling out. If we move $\tau$ after we see NROY, a filter becomes a fit. The same level, 95\%, sets both foil intervals.
+or define a credible region. It is a rule for ruling out. If we move $\tau$ after we see NROY, a filter becomes a fit. The same level, \ConfidencePct\%, sets both foil intervals.
 
 \subsection{Discrepancy \texorpdfstring{$\delta$}{delta}}
-The code adds the fixed discrepancy $\delta=(0.02,0.05,0.02)$ to $V$.
+The code adds the fixed discrepancy $\delta=(\DeltaOne,\DeltaTwo,\DeltaThree)$ to $V$.
 In this planted exercise it is a design tolerance, not an estimated
 model-error variance. With external targets, the same slot is the
 allowance for a model that is not the world. If we loosen $\delta$ after a wave, it is the same error as moving $\tau$.
@@ -392,9 +394,9 @@ box on purpose. The project is about interference. A world without interference 
 
 \subsection{How \texorpdfstring{$c$}{c} is drawn}
 No one picks a favorite parameter point by looking at $\theta$. Wave~1
-is a Latin hypercube of 1000 points in $C$. The code keeps each point
-with $I(c)\le\tau$. Waves 2 and 3 draw 1000 new points in the bounding
-box of the points kept in the previous wave. The box widens by 20\% of
+is a Latin hypercube of \WavePoints{} points in $C$. The code keeps each point
+with $I(c)\le\tau$. Waves 2 and 3 draw \WavePoints{} new points in the bounding
+box of the points kept in the previous wave. The box widens by \BoxInflationPct\% of
 its span and is clipped to $C$. There is no emulator: the code
 simulates every point. NROY is the \emph{union} of the kept points over
 all waves. The planted point $c^\star$ is the center of $C$. We chose
@@ -402,7 +404,7 @@ it without looking at $\theta$.
 
 \subsection{Targets \texorpdfstring{$z$}{z}}
 \label{sec:zcontrol}
-The targets are planted: $z:=\widehat M(c^\star)$, with 200 reps and
+The targets are planted: $z:=\widehat M(c^\star)$, with \RepsZ{} reps and
 its Monte Carlo variances. The file \texttt{data/planted.json} stores
 them. Planting supplies a known benchmark and makes a match plausible. It
 does not guarantee that a finite Latin-hypercube search keeps a point.
@@ -423,12 +425,12 @@ slot (legacy name) & definition & arm \\
 \bottomrule
 \end{tabular}
 \end{center}
-The moments use $R_m=30$ paired reps and run two arms, not three. The
+The moments use $R_m=\RepsMoment$ paired reps and run two arms, not three. The
 control arm is not simulated for the moments. So $\theta_2$, a
 contrast against control, is not a moment that the code matches. The
 code uses fewer reps for the moments than for the estimands because
 the search must be cheap. The estimands are computed only for kept
-points. The targets and estimands each use 200 reps. Equal replication counts
+points. The targets and estimands each use \RepsEstimand{} reps. Equal replication counts
 do not imply equal Monte Carlo precision across these different
 statistics.
 
@@ -436,7 +438,7 @@ statistics.
 The min-I point is the closest match in NROY. The median-I point is the
 point at position $\lfloor |\NROY|/2\rfloor$ in the order of $I$.
 Both depend on moment fit, not on the estimand. We use two points, not
-400. Running an analyst at every kept point gives the analyst the calibration set. Default practice does not do that.
+\ThetaSample. Running an analyst at every kept point gives the analyst the calibration set. Default practice does not do that.
 
 \subsection{Foils}
 \label{sec:design}
@@ -455,7 +457,7 @@ $D$ is $\hat\beta$. The standard error is HC1:
 The interval for $\hat\beta$ is $\hat\beta\pm1.96\,\mathrm{SE}$. On the
 degree arm, $D$ is ``being a top-degree person.'' The SUTVA analyst
 turns $\hat\beta$ into a policy estimate for the whole village,
-$(k/N)\hat\beta$, with $k/N=0.1$. The interval scales the same way.
+$(k/N)\hat\beta$, with $k/N=\SeedShare$. The interval scales the same way.
 We call it $\Jone$. We compare $\Jone$ with $\Theta_{\hm}$. The scaling
 by a known positive constant keeps the analyst's own coverage
 statement. It does not repair the analyst's assumptions.
@@ -473,12 +475,12 @@ isolated person has $k_i=1$ and $s_i=0$. The code defines four strata:
 \begin{align*}
   S_1  &= \{i:D_i=1\}, \\
   S_{0a} &= \{i:D_i=0,\; s_i=0\}, \\
-  S_{0b} &= \{i:D_i=0,\; 0<s_i<0.25\}, \\
-  S_{0c} &= \{i:D_i=0,\; s_i\ge 0.25\}.
+  S_{0b} &= \{i:D_i=0,\; 0<s_i<\ShareCut\}, \\
+  S_{0c} &= \{i:D_i=0,\; s_i\ge \ShareCut\}.
 \end{align*}
-In a panel, if any stratum has fewer than 20 people (a thin cell), the
+In a panel, if any stratum has fewer than \StratumMinN{} people (a thin cell), the
 code merges $S_{0b}$ into $S_{0c}$ for that panel. The kernel truth
-uses the realized stratum means of the true $Y$, averaged over 200
+uses the realized stratum means of the true $Y$, averaged over \RepsEstimand{}
 random-arm reps:
 \begin{equation}
   \dspill(c)=\overline{Y}_{S_{0c}}-\overline{Y}_{S_{0a}},\qquad
@@ -495,7 +497,7 @@ person by the inverse of the exposure probability,
 The first-order probabilities $p_{i,S}$ are exact. Under the random arm,
 the number of treated neighbors of an untreated person of degree $d$ is
 hypergeometric. The variance is the estimator of Aronow and Samii
-(2017). The joint exposure probabilities come from 10,000 simulated
+(2017). The joint exposure probabilities come from \ExposureDraws{} simulated
 random-arm assignments, and Young's bound covers pairs that never
 appear together. The interval is the estimate $\pm1.96$ SE. We call it
 $\Jtwo$, and we compare it with $\Theta_{\expset}$.
@@ -514,7 +516,7 @@ probability is 0 or 1, and inverse-probability weights are not defined.
 Intervals and images are subsets of $\mathbb{R}$. A verdict is an
 inclusion, not a slogan. Let $J=[lo,hi]$ be the interval of a foil at
 one diagnostic point. Let $\Theta=[L,U]$ be the image of the \emph{same}
-kind of functional over the 400 sampled NROY points. Write
+kind of functional over the \ThetaSample{} sampled NROY points. Write
 $\interior(\Theta)=(L,U)$. The function \texttt{classify\_interval}
 gives:
 \begin{align}
@@ -540,24 +542,24 @@ for that, \texttt{covers\_truth}, and the repeated-assignment check
 %----------------------------------------------------------------
 \section{Illustration: a planted village}
 
-One village has $N=800$ people. The graph has an edge rule, not a mean
+One village has $N=\NAgents$ people. The graph has an edge rule, not a mean
 degree. The code draws $A_{ij}\sim\mathrm{Bernoulli}(p)$ with
-$p=4/N$ for every ordered pair. Then it takes $A\mid A^\top$ and sets
+$p=\EdgeRate/N$ for every ordered pair. Then it takes $A\mid A^\top$ and sets
 the diagonal to zero. So an edge appears with probability
 $1-(1-p)^2\approx 8/N$, and the mean degree is about 8. The theory
-gives 7.97, and the graph in this project measures 8.085. The graph is
+gives \MeanDegreeTheory, and the graph in this project measures \MeanDegree. The graph is
 drawn once with a fixed seed and is not calibrated.
 
 $Y_{i,t}\in(0,1)$ is the level of preventive behavior. The covariates
 are $X\sim U[0,1]^3$: education or literacy $x_1$, resources $x_2$ and
-baseline propensity $x_3$. A rule seeds $k=80$ people from $t=0$. The
+baseline propensity $x_3$. A rule seeds $k=\KSeeded$ people from $t=0$. The
 three rules are control ($\pi_0$), random ($\pi_1$) and degree
-($\pi_2$). Ties in degree go to the lower index. In the degree arm, 35
-of the 36 people at degree 12 are seeded. The degree arm is
+($\pi_2$). Ties in degree go to the lower index. In the degree arm, \DegreeCutSeeded{}
+of the \DegreeCutTotal{} people at degree \DegreeCut{} are seeded. The degree arm is
 deterministic given the graph.
 
 The kernel is a logit linear-in-means update: a linear-in-means index
-passed through a logistic link. For $t=0,\ldots,T-1$ with $T=20$ and
+passed through a logistic link. For $t=0,\ldots,T-1$ with $T=\Horizon$ and
 $t^*=0$,
 \begin{equation}
   Y_i(t+1)
@@ -581,22 +583,22 @@ not derived. Its lineage has three parts. Manski (1993) gives the linear-in-mean
 \toprule
  & box / value & role \\
 \midrule
-$\alpha$ & $[-2.5,-0.5]$ & intercept of the index \\
-$\beta$ & $[0.05,0.60]$ & own lag \\
-$\gamma$ & $[0.05,0.80]$ & weight on the peer mean \\
-$\kappa$ & $[0.25,2.50]$ & effect of being seeded (the same on every arm) \\
-$\sigma_\varepsilon$ & $[0.01,0.40]$ & standard deviation of the shock \\
-$\eta$ & $(0.05,0.10,0.02)$ & covariate weights, fixed, not calibrated \\
+$\alpha$ & $[\BoxAlphaLo,\BoxAlphaHi]$ & intercept of the index \\
+$\beta$ & $[\BoxBetaLo,\BoxBetaHi]$ & own lag \\
+$\gamma$ & $[\BoxGammaLo,\BoxGammaHi]$ & weight on the peer mean \\
+$\kappa$ & $[\BoxKappaLo,\BoxKappaHi]$ & effect of being seeded (the same on every arm) \\
+$\sigma_\varepsilon$ & $[\BoxSigmaLo,\BoxSigmaHi]$ & standard deviation of the shock \\
+$\eta$ & $(\EtaOne,\EtaTwo,\EtaThree)$ & covariate weights, fixed, not calibrated \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 The planted point is the center of $C$:
-$c^\star=(-1.5,\,0.325,\,0.425,\,1.375,\,0.205)$. The targets are
-$z=\widehat M(c^\star)=(0.2638,\,0.05,\,0.2618)$ for
+$c^\star=(\CStarAlpha,\,\CStarBeta,\,\CStarGamma,\,\CStarKappa,\,\CStarSigma)$. The targets are
+$z=\widehat M(c^\star)=(\ZOne,\,\ZTwo,\,\ZThree)$ for
 \texttt{level\_imm}, \texttt{gradient\_edu} and \texttt{level\_internet}.
-The discrepancy is $\delta=(0.02,0.05,0.02)$, and the threshold is
-$\tau=7.8147$.
+The discrepancy is $\delta=(\DeltaOne,\DeltaTwo,\DeltaThree)$, and the threshold is
+$\tau=\Tau$.
 
 Every random stream is seeded. Rep $r$ of every arm shares one state
 stream (the start $Y(0)$ and all shocks) and has its own assignment
@@ -617,18 +619,18 @@ All numbers in this section come from the committed results in
 \texttt{results/}.
 
 \subsection{History matching kept a large NROY set}
-Against the targets $z=\widehat M(c^\star)$, three waves kept 202, 416
-and 373 points of 1000 each. The union is $|\NROY|=991$
-(Figure~\ref{fig:waves}). The minimum $I$ in the three waves is 0.0017,
-0.0050 and 0.0071. The median $I$ is 50.37, 11.89 and 13.59. The
-threshold is $\tau=7.8147$. The set did not collapse to a point.
+Against the targets $z=\widehat M(c^\star)$, three waves kept \WaveKeptOne, \WaveKeptTwo{}
+and \WaveKeptThree{} points of \WavePoints{} each. The union is $|\NROY|=\NNroy$
+(Figure~\ref{fig:waves}). The minimum $I$ in the three waves is \WaveMinIOne,
+\WaveMinITwo{} and \WaveMinIThree. The median $I$ is \WaveMedIOne, \WaveMedITwo{} and \WaveMedIThree. The
+threshold is $\tau=\Tau$. The set did not collapse to a point.
 
-The closest NROY point has $I=0.0017$. It does not recover $c^\star$.
-Its parameters are $\alpha=-1.4871$, $\beta=0.399$, $\gamma=0.3301$,
-$\kappa=1.3446$ and $\sigma_\varepsilon=0.1984$. Fit does not pick the
+The closest NROY point has $I=\MinI$. It does not recover $c^\star$.
+Its parameters are $\alpha=\MinIAlpha$, $\beta=\MinIBeta$, $\gamma=\MinIGamma$,
+$\kappa=\MinIKappa$ and $\sigma_\varepsilon=\MinISigma$. Fit does not pick the
 truth. This point is the min-I point by the declared rule, not because
-it won on $\theta$. The median-I point has $I=2.0208$ and a much larger
-$\kappa$ (2.4654).
+it won on $\theta$. The median-I point has $I=\MedI$ and a much larger
+$\kappa$ (\MedIKappa).
 
 \begin{center}
 \begin{minipage}{\linewidth}
@@ -643,17 +645,17 @@ not move.}
 \end{center}
 
 \subsection{The image of \texorpdfstring{$\theta_2$}{theta2} is not a point}
-At the planted point, $\theta_1(c^\star)=0.03631$ and
-$\theta_2(c^\star)=0.03826$. The premium is $\prem(c^\star)=0.00195$.
+At the planted point, $\theta_1(c^\star)=\ThetaOneStar$ and
+$\theta_2(c^\star)=\ThetaTwoStar$. The premium is $\prem(c^\star)=\PremiumStar$.
 In this model, seeding the highest-degree people barely beats seeding
 at random. That is a fact about this $c^\star$. It is not a theorem
 about targeting. The spillover at $c^\star$ is
-$\dspill(c^\star)=0.00792$.
+$\dspill(c^\star)=\SpillStar$.
 
-Over the 400 sampled NROY points, the headline image is
-$\Theta_{\hm}=[0.00587,\,0.07325]$. The image of the spillover is
-$\Theta_{\expset}=[-0.000571,\,0.026893]$. The honest report for
-$\theta_2$ is the range, not 0.03826. The range is not a sampling
+Over the \ThetaSample{} sampled NROY points, the headline image is
+$\Theta_{\hm}=[\ThetaHmLo,\,\ThetaHmHi]$. The image of the spillover is
+$\Theta_{\expset}=[\ThetaExpLo,\,\ThetaExpHi]$. The honest report for
+$\theta_2$ is the range, not \ThetaTwoStar. The range is not a sampling
 distribution and not a posterior.
 
 Figure~\ref{fig:points} shows every sampled point. Each bar is a
@@ -664,7 +666,7 @@ smaller than the dots. For $\dspill$ they are visible.
 \begin{minipage}{\linewidth}
 \centering
 \includegraphics[width=\linewidth]{image_points.png}
-\captionof{figure}{The 400 sampled NROY points against $I(c)$. Left:
+\captionof{figure}{The \ThetaSample{} sampled NROY points against $I(c)$. Left:
 $\theta_2(c)$. Right: $\dspill(c)$. Bars show $\pm1.96$ pointwise MC SE.
 Dashed lines mark the image endpoints.}
 \label{fig:points}
@@ -672,7 +674,7 @@ Dashed lines mark the image endpoints.}
 \end{center}
 
 \paragraph{The endpoint recheck.}
-The code evaluates again each point that sets an endpoint. It uses 200
+The code evaluates again each point that sets an endpoint. It uses \RepsEstimand{}
 fresh reps on separate streams. Table~\ref{tab:recheck} gives the
 result.
 \begin{center}
@@ -684,16 +686,16 @@ the pointwise MC SE).}
 \toprule
 endpoint & NROY index & pilot (SE) & fresh (SE) \\
 \midrule
-$\Theta_{\hm}$ lower & 877 & $+0.005870$ (0.000004) & $+0.005871$ (0.000003) \\
-$\Theta_{\hm}$ upper & 802 & $+0.073250$ (0.000006) & $+0.073255$ (0.000006) \\
-$\Theta_{\expset}$ lower & 944 & $-0.000571$ (0.000502) & $+0.000201$ (0.000491) \\
-$\Theta_{\expset}$ upper & 904 & $+0.026893$ (0.000259) & $+0.027274$ (0.000263) \\
+$\Theta_{\hm}$ lower & \RecheckHmLoIndex{} & $\RecheckHmLoPilot$ (\RecheckHmLoPilotSE) & $\RecheckHmLoFresh$ (\RecheckHmLoFreshSE) \\
+$\Theta_{\hm}$ upper & \RecheckHmHiIndex{} & $\RecheckHmHiPilot$ (\RecheckHmHiPilotSE) & $\RecheckHmHiFresh$ (\RecheckHmHiFreshSE) \\
+$\Theta_{\expset}$ lower & \RecheckExpLoIndex{} & $\RecheckExpLoPilot$ (\RecheckExpLoPilotSE) & $\RecheckExpLoFresh$ (\RecheckExpLoFreshSE) \\
+$\Theta_{\expset}$ upper & \RecheckExpHiIndex{} & $\RecheckExpHiPilot$ (\RecheckExpHiPilotSE) & $\RecheckExpHiFresh$ (\RecheckExpHiFreshSE) \\
 \bottomrule
 \end{tabular}
 \end{center}
 Each bar in \texttt{image\_points.json} is a pointwise Monte Carlo SE
 conditional on a fixed parameter point $c$. The displayed image
-endpoints are extrema selected from 400 noisy estimates. So the SE
+endpoints are extrema selected from \ThetaSample{} noisy estimates. So the SE
 attached to the extremizing point is not an SE for the endpoint. It
 does not include extremum-selection uncertainty. Fresh independent
 re-evaluation of the pilot-selected extremizers removes reuse-of-noise
@@ -726,17 +728,17 @@ compared with its own image.}
 \label{tab:foils}
 \begin{tabular}{@{}lcc@{}}
 \toprule
- & min-I point ($I=0.0017$) & median-I point ($I=2.0208$) \\
+ & min-I point ($I=\MinI$) & median-I point ($I=\MedI$) \\
 \midrule
-truth $\theta_2(c_0)$ & 0.03708 & 0.06346 \\
-Foil 1 interval $\Jone$ & $[0.03259,\,0.03465]$ & $[0.05832,\,0.05949]$ \\
+truth $\theta_2(c_0)$ & \MinIThetaTwo{} & \MedIThetaTwo{} \\
+Foil 1 interval $\Jone$ & $[\MinIFoilOneLo,\,\MinIFoilOneHi]$ & $[\MedIFoilOneLo,\,\MedIFoilOneHi]$ \\
 Foil 1 verdict & F-OVERCONF & F-OVERCONF \\
 Foil 1 contains the truth & no & no \\
 \addlinespace
-truth $\dspill(c_0)$ & 0.00613 & 0.00809 \\
-Foil 2 estimate (SE) & 0.00619 (0.00470) & 0.00826 (0.00416) \\
+truth $\dspill(c_0)$ & \MinISpill{} & \MedISpill{} \\
+Foil 2 estimate (SE) & \MinIFoilTwoEst{} (\MinIFoilTwoSE) & \MedIFoilTwoEst{} (\MedIFoilTwoSE) \\
 $S_{0b}$ merged & no & no \\
-Foil 2 interval $\Jtwo$ & $[-0.003022,\,0.015410]$ & $[0.000112,\,0.016406]$ \\
+Foil 2 interval $\Jtwo$ & $[\MinIFoilTwoLo,\,\MinIFoilTwoHi]$ & $[\MedIFoilTwoLo,\,\MedIFoilTwoHi]$ \\
 Foil 2 verdict (pilot image) & no verdict & F-OVERCONF \\
 Foil 2 contains the truth & yes & yes \\
 \bottomrule
@@ -745,15 +747,15 @@ Foil 2 contains the truth & yes & yes \\
 
 \subsection{Foil 1: the SUTVA analyst}
 Table~\ref{tab:foils} shows that the Foil 1 interval is narrow. At the
-min-I point, $\hat\beta=0.3362$ with interval $[0.3259,\,0.3465]$. At
-the median-I point, $\hat\beta=0.5890$ with interval
-$[0.5832,\,0.5949]$. The scale factor is $k/N=0.1$. Five statements
+min-I point, $\hat\beta=\MinIBetaHat$ with interval $[\MinIBetaLo,\,\MinIBetaHi]$. At
+the median-I point, $\hat\beta=\MedIBetaHat$ with interval
+$[\MedIBetaLo,\,\MedIBetaHi]$. The scale factor is $k/N=\SeedShare$. Five statements
 stay with every report of Foil~1.
 \begin{enumerate}
   \item Foil 1 is not an identified estimator of the simulator's
         $\theta_2$ under the actual interference model. It is the
         whole-village policy estimate implied by a SUTVA analyst,
-        $(k/N)\hat\beta$, with $k/N=0.1$.
+        $(k/N)\hat\beta$, with $k/N=\SeedShare$.
   \item That interpretation assumes consistency/SUTVA, conditional
         exchangeability and positivity given $X$, a correctly specified
         additive constant-effect outcome model, and a
@@ -764,11 +766,11 @@ stay with every report of Foil~1.
         points. So F-OVERCONF is an assumption-contingent
         interval-geometry finding. It is not a coverage claim for
         $\theta_2$ under interference.
-  \item Across 200 paired panels, about 90\% of the gap between
-        $\theta_2$ and $(k/N)$ times the 200-panel mean OLS
+  \item Across \RepsEstimand{} paired panels, about \UnseededShareMeanBetaPct\% of the gap between
+        $\theta_2$ and $(k/N)$ times the \RepsEstimand-panel mean OLS
         coefficient is the policy effect on unseeded people. For the
         displayed replication-0 point estimate, the corresponding
-        shares are about 96\% at min-I and 92\% at median-I.
+        shares are about \MinIUnseededShareDisplayedPct\% at min-I and \MedIUnseededShareDisplayedPct\% at median-I.
   \item The rescaling was adopted after the frozen numbers were
         inspected. Its justification is the SUTVA aggregation identity.
         The post hoc design correction is disclosed.
@@ -786,27 +788,27 @@ be the effect on a person in one rep. Then
 The unseeded part is zero under SUTVA. The seeded policy contrast is the
 mean of $y_2-y_0$ over $S$. Under interference it is not a SUTVA effect
 of own treatment. Table~\ref{tab:gap} gives the numbers. The gap for
-the mean beta averages over 200 panels. The gap for the displayed beta
+the mean beta averages over \RepsEstimand{} panels. The gap for the displayed beta
 uses the one panel that Foil~1 sees. We keep the two apart.
 \begin{center}
 \small
-\captionof{table}{Gap decomposition for Foil 1 (200 paired reps).}
+\captionof{table}{Gap decomposition for Foil 1 (\RepsEstimand{} paired reps).}
 \label{tab:gap}
 \begin{tabular}{@{}lcc@{}}
 \toprule
  & min-I point & median-I point \\
 \midrule
-$\theta_2$ & 0.03708 & 0.06346 \\
-seeded part & 0.03374 & 0.05925 \\
-unseeded part & 0.00333 & 0.00421 \\
-seeded policy contrast & 0.3374 & 0.5925 \\
-mean beta & 0.3339 & 0.5880 \\
-gap for the mean beta & 0.00369 & 0.00466 \\
-unseeded share of that gap & 0.9034 & 0.9027 \\
-OLS-error part of that gap & 0.00036 & 0.00045 \\
-gap for the displayed beta & 0.00346 & 0.00456 \\
-unseeded share of that gap & 0.9642 & 0.9236 \\
-baseline gap (seeded minus unseeded, $Y$ under control) & 0.0007 & 0.0007 \\
+$\theta_2$ & \MinIThetaTwo{} & \MedIThetaTwo{} \\
+seeded part & \MinISeededPart{} & \MedISeededPart{} \\
+unseeded part & \MinIUnseededPart{} & \MedIUnseededPart{} \\
+seeded policy contrast & \MinISeededContrast{} & \MedISeededContrast{} \\
+mean beta & \MinIMeanBeta{} & \MedIMeanBeta{} \\
+gap for the mean beta & \MinIGapMeanBeta{} & \MedIGapMeanBeta{} \\
+unseeded share of that gap & \MinIUnseededShareMeanBeta{} & \MedIUnseededShareMeanBeta{} \\
+OLS-error part of that gap & \MinIOlsErrorPart{} & \MedIOlsErrorPart{} \\
+gap for the displayed beta & \MinIGapDisplayed{} & \MedIGapDisplayed{} \\
+unseeded share of that gap & \MinIUnseededShareDisplayed{} & \MedIUnseededShareDisplayed{} \\
+baseline gap (seeded minus unseeded, $Y$ under control) & \MinIBaselineGap{} & \MedIBaselineGap{} \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -814,7 +816,7 @@ Most of the gap is the effect on people who were not seeded. A SUTVA
 analyst has no term for it.
 
 \paragraph{Why there is no forest foil.}
-This was decision D3. In the degree arm, treatment is a deterministic function of degree and the index tie-break. Conditioning on degree leaves severe practical positivity failure: no treated people appear below degree 12, no untreated people appear above degree 12, and only one untreated person appears at degree 12. Omitting degree leaves the assignment variable unadjusted. A forest can differ numerically from OLS, but it retains the same SUTVA blind spot and does not identify $\theta_2$ from this panel. A design-based third foil needs randomization across villages (Hudgens
+This was decision D3. In the degree arm, treatment is a deterministic function of degree and the index tie-break. Conditioning on degree leaves severe practical positivity failure: no treated people appear below degree \DegreeCut, no untreated people appear above degree \DegreeCut, and only one untreated person appears at degree \DegreeCut. Omitting degree leaves the assignment variable unadjusted. A forest can differ numerically from OLS, but it retains the same SUTVA blind spot and does not identify $\theta_2$ from this panel. A design-based third foil needs randomization across villages (Hudgens
 and Halloran 2008, Baird et al.\ 2018).
 
 \subsection{Foil 2: Hájek on the random arm}
@@ -827,14 +829,14 @@ pre-declared repeated-assignment calibration in
 \texttt{scripts/check\_foil2\_coverage.py}. Both Foil~2 intervals
 contain the truth (Table~\ref{tab:foils}).
 
-Against the saved 200-rep pilot image, $\Theta_{\expset}=[-0.000571,\,0.026893]$,
-the median-I Foil 2 interval $[0.000112,\,0.016406]$ is strictly
+Against the saved \RepsEstimand-rep pilot image, $\Theta_{\expset}=[\ThetaExpLo,\,\ThetaExpHi]$,
+the median-I Foil 2 interval $[\MedIFoilTwoLo,\,\MedIFoilTwoHi]$ is strictly
 interior and is therefore classified F-OVERCONF. That classification is
-not robust to endpoint Monte Carlo noise. An independent 200-rep recheck
-of the pilot-selected lower-end candidate is 0.000201 (pointwise MC SE
-0.000491). This value is above the lower end of the interval. The
+not robust to endpoint Monte Carlo noise. An independent \RepsEstimand-rep recheck
+of the pilot-selected lower-end candidate is \RecheckExpLoFreshAbs{} (pointwise MC SE
+\RecheckExpLoFreshSE). This value is above the lower end of the interval. The
 recheck evaluates selected candidates. It neither identifies nor bounds
-the true extrema over all 400 sampled NROY points. We therefore claim no
+the true extrema over all \ThetaSample{} sampled NROY points. We therefore claim no
 robust Foil 2 verdict at either diagnostic point. At the min-I point,
 the interval reaches below the lower end of $\Theta_{\expset}$, so
 there is no verdict at all.
@@ -846,17 +848,17 @@ that dropped the covariance between the strata. Commit
 \paragraph{The calibration check.}
 The script \texttt{scripts/check\_foil2\_coverage.py} is a required
 check. Its gate uses outcomes that obey the exposure map exactly, with
-a true spillover of 0.03. It draws 10,000 random-arm assignments. The
+a true spillover of \GateTruth. It draws \GateAssignments{} random-arm assignments. The
 gate rule was written before the run. It fails if the ratio of the mean
 estimated variance to the empirical variance, plus 1.645 bootstrap SE,
-is below 1. The gate passes. The mean estimate is 0.03006 and the ratio
-is 1.034 (bootstrap SE 0.0154). The result:
+is below 1. The gate passes. The mean estimate is \GateMeanEstimate{} and the ratio
+is \GateRatio{} (bootstrap SE \GateRatioBootSE). The result:
 
 \begin{quote}
 In a fixed-world repeated-assignment check whose outcomes obey the
-exposure map exactly, the nominal 95\% Foil 2 Wald interval covered
-93.4\% of assignments (exact 95\% binomial interval 92.9\%--93.9\%). The
-average estimated variance was 1.034 times the empirical design
+exposure map exactly, the nominal \ConfidencePct\% Foil 2 Wald interval covered
+\GateCoveragePct\% of assignments (exact 95\% binomial interval \GateCoverageLoPct\%--\GateCoverageHiPct\%). The
+average estimated variance was \GateRatio{} times the empirical design
 variance, so the shortfall is not explained by average variance
 underestimation. It reflects the finite-sample behavior of this
 studentized normal interval, with the implemented Hájek linearization
@@ -869,23 +871,23 @@ first-order linearization and one simulated table of joint
 probabilities.
 
 The script also reports the kernel, where the exposure map is not
-exact because spillover also travels two steps. Over 200 kernel panels,
-the coverage of the nominal 95\% interval is 0.920 at $c^\star$, 0.930
-at the min-I point and 0.925 at the median-I point. If we redraw only
-the assignment and hold the noise fixed, the coverage is 0.930, 0.930
-and 0.9267. The code reports these numbers and does not gate on them.
+exact because spillover also travels two steps. Over \CheckPanels{} kernel panels,
+the coverage of the nominal \ConfidencePct\% interval is \KernelCovStar{} at $c^\star$, \KernelCovMinI{}
+at the min-I point and \KernelCovMedI{} at the median-I point. If we redraw only
+the assignment and hold the noise fixed, the coverage is \DesignCovStar, \DesignCovMinI{}
+and \DesignCovMedI. The code reports these numbers and does not gate on them.
 
 \subsection{The World Bank run: F-EMPTY}
 The command \texttt{run\_poc.py worldbank} reproduces the August 2026
 attempt with real World Bank anchors. It is a historical sensitivity
 run. The anchors are three cross-country indicators. The targets are
-$z=(0.8621,\,0.6054,\,0.6864)$. The run ends in F-EMPTY. Wave~1 keeps
-no point. The best $I$ is 204.35, the median is 1093.22 and the maximum
-is 1818.34, against $\tau=7.8147$. The code does not loosen $\tau$ or
-$\delta$. The closest sampled moments are $(0.6188,\,0.0545,\,0.6133)$.
-In the 1,000 sampled wave-1 points, none passed the threshold. The
-closest sampled education correlation was 0.05, against a target of
-0.61 (Figure~\ref{fig:empty}). The finding is about the pair
+$z=(\WbZOne,\,\WbZTwo,\,\WbZThree)$. The run ends in F-EMPTY. Wave~1 keeps
+no point. The best $I$ is \WbBestI, the median is \WbMedianI{} and the maximum
+is \WbMaxI, against $\tau=\Tau$. The code does not loosen $\tau$ or
+$\delta$. The closest sampled moments are $(\WbClosestMOne,\,\WbClosestMTwo,\,\WbClosestMThree)$.
+In the \WavePointsComma{} sampled wave-1 points, none passed the threshold. The
+closest sampled education correlation was \WbClosestMTwoShort, against a target of
+\WbZTwoShort{} (Figure~\ref{fig:empty}). The finding is about the pair
 (kernel, these anchors). It is not a wide image.
 
 \begin{center}
@@ -931,7 +933,7 @@ targets still allow. An empty sampled NROY is a usable negative result for the d
 design: this run found no sampled point that passed the threshold for
 those targets. It does not establish infeasibility over all of $C$. You
 must not loosen the threshold. The width of the image is measured, not assumed. Here
-$\Theta_{\hm}=[0.00587,\,0.07325]$.
+$\Theta_{\hm}=[\ThetaHmLo,\,\ThetaHmHi]$.
 
 \paragraph{Empirical causal inference.}
 This is not a new identification strategy. It does not replace
@@ -992,9 +994,9 @@ dictionary of objects. It becomes more only if someone supplies targets that thi
 \noindent\textit{Implementation.}
 Repo \texttt{ecn593-applied-project}, branch \texttt{main}.
 The committed results are in commit \texttt{4feb467}.
-$|\NROY|=991$,
-$\Theta_{\hm}=[0.00587,\,0.07325]$,
-$\theta_2(c^\star)=0.03826$.
+$|\NROY|=\NNroy$,
+$\Theta_{\hm}=[\ThetaHmLo,\,\ThetaHmHi]$,
+$\theta_2(c^\star)=\ThetaTwoStar$.
 Foil~1 is OLS-HC1 scaled by $k/N$.
 Figures are redrawn from the saved results.
 \texttt{README.md} lists the commands to replicate every number.

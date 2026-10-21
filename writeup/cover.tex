@@ -1,7 +1,7 @@
 % cover.tex: the cover page of the ECN 593 final report.
-% Every number here is in results/planted/poc_results.json or
-% results/checks/foil2_coverage.json (commit 4feb467). The diagram uses data
-% coordinates, so each value can be read off its source line.
+% Every result number is a macro from numbers.tex (scripts/write_numbers.py).
+% The diagram uses data coordinates. The axis ranges and label offsets are
+% layout: check the cover by eye after a rerun that moves a value.
 \begin{titlepage}
 \thispagestyle{empty}
 \setlength{\parskip}{0pt}
@@ -35,11 +35,11 @@ what the targets cannot rule out\par}
   % Row 1: theta_2 on [0, 0.08] mapped to 16.4 cm (x = 205 cm per unit)
   \begin{scope}[x=205cm, y=1cm]
     \node[anchor=south west] at (0, 0.78) {\bfseries Foil 1\normalfont\ \ ignores interference \textperiodcentered\ policy effect};
-    \fill[band] (0.00587, 0.18) rectangle (0.07325, 0.74);
-    \node[anchor=north east, text=line] at (0.07325, 0.72) {image $\Theta_{\mathrm{hm}}$};
-    \draw[foil] (0.03259, 0.33) -- (0.03465, 0.33);
-    \node[truth] at (0.03708, 0.56) {$\star$};
-    \node[anchor=west] at (0.0382, 0.56) {truth here: 0.0371};
+    \fill[band] (\ThetaHmLo, 0.18) rectangle (\ThetaHmHi, 0.74);
+    \node[anchor=north east, text=line] at (\ThetaHmHi, 0.72) {image $\Theta_{\mathrm{hm}}$};
+    \draw[foil] (\MinIFoilOneLo, 0.33) -- (\MinIFoilOneHi, 0.33);
+    \node[truth] (star1) at (\MinIThetaTwo, 0.56) {$\star$};
+    \node[anchor=west] at (star1.east) {truth here: \MinIThetaTwoShort};
     \draw[tick] (0, 0) -- (0.08, 0);
     \foreach \v in {0, 0.02, 0.04, 0.06, 0.08} {
       \draw[tick] (\v, 0) -- (\v, -0.07);
@@ -48,11 +48,11 @@ what the targets cannot rule out\par}
   % Row 2: delta_spill on [-0.004, 0.028] mapped to 16.4 cm (x = 512.5 cm per unit)
   \begin{scope}[x=512.5cm, y=1cm, xshift=2.05cm, yshift=-2.05cm]
     \node[anchor=south west] at (-0.004, 0.78) {\bfseries Foil 2\normalfont\ \ models exposure \textperiodcentered\ spillover};
-    \fill[band] (-0.000571, 0.18) rectangle (0.026893, 0.74);
-    \node[anchor=north east, text=line] at (0.026893, 0.72) {image $\Theta_{\mathrm{exp}}$};
-    \draw[foil] (-0.003022, 0.33) -- (0.015410, 0.33);
-    \node[truth] at (0.006129, 0.56) {$\star$};
-    \node[anchor=west] at (0.0068, 0.56) {truth here: 0.0061};
+    \fill[band] (\ThetaExpLo, 0.18) rectangle (\ThetaExpHi, 0.74);
+    \node[anchor=north east, text=line] at (\ThetaExpHi, 0.72) {image $\Theta_{\mathrm{exp}}$};
+    \draw[foil] (\MinIFoilTwoLo, 0.33) -- (\MinIFoilTwoHi, 0.33);
+    \node[truth] (star2) at (\MinISpill, 0.56) {$\star$};
+    \node[anchor=west] at (star2.east) {truth here: \MinISpillShort};
     \draw[tick] (-0.004, 0) -- (0.028, 0);
     \foreach \v in {0, 0.01, 0.02} {
       \draw[tick] (\v, 0) -- (\v, -0.07);
@@ -63,8 +63,8 @@ what the targets cannot rule out\par}
 \vspace{0.4em}
 {\footnotesize\color{line}%
 The diagram shows the min-I point, the best-fitting NROY point. The two
-rows use different scales. Bands: the image of the effect over 400 sampled NROY points. Black
-lines: the analyst's nominal 95\% interval from one panel. Stars: the
+rows use different scales. Bands: the image of the effect over \ThetaSample{} sampled NROY points. Black
+lines: the analyst's nominal \ConfidencePct\% interval from one panel. Stars: the
 simulator's true value at this point. Foil~1 is tight, sits inside the band,
 and misses the truth. Foil~2 contains the truth, but it is too wide for a
 robust verdict.\par}
@@ -94,11 +94,11 @@ people who were not seeded. Report the image, not one point.\par}
 {\footnotesize
 \begin{tabularx}{\linewidth}{@{}X r@{}}
 \toprule
-\textcolor{line}{Points evaluated in three history-matching waves / points kept (NROY)} & 3,000 / 991 \\
-\textcolor{line}{Image of the policy effect over the sampled NROY points} & [0.0059, 0.0732] \\
-\textcolor{line}{Policy effect at the planted point c*} & 0.0383 \\
-\textcolor{line}{Foil 1 estimate below the truth, at min-I / median-I} & 9.3\% / 7.2\% \\
-\textcolor{line}{Foil 2 interval coverage when the exposure map holds exactly} & 93.4\% \\
+\textcolor{line}{Points evaluated in three history-matching waves / points kept (NROY)} & \PointsEvaluated{} / \NNroy{} \\
+\textcolor{line}{Image of the policy effect over the sampled NROY points} & [\ThetaHmLoShort, \ThetaHmHiShort] \\
+\textcolor{line}{Policy effect at the planted point c*} & \ThetaTwoStarShort{} \\
+\textcolor{line}{Foil 1 estimate below the truth, at min-I / median-I} & \MinIFoilOneBelowPct\% / \MedIFoilOneBelowPct\% \\
+\textcolor{line}{Foil 2 interval coverage when the exposure map holds exactly} & \GateCoveragePct\% \\
 \bottomrule
 \end{tabularx}\par}
 
