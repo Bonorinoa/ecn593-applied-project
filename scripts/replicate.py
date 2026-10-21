@@ -2,7 +2,7 @@
 
 Usage, from the repo root (after the one-time setup in README.md):
     .venv/bin/python scripts/replicate.py           # full: about 1-2 hours
-    .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check: about 5 minutes
+    .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check: about 8 minutes
 
 Steps, in order. The script stops at the first step that fails.
   1. tests                 pytest tests
@@ -57,13 +57,14 @@ def strip_stamps(obj):
     return obj
 
 
-def report():
+def report(quick):
     print("[9/9] report           each result file vs the committed version (ignoring ran_at, git_commit)")
     all_same = True
     for path in RESULT_FILES:
         committed = subprocess.run(["git", "show", f"HEAD:{path}"], cwd=ROOT, capture_output=True, text=True)
         if committed.returncode != 0:
-            print(f"      new         {path} (not committed yet)")
+            print(f"      new         {path} (not committed yet, so not compared)")
+            all_same = False
             continue
         same = strip_stamps(json.loads(committed.stdout)) == strip_stamps(json.loads((ROOT / path).read_text()))
         all_same &= same
@@ -73,8 +74,12 @@ def report():
     print("      other changed files (figures, writeup, locks):", "none" if not changed else "")
     for line in changed.splitlines():
         print("       ", line)
-    print("REPLICATED: every result is identical to the committed one." if all_same
-          else "DIFFERENT: see the CHANGED files above (git diff shows the details).")
+    if not all_same:
+        print("DIFFERENT: see the CHANGED or new files above (git diff shows the details).")
+    elif quick:
+        print("REPLICATED, except the Foil 2 check, which --quick did not rerun.")
+    else:
+        print("REPLICATED: every result is identical to the committed one.")
 
 
 def main():
@@ -95,7 +100,7 @@ def main():
         subprocess.run(["latexmk", "-c"], cwd=ROOT / "writeup", capture_output=True)
     else:
         print("[8/9] paper PDF        skipped: latexmk not found (or upload writeup/ to Overleaf)")
-    report()
+    report(quick)
     print(f"total {time.time() - t0:.0f} s")
 
 

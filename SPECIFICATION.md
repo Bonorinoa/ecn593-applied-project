@@ -359,7 +359,7 @@ Required note:
 | `python scripts/write_numbers.py` | `config/`, `results/`, the drawn graph | `writeup/numbers.tex` (every number in the paper, as a LaTeX macro) |
 | `python scripts/draw_figures.py planted` | `results/planted/poc_results.json`, `results/planted/image_points.json` | the figures of that run. It runs no simulation. |
 
-The file `poc_results.json` has these keys: `git_commit`, `ran_at`, `z_source`, `z`, `z_names`, `sampling_variances`, `delta`, `tau`, `finding_hm`, `wave_kept`, `wave_I_stats`, `closest`, `n_nroy`, `param_names`, `c_star`, `theta_star`, `spill_star`, `notes` and `figures`. The planted run adds `Theta_hm`, `Theta_exp`, `n_theta_sample`, `endpoint_recheck` and `findings` (the keys `min_I` and `median_I`). The World Bank run adds `variance_label`. The key `git_commit` is the HEAD hash of the code, with `+dirty` if `src/`, `scripts/`, `data/` or the requirements files differ from it.
+The file `poc_results.json` has these keys: `git_commit`, `ran_at`, `z_source`, `z`, `z_names`, `sampling_variances`, `delta`, `tau`, `finding_hm`, `wave_kept`, `wave_I_stats`, `closest`, `n_nroy`, `param_names`, `c_star`, `theta_star`, `spill_star`, `notes` and `figures`. The planted run adds `Theta_hm`, `Theta_exp`, `n_theta_sample`, `endpoint_recheck` and `findings` (the keys `min_I` and `median_I`). The World Bank run adds `variance_label`. The key `git_commit` is the HEAD hash of the code, with `+dirty` if `config/`, `src/`, `scripts/`, `data/` or the requirements files differ from it.
 
 The planted run also stores `theta_star` and `spill_star`, the truth at $c^*$: theta1 = 0.03631, theta2 = 0.03826, premium = 0.00195, and delta_spill = 0.00792.
 

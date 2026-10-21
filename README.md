@@ -83,7 +83,7 @@ Measured runtimes on an Apple-silicon laptop, from a fresh clone:
 - `pytest tests -q` takes about 20 s.
 - `run_poc.py worldbank` takes 33 s.
 - `run_poc.py planted` takes 270-400 s (about 4.5-7 min, depending on machine load).
-- `replicate.py --quick` took 454 s in total.
+- `replicate.py --quick` took 454 s in one run (about 8 minutes).
 - `check_foil2_coverage.py` takes about 1–2 hours.
 
 A fresh clone gave the committed results. Every result field matches the earlier run except `ran_at` and `git_commit`. The files `image_points.json` and `overlay.png` are byte-identical. A rerun reproduces every number, because every random stream is seeded.

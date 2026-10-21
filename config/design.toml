@@ -7,7 +7,7 @@
 [monte_carlo]
 reps_estimand = 200              # reps per arm for theta(c) and delta_spill(c)
 reps_moment = 30                 # reps per arm for M(c)
-reps_z = 200                     # z := M-hat(c*) (scripts/plant_z.py)
+reps_z = 200                     # z := M-hat(c*) (scripts/plant_z.py); was tied to reps_estimand, keep them in step
 # Simulation noise and assignment streams are not seeded here: they use
 # kernel.stream_seed(label, rep) = crc32 of a length-prefixed key.
 
@@ -28,7 +28,7 @@ level_internet = 0.02
 
 [image]
 theta_sample = 400               # NROY points sampled for the images
-seed = 20260815                  # sample of the 400 points
+seed = 20260815                  # sample of the 400 points; was history_matching.seed + 1, keep them in step
 # Endpoint recheck: fresh reps_estimand reps on stream offsets 100000, 100001, ...
 # Disjoint from the image reps (0..199), the foil panel (0) and the Foil 2 gate (1,000,000+).
 recheck_offset = 100_000
