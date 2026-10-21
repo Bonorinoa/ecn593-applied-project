@@ -61,7 +61,7 @@ One-time setup, then one command:
 uv venv .venv --python 3.11
 uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt
 .venv/bin/python scripts/replicate.py            # everything, about 13 minutes
-.venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check, about 5-8 minutes
+.venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check, about 7-8 minutes
 ```
 
 `replicate.py` runs the tests, checks z, runs both pipelines and the Foil 2 check, copies the figures into `writeup/`, writes the paper's numbers (`writeup/numbers.tex`), and builds the PDF. It ends with a report that compares every result file with the committed one. The paper types no result: every number in it is a macro from `numbers.tex`. The PDF build needs TeX Live with `latexmk`; without it, upload `writeup/` to Overleaf.
