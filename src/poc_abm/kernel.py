@@ -1,8 +1,8 @@
 """The ABM kernel — one model structure, many worlds.
 
-This module exists to be READ. Every function is short, commented, and mirrors
-METHODOLOGY.md §1–§3 line by line. If you change anything here, you are changing
-the specification, not an implementation detail.
+This module exists to be read. Every function is short and commented.
+SPECIFICATION.md describes this code. If the two disagree, the code is what
+ran, and the document has an error.
 """
 import zlib
 
@@ -12,7 +12,7 @@ from . import config
 
 
 def stream_seed(label: str, offset: int) -> int:
-    """Stable RNG seed from a length-prefixed key (METHODOLOGY §9).
+    """Stable RNG seed from a length-prefixed key.
 
     Never Python's hash() — CPython salts string hashes per process, so
     hash(('random', 7)) is a different integer every session.
@@ -70,7 +70,7 @@ def logistic(z):
 def assign(world, rule: str, rng) -> np.ndarray:
     """Return the treatment vector D for a named assignment rule.
 
-    rule in {"control", "random", "degree"} — METHODOLOGY §3.
+    rule in {"control", "random", "degree"}.
     rng is used only for the random arm (SRSWOR).
     """
     n = world.n

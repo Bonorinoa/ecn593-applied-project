@@ -1,4 +1,4 @@
-"""Policy estimands and the exposure map — METHODOLOGY §4, §7, §9.
+"""Policy estimands, the images, the exposure map and Foil 2.
 
 θ₂ (hub-seed vs control) is the headline. Θ_hm is its not-ruled-out image
 over NROY, reported as empirical [L, U]. Θ_exp is the image of δ_spill.
@@ -75,7 +75,7 @@ def exposure_share(world: World, D: np.ndarray) -> np.ndarray:
 
 
 def stratum_labels(D: np.ndarray, share: np.ndarray, cut: float) -> np.ndarray:
-    """Frozen strata: S1 / S0a / S0b / S0c (METHODOLOGY §9)."""
+    """Exposure groups: S1 / S0a / S0b / S0c."""
     D = np.asarray(D)
     share = np.asarray(share)
     labels = np.empty(D.shape[0], dtype=object)
@@ -101,7 +101,7 @@ def maybe_merge_s0b(labels: np.ndarray, min_n: int) -> tuple[np.ndarray, bool]:
 
 
 def true_spill_from_panel(world, Y, D, cut=None, min_n=None) -> dict:
-    """Realized stratum-mean contrasts (oracle Y). Empty cell → nan."""
+    """Realized group-mean contrasts on the true Y. Empty group → nan."""
     cut = config.EXPOSURE_SHARE_CUT if cut is None else cut
     min_n = config.STRATUM_MIN_N if min_n is None else min_n
     s = exposure_share(world, D)
@@ -307,7 +307,7 @@ def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
 
 
 def evaluate_spill(world: World, c: dict, reps: int | None = None, cut=None, offset0: int = 0) -> dict:
-    """MC truth of δ_spill, δ_dir at c under π₁ (oracle Y)."""
+    """Monte Carlo truth of δ_spill, δ_dir at c in the random arm (true Y)."""
     reps = config.REPS_ESTIMAND if reps is None else reps
     cut = config.EXPOSURE_SHARE_CUT if cut is None else cut
     spills = []

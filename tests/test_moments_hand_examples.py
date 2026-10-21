@@ -39,7 +39,7 @@ def test_c_star_is_the_center_of_the_frozen_box():
 
 
 def test_planted_z_is_unit_interval_and_has_sampling_variances():
-    """AMENDMENT-02: z comes from data/planted.json, already in [0,1].
+    """z comes from data/planted.json, already in [0,1].
     Sampling variances are the stored MC variances of the R_z mean.
     """
     z, audit = load_frozen_z()

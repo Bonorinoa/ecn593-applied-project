@@ -31,7 +31,7 @@ def test_logistic_endpoints():
 
 
 def test_control_arm_is_all_zeros():
-    """π₀ assigns no treatment — METHODOLOGY §3."""
+    """π₀ assigns no treatment."""
     w = World()
     D = assign(w, "control", np.random.default_rng(0))
     assert D.sum() == 0
@@ -89,7 +89,7 @@ def test_determinism_same_inputs_same_output():
 
 
 def test_stream_seed_is_crc32_of_length_prefixed_key():
-    """METHODOLOGY §9: never Python hash(); crc32 of a length-prefixed key.
+    """Never Python hash(); crc32 of a length-prefixed key.
 
     Arithmetic: key = b'6:random:7' because len('random')=6, rule='random',
     offset=7. zlib.crc32 of that exact byte string is the seed. Two calls

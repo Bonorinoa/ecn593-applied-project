@@ -1,4 +1,4 @@
-"""History matching: LHS waves -> NROY set — METHODOLOGY §6–§7.
+"""History matching: Latin hypercube waves -> NROY.
 
 Deliberately emulator-free: direct evaluation only. Empty NROY is a finding;
 τ is never loosened.
@@ -38,7 +38,7 @@ def array_to_params(row: np.ndarray, names) -> dict:
 
 
 def survivor_bbox(points: np.ndarray, inflation: float):
-    """Bounding box of survivors, inflated by `inflation` fraction on each side.
+    """Bounding box of the points kept in a wave, widened by `inflation` of the span.
 
     pad = inflation * span / 2, so inflation=0.20 expands the box 10% each side
     (20% of the span in total).
@@ -86,7 +86,7 @@ def run_waves(
 ):
     """The wave loop. Returns a dict with NROY, I(c), finding, τ.
 
-    NROY is the UNION of points with I ≤ τ across waves (METHODOLOGY §6).
+    NROY is the UNION of points with I ≤ τ across waves.
     """
     n_points = config.WAVE_POINTS if n_points is None else n_points
     n_waves = config.WAVES if n_waves is None else n_waves
@@ -135,7 +135,7 @@ def run_waves(
         )
         wave_kept.append(len(kept))
         print(
-            f"wave {wave + 1}: {len(kept)} survivors of {pts.shape[0]} "
+            f"wave {wave + 1}: {len(kept)} kept of {pts.shape[0]} "
             f"(I min={I_this.min():.2f} med={np.median(I_this):.2f})"
         )
         if not kept:

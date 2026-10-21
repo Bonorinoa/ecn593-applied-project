@@ -1,4 +1,4 @@
-"""Hand-example tests for history matching — METHODOLOGY §6–§7."""
+"""Hand-example tests for history matching."""
 import sys
 from pathlib import Path
 
@@ -66,7 +66,7 @@ def test_lhs_puts_one_point_in_each_marginal_stratum():
 
 
 def test_empty_nroy_is_a_finding_not_a_rescue():
-    """If every I(c) > τ, return 0 survivors and F-EMPTY. Do not touch τ.
+    """If every I(c) > τ, keep 0 points and report F-EMPTY. Do not touch τ.
 
     Fake moment map: M̂ ≡ (0,0,0), z ≡ (1,1,1), V ≡ I_3 so I = 3 > τ?  Wait:
     I = 1²+1²+1² = 3, and τ ≈ 7.81, so 3 would SURVIVE. Use z=(10,10,10)
@@ -93,7 +93,7 @@ def test_empty_nroy_is_a_finding_not_a_rescue():
     assert abs(result["tau"] - tau_threshold()) < 1e-12
 
 
-def test_nroy_is_the_union_of_wave_survivors():
+def test_nroy_is_the_union_of_points_kept_in_each_wave():
     """Wave 1 keeps points with alpha < -1.5; wave 2 draws in the inflated
     bbox of those and keeps the same rule. Union has at least the wave-1 set.
     Fake I uses only alpha so this is arithmetic on the box, not a kernel.

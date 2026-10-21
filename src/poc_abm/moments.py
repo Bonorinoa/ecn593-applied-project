@@ -62,7 +62,7 @@ def load_worldbank_z(path=None):
 
 
 def load_frozen_z():
-    """Load AMENDMENT-02 planted z from data/planted.json.
+    """Load the planted targets z from data/planted.json.
 
     z is M̂(c*) in [0,1] already. Sampling variances travel in the audit dict.
     """
@@ -88,7 +88,7 @@ def plant_and_freeze(world: World, path=None) -> dict:
     path = config.DATA_DIR / "planted.json" if path is None else path
     m, mc = simulate_moments(world, config.C_STAR, reps=config.REPS_Z)
     payload = {
-        "amendment": "AMENDMENT-02",
+        "amendment": "AMENDMENT-02",  # historical label, kept so planted.json reproduces byte for byte
         "c_star": {k: float(v) for k, v in config.C_STAR.items()},
         "z": m.tolist(),
         "sampling_variances": mc.tolist(),

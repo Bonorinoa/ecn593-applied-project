@@ -1,4 +1,4 @@
-"""Hand-example tests for estimands and the exposure map — METHODOLOGY §4, §7, §9."""
+"""Hand-example tests for estimands and the exposure map."""
 import sys
 from pathlib import Path
 
@@ -65,7 +65,7 @@ def _path_world():
 
 
 def test_path_graph_exposure_share_treat_B():
-    """Path A–B–C–D, treat {B}. s_i = (sum_{j~i} D_j) / k_i  (METHODOLOGY §9).
+    """Path A–B–C–D, treat {B}. s_i = (sum_{j~i} D_j) / k_i.
 
     A~B: k_A=1, neighbour B treated → s_A = 1/1 = 1
     B~A,C: k_B=2, both untreated → s_B = 0
@@ -78,8 +78,8 @@ def test_path_graph_exposure_share_treat_B():
       C → S0c (D=0, s=0.5 ≥ 0.25)
       D → S0a (D=0, s=0)
 
-    Note: AMENDMENT-01 wrote s=(0, ½, ½, 0) and A→S0a; that contradicts
-    s_i = neighbour share on a path. The methodology definition wins.
+    Note: an early memo wrote s=(0, ½, ½, 0) and A→S0a. That is wrong for
+    s_i = neighbour share on a path; this test checks the code's definition.
     """
     w = _path_world()
     D = np.array([0.0, 1.0, 0.0, 0.0])
