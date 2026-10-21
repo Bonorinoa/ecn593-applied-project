@@ -1,0 +1,119 @@
+% cover.tex: the cover page of the ECN 593 final report.
+% Every number here is in results/planted/poc_results.json or
+% results/checks/foil2_coverage.json (commit 4feb467). The diagram uses data
+% coordinates, so each value can be read off its source line.
+\begin{titlepage}
+\thispagestyle{empty}
+\setlength{\parskip}{0pt}
+\raggedright
+
+{\footnotesize\color{line}%
+ECN 593 \textperiodcentered\ APPLIED PROJECT \textperiodcentered\ FINAL REPORT\hfill ARIZONA STATE UNIVERSITY\par}
+\vspace{0.5em}
+{\color{rule}\rule{\linewidth}{1.2pt}}
+\vspace{1.6em}
+
+{\fontsize{24}{29}\selectfont\bfseries\color{ink}%
+Not-ruled-out images\\[0.15em]of policy contrasts\par}
+\vspace{0.9em}
+{\normalsize\color{line}%
+A village agent-based model, calibrated by history matching,\\
+and two one-world analysts graded against\\
+what the targets cannot rule out\par}
+
+\vspace{1.6em}
+
+% ---- the paper in one picture: the min-I point (the best-fitting NROY point)
+{\normalsize\bfseries\color{ink} The paper in one picture\par}
+\vspace{0.7em}
+\begin{tikzpicture}[
+    every node/.style={font=\footnotesize, text=ink},
+    band/.style={fill=wash, draw=line, line width=0.3pt},
+    foil/.style={line width=2.4pt, draw=ink},
+    truth/.style={font=\normalsize},
+    tick/.style={line width=0.4pt, draw=line}]
+  % Row 1: theta_2 on [0, 0.08] mapped to 16.4 cm (x = 205 cm per unit)
+  \begin{scope}[x=205cm, y=1cm]
+    \node[anchor=south west] at (0, 0.78) {\bfseries Foil 1\normalfont\ \ ignores interference \textperiodcentered\ policy effect};
+    \fill[band] (0.00587, 0.18) rectangle (0.07325, 0.74);
+    \node[anchor=north east, text=line] at (0.07325, 0.72) {image $\Theta_{\mathrm{hm}}$};
+    \draw[foil] (0.03259, 0.33) -- (0.03465, 0.33);
+    \node[truth] at (0.03708, 0.56) {$\star$};
+    \node[anchor=west] at (0.0382, 0.56) {truth here: 0.0371};
+    \draw[tick] (0, 0) -- (0.08, 0);
+    \foreach \v in {0, 0.02, 0.04, 0.06, 0.08} {
+      \draw[tick] (\v, 0) -- (\v, -0.07);
+      \node[below, text=line] at (\v, -0.05) {\v};}
+  \end{scope}
+  % Row 2: delta_spill on [-0.004, 0.028] mapped to 16.4 cm (x = 512.5 cm per unit)
+  \begin{scope}[x=512.5cm, y=1cm, xshift=2.05cm, yshift=-2.05cm]
+    \node[anchor=south west] at (-0.004, 0.78) {\bfseries Foil 2\normalfont\ \ models exposure \textperiodcentered\ spillover};
+    \fill[band] (-0.000571, 0.18) rectangle (0.026893, 0.74);
+    \node[anchor=north east, text=line] at (0.026893, 0.72) {image $\Theta_{\mathrm{exp}}$};
+    \draw[foil] (-0.003022, 0.33) -- (0.015410, 0.33);
+    \node[truth] at (0.006129, 0.56) {$\star$};
+    \node[anchor=west] at (0.0068, 0.56) {truth here: 0.0061};
+    \draw[tick] (-0.004, 0) -- (0.028, 0);
+    \foreach \v in {0, 0.01, 0.02} {
+      \draw[tick] (\v, 0) -- (\v, -0.07);
+      \node[below, text=line] at (\v, -0.05) {\v};}
+  \end{scope}
+\end{tikzpicture}
+
+\vspace{0.4em}
+{\footnotesize\color{line}%
+The diagram shows the min-I point, the best-fitting NROY point. The two
+rows use different scales. Bands: the image of the effect over 400 sampled NROY points. Black
+lines: the analyst's nominal 95\% interval from one panel. Stars: the
+simulator's true value at this point. Foil~1 is tight, sits inside the band,
+and misses the truth. Foil~2 contains the truth, but it is too wide for a
+robust verdict.\par}
+
+\vspace{1.3em}
+
+% ---- question and answer
+\noindent
+\begin{minipage}[t]{0.47\linewidth}\raggedright
+{\normalsize\bfseries\color{ink} The question}\par\vspace{0.4em}
+{\small Many parameter points fit the same three targets, and they imply
+different campaign effects. What must a calibrated simulator report? How
+far can an interval computed at one point be trusted?\par}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.47\linewidth}\raggedright
+{\normalsize\bfseries\color{ink} The answer}\par\vspace{0.4em}
+{\small Foil 1 is F-OVERCONF at both diagnostic points; no robust Foil~2
+verdict is claimed at either point. Most of Foil~1's miss is the effect on
+people who were not seeded. Report the image, not one point.\par}
+\end{minipage}
+
+\vspace{1.3em}
+
+% ---- in numbers
+{\normalsize\bfseries\color{ink} In numbers\par}
+\vspace{0.4em}
+{\footnotesize
+\begin{tabularx}{\linewidth}{@{}X r@{}}
+\toprule
+\textcolor{line}{Points evaluated in three history-matching waves / points kept (NROY)} & 3,000 / 991 \\
+\textcolor{line}{Image of the policy effect over the sampled NROY points} & [0.0059, 0.0732] \\
+\textcolor{line}{Policy effect at the planted point c*} & 0.0383 \\
+\textcolor{line}{Foil 1 estimate below the truth, at min-I / median-I} & 9.3\% / 7.2\% \\
+\textcolor{line}{Foil 2 interval coverage when the exposure map holds exactly} & 93.4\% \\
+\bottomrule
+\end{tabularx}\par}
+
+\vfill
+
+{\color{rule}\rule{\linewidth}{0.4pt}}\par\vspace{0.6em}
+\noindent
+\begin{minipage}[t]{0.44\linewidth}\raggedright
+{\small\bfseries\color{ink} Augusto Gonz\'alez-Bonorino}\par\vspace{0.15em}
+{\footnotesize\color{line} Arizona State University\\
+Applied project for ECN 593\par}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.54\linewidth}\raggedleft
+{\footnotesize\color{line} Draft for review, October 2026\\
+\texttt{github.com/Bonorinoa/ecn593-applied-project}\\
+Deterministic \textperiodcentered\ 51 tests \textperiodcentered\ rerun in about 5 minutes\par}
+\end{minipage}
+\end{titlepage}
