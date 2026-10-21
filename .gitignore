@@ -5,8 +5,8 @@ __pycache__/
 *.pyc
 # private study material (sessions, old decks, the Tamer talk): local only, never pushed
 study/
-# scratch outputs of the check scripts; regenerate with scripts/check_*.py, scripts/plant_z.py
-results/checks/
+# scratch copy written by scripts/plant_z.py (check mode); results/checks/foil2_coverage.json is tracked
+results/checks/planted_regenerated.json
 writeup/*.aux
 writeup/*.log
 writeup/*.out
