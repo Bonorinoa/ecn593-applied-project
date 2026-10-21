@@ -75,7 +75,7 @@ def exposure_share(world: World, D: np.ndarray) -> np.ndarray:
 
 
 def stratum_labels(D: np.ndarray, share: np.ndarray, cut: float) -> np.ndarray:
-    """Exposure groups: S1 / S0a / S0b / S0c."""
+    """Exposure strata: S1 / S0a / S0b / S0c."""
     D = np.asarray(D)
     share = np.asarray(share)
     labels = np.empty(D.shape[0], dtype=object)
@@ -101,7 +101,7 @@ def maybe_merge_s0b(labels: np.ndarray, min_n: int) -> tuple[np.ndarray, bool]:
 
 
 def true_spill_from_panel(world, Y, D, cut=None, min_n=None) -> dict:
-    """Realized group-mean contrasts on the true Y. Empty group → nan."""
+    """Realized stratum-mean contrasts on the true Y. Empty stratum → nan."""
     cut = config.EXPOSURE_SHARE_CUT if cut is None else cut
     min_n = config.STRATUM_MIN_N if min_n is None else min_n
     s = exposure_share(world, D)
