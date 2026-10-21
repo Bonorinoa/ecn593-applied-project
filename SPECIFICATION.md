@@ -1,6 +1,6 @@
 # Specification
 
-This document describes the code in this repo, on the branch `code-is-law`. If the document and the code disagree, the code is what ran, and the document has an error. The code is law. Main-pipeline constants are in `src/poc_abm/config.py`. The Foil 2 check defines its check-specific constants in `scripts/check_foil2_coverage.py`. Run outputs below come from the committed results in `results/`. Run constants come from the cited code. Paths are relative to the repo root. Code identifiers appear in code font.
+This document describes the code in this repo, on the branch `main`. If the document and the code disagree, the code is what ran, and the document has an error. The code is law. Main-pipeline constants are in `src/poc_abm/config.py`. The Foil 2 check defines its check-specific constants in `scripts/check_foil2_coverage.py`. Run outputs below come from the committed results in `results/`. Run constants come from the cited code. Paths are relative to the repo root. Code identifiers appear in code font.
 
 Sections 1 to 5 cover the model, the targets, the images and foils, the non-claims, and the World Bank run. Section 6 lists the outputs of each script and the environment.
 
