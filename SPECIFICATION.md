@@ -363,4 +363,4 @@ The file `poc_results.json` has these keys: `git_commit`, `ran_at`, `z_source`, 
 
 The planted run also stores `theta_star` and `spill_star`, the truth at $c^*$: theta1 = 0.03631, theta2 = 0.03826, premium = 0.00195, and delta_spill = 0.00792.
 
-The pins are Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2. The pipeline calls `uv pip freeze` to write `locks/freeze-*.txt`, so `uv` must be on the path. The tests are in `tests/`. There are 52 of them.
+The pins are Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2 and pytest 9.1.1 (before 2026-10-22: Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2; see the README). The pipeline calls `uv pip freeze` to write `locks/freeze-*.txt`, so `uv` must be on the path. The tests are in `tests/`. There are 52 of them.

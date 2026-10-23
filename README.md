@@ -58,7 +58,7 @@ Foil 2 calibration check: the nominal 95% interval covered 93.4% of assignments 
 One-time setup, then one command:
 
 ```bash
-uv venv .venv --python 3.11
+uv venv .venv --python 3.14
 uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt
 .venv/bin/python scripts/replicate.py            # everything, about 13 minutes
 .venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check, about 7-8 minutes
@@ -87,7 +87,9 @@ Measured runtimes on an Apple-silicon laptop, from a fresh clone:
 
 A fresh clone gave the committed results. Every result field matches the earlier run except `ran_at` and `git_commit`. The files `image_points.json` and `overlay.png` are byte-identical. A rerun reproduces every number, because every random stream is seeded.
 
-Pins: Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3, pytest 8.4.2. Reproducibility is part of the claim, so a rerun must match to the last digit. The file `locks/freeze-*.txt` records the full environment of each run. It includes extra packages that the code does not import. The project does not use Mesa, pandas, or GPU libraries. The kernel is vectorized algebra.
+Pins: Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2, pytest 9.1.1. Reproducibility is part of the claim, so a rerun must match to the last digit. The file `locks/freeze-*.txt` records the full environment of each run. It includes extra packages that the code does not import. The project does not use Mesa, pandas, or GPU libraries. The kernel is vectorized algebra.
+
+Pin change on 2026-10-22. The committed results, figures and lock files come from the earlier pins (Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3, pytest 8.4.2). macOS 27.0.1 cannot load the compiled scipy 1.15.3 extension, so the pins moved. A full `replicate.py` on the new pins matched every committed result file, with one exception. In `results/checks/foil2_coverage.json`, the upper Clopper-Pearson bound moved by 1.1e-16 (the last binary digit). The gate still passes. `writeup/numbers.tex` did not change (174 numbers). The figures show the same data. Only antialiasing and glyph pixels differ, so the PNG files are not byte-identical.
 
 Two cautions. `run_poc.py` calls `uv` and overwrites the committed results, figures and lock file of its run. `check_foil2_coverage.py` reads `results/planted/poc_results.json`, so run the planted run first. After a rerun, use `git diff results/` to compare your numbers with the committed ones. In our clean-clone check, only `ran_at` and `git_commit` changed.
 
