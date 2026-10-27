@@ -11,7 +11,7 @@
     "coverage": 0.9343,
     "coverage_clopper_pearson_95": [
       0.929266297791224,
-      0.9390789238312393
+      0.9390789238312394
     ],
     "rule": "FAIL iff variance_ratio + 1.645 * boot SE < 1",
     "pass": true
@@ -31,24 +31,24 @@
         "design_mean_se": 0.004950168552589963
       },
       "min_I": {
-        "truth": 0.006129285419336761,
-        "coverage": 0.93,
-        "sd_estimate": 0.005217549458517511,
-        "mean_se": 0.004855783228854998,
-        "design_target": 0.006052076779027314,
-        "design_coverage": 0.93,
-        "design_sd_estimate": 0.005172438907018889,
-        "design_mean_se": 0.004794503647451613
+        "truth": 0.012711961996060107,
+        "coverage": 0.925,
+        "sd_estimate": 0.005708289194848452,
+        "mean_se": 0.005334456130167322,
+        "design_target": 0.012637958616687317,
+        "design_coverage": 0.9266666666666666,
+        "design_sd_estimate": 0.0056825423897187,
+        "design_mean_se": 0.005269284869509231
       },
       "median_I": {
-        "truth": 0.008089303314279617,
-        "coverage": 0.925,
-        "sd_estimate": 0.004590419294314131,
-        "mean_se": 0.004286553746930486,
-        "design_target": 0.008031086906089942,
+        "truth": 0.01520038590605576,
+        "coverage": 0.92,
+        "sd_estimate": 0.005748245852012808,
+        "mean_se": 0.005357052526751544,
+        "design_target": 0.015122763218246859,
         "design_coverage": 0.9266666666666666,
-        "design_sd_estimate": 0.004543601015505734,
-        "design_mean_se": 0.00422299159854313
+        "design_sd_estimate": 0.005685061373661036,
+        "design_mean_se": 0.005285491476261
       }
     }
   },

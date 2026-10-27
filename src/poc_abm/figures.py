@@ -46,7 +46,7 @@ def draw_overlay(payload: dict, path: Path) -> Path:
         ax.set_title(f"{title}  —  policy contrast")
         ax.set_xlabel(r"$\theta_2$")
         if r == 0:
-            ax.legend(loc="upper right", fontsize=8, frameon=False)
+            ax.legend(loc="lower right", fontsize=8, frameon=False)
 
         # right: spillover
         ax = axes[r, 1]
@@ -61,7 +61,7 @@ def draw_overlay(payload: dict, path: Path) -> Path:
         ax.set_title(f"{title}  —  spillover")
         ax.set_xlabel(r"$\delta_{\mathrm{spill}}$")
         if r == 0:
-            ax.legend(loc="upper right", fontsize=8, frameon=False)
+            ax.legend(loc="lower right", fontsize=8, frameon=False)
 
     fig.suptitle("Images over NROY (bands) vs one-world foil intervals (lines), at three points", fontsize=10.5)
     fig.tight_layout()
