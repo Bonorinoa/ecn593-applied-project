@@ -1,57 +1,69 @@
 # ECN 593 applied project: honest images of a policy effect
 
-A village agent-based model has five free parameters and three targets, so many parameter points fit the targets equally well. The project reports the image of a policy effect over the sampled parameter points that fit, and tests whether two one-world analysts give honest intervals.
+A village agent-based model has five free parameters and four targets, so many parameter points fit the targets equally well. The project reports the image of a policy effect over the sampled parameter points that fit, and tests whether two one-world analysts give honest intervals.
 
 ## Why it matters
 
 Calibrated simulators inform policy advice. Calibration usually ends in one "best" parameter point. If many points fit equally well, a one-world interval can look precise and still be wrong. The image is the honest report. It applies the partial-identification logic of Manski (2003) and Tamer (2010) to a calibrated simulator. The image is not an identified set in Tamer's sense (see "What the project does not claim").
 
-## The headline
+## The design (pre-registration v2)
 
-> Foil 1 is F-OVERCONF at both diagnostic points; no robust Foil 2 verdict is claimed at either point.
-
-The analyst who ignores interference reports a tight interval that sits inside the image and misses the truth. The analyst who models exposure passes the predeclared average-variance gate, but its interval is wide and gets no robust verdict.
-
-How to read it:
+The design is frozen in `docs/preregistration-v2.md`. The code implements it. The earlier design is the git tag `v1-worldbank-moments`. Its targets contained the policy answer. It still replicates from that tag.
 
 - **The model.** N = 800 people sit on a fixed random graph. Each person has a preventive-behavior level Y in (0, 1). A campaign seeds 10% of the people.
-- **The targets.** Three targets z are planted: z = M(c*) at a known point c*. So the true effect is known, and the test can grade the analysts.
+- **The targets.** Four targets z are planted: z = M(c*) at a known point c*, so the true effect is known. The targets are what a researcher could observe: the village in the status quo, plus one randomized pilot. The moments are `sq_level`, `sq_corr_x1`, `sq_peer_corr` and `pilot_level`. The policy to predict, seeding the highest-degree people, is never a target.
 - **NROY and the image.** History matching evaluates three finite Latin-hypercube waves. NROY is the union of sampled points with I(c) at or below tau. Theta_hm is the range of theta2 over a declared uniform sample of 400 NROY points. Here theta2 is the effect of seeding the 80 highest-degree people, against no campaign.
 - **Foil 1.** This analyst assumes no interference (SUTVA). The estimate is OLS on the degree arm, scaled by k/N = 0.1.
 - **Foil 2.** This analyst models exposure to treated neighbors on a randomized arm. The target is the spillover delta_spill. The image of delta_spill is Theta_exp.
 - **F-OVERCONF.** An interval is F-OVERCONF if it lies strictly inside its image. For Foil 1 this is a statement about interval geometry under the analyst's assumptions. It is not a coverage claim.
-- **Diagnostic points.** The min-I point and the median-I point of NROY. They are chosen by I only, never by the effect.
+- **Three points, two analysts.** The calibrator fits the model and works at one best-fitting point. The code uses the min-I point and the median-I point of NROY. They are chosen by I only, never by the effect. The field experimenter has one panel from the real village, which is the planted point c*.
+- **Two containment flags.** At every point, each foil gets `covers_truth` (the truth at that point) and `covers_planted_truth` (the truth at c*). At c* the two flags are equal. Both are descriptive indicators for one realized panel. They are not repeated-sampling coverage.
 
-![Images and one-world intervals at the two diagnostic points](figures/planted/overlay.png)
+The v1 headline is retired. A v2 headline is not adopted yet: that decision is the project owner's.
 
-Rows are the min-I and median-I points. The left column shows theta2 against Theta_hm, with the Foil 1 interval. The right column shows delta_spill against Theta_exp, with the Foil 2 interval. A star marks the truth at that point. A triangle marks the truth at c*.
+![Images and one-world intervals at the three points](figures/planted/overlay.png)
 
-## The numbers behind the headline
+Rows are the min-I point, the median-I point and c*. The left column shows theta2 against Theta_hm, with the Foil 1 interval. The right column shows delta_spill against Theta_exp, with the Foil 2 interval. A star marks the truth at that point. A triangle marks the truth at c* (in the first two rows).
 
-All numbers come from `results/planted/poc_results.json` and `results/checks/foil2_coverage.json`.
+## The numbers
+
+All numbers come from `results/planted/poc_results.json` and `results/checks/foil2_coverage.json`. The paper takes them from `writeup/numbers.tex`.
 
 | Quantity | Value |
 |---|---|
-| Targets z (level_imm, gradient_edu, level_internet) | 0.2638, 0.05, 0.2618 |
-| Threshold tau | 7.8147 |
-| Points kept per wave (of 1000 each) | 202, 416, 373 |
-| NROY size | 991 |
-| Image Theta_hm (400 sampled NROY points) | [0.00587, 0.07325] |
-| Image Theta_exp (400 sampled NROY points) | [−0.000571, 0.026893] |
+| Targets z (sq_level, sq_corr_x1, sq_peer_corr, pilot_level) | 0.2255, 0.0726, 0.0003, 0.2618 |
+| Threshold tau (chi-square, 4 degrees of freedom) | 9.4877 |
+| Points kept per wave (of 1000 each) | 181, 449, 408 |
+| NROY size | 1,038 |
+| Image Theta_hm (400 sampled NROY points) | [0.00577, 0.07369] |
+| Image Theta_exp (400 sampled NROY points) | [−0.000578, 0.026525] |
 | theta2 and delta_spill at the planted point c* | 0.03826 and 0.00792 |
+| theta1 at c* (equal to pilot_level − sq_level, see below) | 0.03631 |
 
-| | min-I point (I = 0.0017) | median-I point (I = 2.0208) |
-|---|---|---|
-| Truth theta2 | 0.03708 | 0.06346 |
-| Foil 1 interval | [0.03259, 0.03465] | [0.05832, 0.05949] |
-| Foil 1 verdict, contains truth | F-OVERCONF, no | F-OVERCONF, no |
-| Truth delta_spill | 0.00613 | 0.00809 |
-| Foil 2 interval | [−0.003022, 0.015410] | [0.000112, 0.016406] |
-| Foil 2 verdict, contains truth | no verdict, yes | F-OVERCONF in the pilot image, yes |
+| | min-I point (I = 0.0141) | median-I point (I = 3.3437) | c* |
+|---|---|---|---|
+| Truth theta2 | 0.03933 | 0.05642 | 0.03826 |
+| Foil 1 interval | [0.03057, 0.03285] | [0.04664, 0.04840] | [0.03267, 0.03479] |
+| Foil 1 verdict | F-OVERCONF | F-OVERCONF | F-OVERCONF |
+| Foil 1 contains the point truth, the planted truth | no, no | no, no | no, no |
+| Truth delta_spill | 0.01271 | 0.01520 | 0.00792 |
+| Foil 2 interval | [0.002988, 0.023619] | [0.005598, 0.026135] | [−0.001405, 0.017638] |
+| Foil 2 verdict | F-OVERCONF | F-OVERCONF | no verdict |
+| Foil 2 contains the point truth, the planted truth | yes, yes | yes, yes | yes, yes |
 
-The Foil 2 verdict at the median-I point is not robust. An independent recheck of the lower-end candidate of Theta_exp is 0.000201, above the lower end of the interval.
+The pilot moment identifies theta1 by design. With paired reps, `pilot_level` − `sq_level` at c* equals theta1(c*) exactly. This is intended: a randomized pilot identifies theta1. The question is whether the model can extrapolate from it to theta2.
+
+The endpoint recheck evaluates the points that set the Theta_exp endpoints again, with fresh reps. The lower candidate is +0.000200 (pilot: −0.000578). The upper candidate is +0.027542 (pilot: 0.026525). Both Foil 2 intervals at the min-I and median-I points stay strictly inside the range between these two fresh values. The recheck covers only the selected candidates. It does not bound the true extrema.
+
+The readout `nroy_param_spread` shows which parameters the targets restrict. It is the standard deviation over the sampled NROY points, divided by the standard deviation of a uniform draw over C. A ratio near 1 means the targets do not restrict that parameter.
+
+| Parameter | alpha | beta | gamma | kappa | sigma_eps |
+|---|---|---|---|---|---|
+| Ratio | 0.259 | 0.965 | 0.992 | 0.962 | 0.839 |
 
 Foil 2 calibration check: the nominal 95% interval covered 93.4% of assignments (exact 95% binomial interval 92.9%–93.9%). The average estimated variance was 1.034 times the empirical design variance.
+
+Two facts about the graph: the global clustering coefficient is 0.0096 (3 × triangles / connected triples; the edge probability, which a random graph has in expectation, is 0.0100), and the mean degree is 8.085.
 
 ## How to replicate
 
@@ -60,49 +72,49 @@ One-time setup, then one command:
 ```bash
 uv venv .venv --python 3.14
 uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt
-.venv/bin/python scripts/replicate.py            # everything, about 13 minutes
-.venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check, about 7-8 minutes
+.venv/bin/python scripts/replicate.py            # everything
+.venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check
 ```
 
-`replicate.py` runs the tests, checks z, runs both pipelines and the Foil 2 check, copies the figures into `writeup/`, writes the paper's numbers (`writeup/numbers.tex`), and builds the PDF. It ends with a report that compares every result file with the committed one. The paper types no result: every number in it is a macro from `numbers.tex`. The PDF build needs TeX Live with `latexmk`; without it, upload `writeup/` to Overleaf.
+`replicate.py` has eight steps: the tests, the z check, the planted run, the Foil 2 check, the figure copy into `writeup/`, the paper's numbers (`writeup/numbers.tex`), the PDF build, and a report that compares every result file with the committed one. The paper types no result: every number in it is a macro from `numbers.tex`. The PDF build needs TeX Live with `latexmk`; without it, upload `writeup/` to Overleaf.
+
+Until `writeup/main.tex` is rewritten for v2, step 7 (the PDF build) fails, because `main.tex` still uses macros that no longer exist. The script stops there and prints no report. Run the steps one at a time (below), and compare with `git diff results/`.
 
 The steps, one at a time:
 
 ```bash
 python scripts/plant_z.py                        # check: data/planted.json reproduces byte for byte
-python scripts/run_poc.py planted                # main run -> results/planted/, figures/planted/
-python scripts/run_poc.py worldbank              # historical run -> results/worldbank/ (F-EMPTY)
+python scripts/run_poc.py planted                # the run -> results/planted/, figures/planted/
 python scripts/check_foil2_coverage.py           # Foil 2 calibration check -> results/checks/foil2_coverage.json
 python scripts/draw_figures.py planted           # redraw figures from saved results (no simulation)
 python scripts/sync_writeup_figures.py           # copy the figures into writeup/figures/
 python scripts/write_numbers.py                  # write writeup/numbers.tex from config/ and results/
 ```
 
-Measured runtimes on an Apple-silicon laptop, from a fresh clone:
+Measured runtimes on an Apple-silicon laptop, in the repo at commit `cc01779`:
 
-- The full `replicate.py`, from a fresh clone at commit `c075b5a`, took 787 s (about 13 minutes): tests 27 s, World Bank run 44 s, planted run 362 s, Foil 2 check 350 s, the paper steps under 5 s.
-- The planted run varies with machine load: 270-400 s in our runs.
-- `replicate.py --quick` skips the Foil 2 check and takes about 7-8 minutes.
-- Before commit `c075b5a` cached its exposure probabilities, the Foil 2 check took about 52 minutes. The results are identical.
+- The tests took 3 s (54 pass, 1 is an expected failure). The z check took under 1 s. The planted run took 243 s. The Foil 2 check took 233 s. The figure copy and the numbers took about 1 s each. These six steps take about 8 minutes.
+- Step 7, the PDF build, failed after 1 s, as described above.
+- `replicate.py --quick` skips the Foil 2 check, which is 233 s of that time.
+- A second planted run after the commit changed only `ran_at` and `git_commit` in `results/planted/poc_results.json`. The files `image_points.json`, the figures and the lock file were byte-identical. The Foil 2 check file was also byte-identical after a second run. Every random stream is seeded, so a rerun reproduces every number.
 
-A fresh clone gave the committed results. Every result field matches the earlier run except `ran_at` and `git_commit`. The files `image_points.json` and `overlay.png` are byte-identical. A rerun reproduces every number, because every random stream is seeded.
+Pins: Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2, pytest 9.1.1. Reproducibility is part of the claim, so a rerun must match to the last digit. The file `locks/freeze-planted.txt` records the full environment of the run. It includes extra packages that the code does not import. The project does not use Mesa, pandas, or GPU libraries. The kernel is vectorized algebra.
 
-Pins: Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2, pytest 9.1.1. Reproducibility is part of the claim, so a rerun must match to the last digit. The file `locks/freeze-*.txt` records the full environment of each run. It includes extra packages that the code does not import. The project does not use Mesa, pandas, or GPU libraries. The kernel is vectorized algebra.
+Pin change on 2026-10-22. macOS 27.0.1 cannot load the compiled scipy 1.15.3 extension, so the pins moved from Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2. Every v2 result, figure and lock file was produced on the new pins. The v1 tag holds results from the older pins.
 
-Pin change on 2026-10-22. The committed results, figures and lock files come from the earlier pins (Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3, pytest 8.4.2). macOS 27.0.1 cannot load the compiled scipy 1.15.3 extension, so the pins moved. A full `replicate.py` on the new pins matched every committed result file, with one exception. In `results/checks/foil2_coverage.json`, the upper Clopper-Pearson bound moved by 1.1e-16 (the last binary digit). The gate still passes. `writeup/numbers.tex` did not change (174 numbers). The figures show the same data. Only antialiasing and glyph pixels differ, so the PNG files are not byte-identical.
-
-Two cautions. `run_poc.py` calls `uv` and overwrites the committed results, figures and lock file of its run. `check_foil2_coverage.py` reads `results/planted/poc_results.json`, so run the planted run first. After a rerun, use `git diff results/` to compare your numbers with the committed ones. In our clean-clone check, only `ran_at` and `git_commit` changed.
+Two cautions. `run_poc.py` calls `uv` and overwrites the committed results, figures and lock file. `check_foil2_coverage.py` reads `results/planted/poc_results.json`, so run the planted run first. After a rerun, use `git diff results/` to compare your numbers with the committed ones.
 
 ## Repository layout
 
-- `config/`: every exogenous parameter, chosen before any run. `world.toml` is the simulated village and the policy question. `design.toml` is the analyst's choices, including the Foil 2 check. Endogenous quantities are never in config: they live in `data/planted.json` and `results/`.
+- `config/`: every exogenous parameter, chosen before any run. `world.toml` is the simulated village and the policy question. `design.toml` is the analyst's choices: the Monte Carlo reps, history matching (including `delta` for each moment name), the images, the foils and the Foil 2 check. Endogenous quantities are never in config: they live in `data/planted.json` and `results/`.
 - `src/poc_abm/`: the code. The kernel, the moments, history matching, the estimands, the foils, the pipeline and the figures. `config.py` only loads the two TOML files.
-- `scripts/`: `replicate.py` and the steps it runs, plus `draw_figures.py` and the World Bank fetcher.
-- `tests/`: 52 tests. Most of them check hand-computed examples.
-- `data/`: the targets z (`planted.json`) and the stored inputs of the World Bank run.
-- `results/`: the committed JSON of each run, and the Foil 2 calibration check.
-- `figures/`: the figures of each run (`planted/` and `worldbank/`).
-- `locks/`: the frozen package list of each run.
+- `scripts/`: `replicate.py` and the steps it runs, plus `draw_figures.py`.
+- `tests/`: 55 tests. Most of them check hand-computed examples.
+- `data/`: the targets z (`planted.json`).
+- `results/`: the committed JSON of the run, and the Foil 2 calibration check.
+- `figures/`: the figures of the run (`planted/`).
+- `locks/`: the frozen package list of the run.
+- `docs/`: the frozen pre-registration (`preregistration-v2.md`) and the sprint cards.
 - `writeup/`: the paper as a self-contained Overleaf project: `main.tex`, `cover.tex`, `numbers.tex` (generated), `latexmkrc` (XeLaTeX, reproducible PDF), figure copies and the compiled `main.pdf`. Tests check that the figure copies and `numbers.tex` match the results.
 
 `SPECIFICATION.md` describes the code in detail. If the two disagree, the code is what ran.
@@ -110,21 +122,17 @@ Two cautions. `run_poc.py` calls `uv` and overwrites the committed results, figu
 ## What the project does not claim
 
 - Theta_hm is not a posterior. It is not a Manski/Tamer identified set. It comes from a thresholded discrepancy. Sampling noise is folded into the variance matrix V. The kernel is taken as true. The image shares the reporting logic of a set, so do not collapse it to a point.
-- The closest NROY point (I = 0.0017) does not recover c*. Fit does not pick the truth.
+- The closest NROY point (I = 0.0141) does not recover c*. Fit does not pick the truth.
 - F-OVERCONF for Foil 1 is about interval geometry under the analyst's assumptions. It is not a coverage claim.
+- The `covers_truth` and `covers_planted_truth` flags describe one realized panel. They are not repeated-sampling coverage.
+- The sampled image can understate the true NROY image. The three waves are finite.
 - The project has one planted world, one graph, and one set of targets. It claims no external validity.
-
-## The World Bank run
-
-`python scripts/run_poc.py worldbank` reproduces the 2026-08 attempt with real World Bank anchors. It is a historical sensitivity run. It ends in F-EMPTY: the best I is 204 against tau = 7.8. In the 1,000 sampled wave-1 points, none passed the threshold. The closest sampled education correlation was 0.05, against a target of 0.61.
-
-> The World Bank sensitivity run reproduces a historical F-EMPTY calculation. Its diagonal weights are legacy heuristic cross-entity dispersion terms, not design-based sampling variances or village-level measurement-error variances. The source includes overlapping regional/income aggregates, uses ddof=0 for level dispersion, and uses an asymptotic n-2 correlation convention.
 
 ## Planned extensions
 
 1. A construct-validity layer. It scores Y through noisy or biased measures and screens the measures. It is parked until the core results are frozen. The code is at commit `ebed7ce`.
 2. Image endpoints with a declared precision plan. Use more reps for every candidate before taking the extrema, or use a simultaneous procedure.
-3. External targets with a stated target population and a transport model. The World Bank run shows what fails without one.
+3. External targets with a stated target population and a transport model.
 4. A design-based third foil. It needs randomization across villages.
 5. A second kernel family. It shows how much of the image is due to the model choice.
 
