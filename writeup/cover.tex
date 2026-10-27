@@ -11,17 +11,17 @@
 ECN 593 \textperiodcentered\ APPLIED PROJECT \textperiodcentered\ FINAL REPORT\hfill ARIZONA STATE UNIVERSITY\par}
 \vspace{0.5em}
 {\color{rule}\rule{\linewidth}{1.2pt}}
-\vspace{1.6em}
+\vspace{1.2em}
 
 {\fontsize{24}{29}\selectfont\bfseries\color{ink}%
 Not-ruled-out images\\[0.15em]of policy contrasts\par}
 \vspace{0.9em}
 {\normalsize\color{line}%
 A village agent-based model, calibrated by history matching,\\
-and two one-world analysts graded against\\
-what the targets cannot rule out\par}
+and two analysts (a field experimenter and a calibrator)\\
+graded against what the targets cannot rule out\par}
 
-\vspace{1.6em}
+\vspace{1.2em}
 
 % ---- the paper in one picture: the min-I point (the best-fitting NROY point)
 {\normalsize\bfseries\color{ink} The paper in one picture\par}
@@ -62,31 +62,33 @@ what the targets cannot rule out\par}
 
 \vspace{0.4em}
 {\footnotesize\color{line}%
-The diagram shows the min-I point, the best-fitting NROY point. The two
+The diagram shows the min-I point, the calibrator's best-fitting NROY point. The two
 rows use different scales. Bands: the image of the effect over \ThetaSample{} sampled NROY points. Black
 lines: the analyst's nominal \ConfidencePct\% interval from one panel. Stars: the
 simulator's true value at this point. Foil~1 is tight, sits inside the band,
-and misses the truth. Foil~2 contains the truth, but it is too wide for a
-robust verdict.\par}
+and misses the truth. Foil~2 contains the truth, yet it also sits inside its
+band: narrower than what the targets leave open.\par}
 
-\vspace{1.3em}
+\vspace{0.9em}
 
 % ---- question and answer
 \noindent
 \begin{minipage}[t]{0.47\linewidth}\raggedright
 {\normalsize\bfseries\color{ink} The question}\par\vspace{0.4em}
-{\small Many parameter points fit the same three targets, and they imply
-different campaign effects. What must a calibrated simulator report? How
-far can an interval computed at one point be trusted?\par}
+{\small Many parameter points fit the same \NMoments{} targets (the status quo plus
+one randomized pilot), and they imply different effects of seeding the
+hubs. What must a calibrated simulator report? How far can an interval
+computed at one point be trusted?\par}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\linewidth}\raggedright
 {\normalsize\bfseries\color{ink} The answer}\par\vspace{0.4em}
-{\small Foil 1 is F-OVERCONF at both diagnostic points; no robust Foil~2
-verdict is claimed at either point. Most of Foil~1's miss is the effect on
-people who were not seeded. Report the image, not one point.\par}
+{\small Foil~1 misses the truth at all three points, the real village
+included, and is F-OVERCONF at all three. Foil~2 contains the truth at all
+three, and is F-OVERCONF at both calibrated points. Report the image, not
+one point.\par}
 \end{minipage}
 
-\vspace{1.3em}
+\vspace{0.9em}
 
 % ---- in numbers
 {\normalsize\bfseries\color{ink} In numbers\par}
@@ -97,7 +99,7 @@ people who were not seeded. Report the image, not one point.\par}
 \textcolor{line}{Points evaluated in three history-matching waves / points kept (NROY)} & \PointsEvaluated{} / \NNroy{} \\
 \textcolor{line}{Image of the policy effect over the sampled NROY points} & [\ThetaHmLoShort, \ThetaHmHiShort] \\
 \textcolor{line}{Policy effect at the planted point c*} & \ThetaTwoStarShort{} \\
-\textcolor{line}{Foil 1 estimate below the truth, at min-I / median-I} & \MinIFoilOneBelowPct\% / \MedIFoilOneBelowPct\% \\
+\textcolor{line}{Foil 1 estimate below the truth, at $c^\star$ / min-I / median-I} & \StarPtFoilOneBelowPct\% / \MinIFoilOneBelowPct\% / \MedIFoilOneBelowPct\% \\
 \textcolor{line}{Foil 2 interval coverage when the exposure map holds exactly} & \GateCoveragePct\% \\
 \bottomrule
 \end{tabularx}\par}
@@ -114,6 +116,6 @@ Applied project for ECN 593\par}
 \begin{minipage}[t]{0.54\linewidth}\raggedleft
 {\footnotesize\color{line} Draft for review, October 2026\\
 \texttt{github.com/Bonorinoa/ecn593-applied-project}\\
-Deterministic \textperiodcentered\ 52 tests \textperiodcentered\ one command replicates it\par}
+Deterministic \textperiodcentered\ 55 tests \textperiodcentered\ one command replicates it\par}
 \end{minipage}
 \end{titlepage}

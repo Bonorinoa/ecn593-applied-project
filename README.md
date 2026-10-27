@@ -78,8 +78,6 @@ uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev
 
 `replicate.py` has eight steps: the tests, the z check, the planted run, the Foil 2 check, the figure copy into `writeup/`, the paper's numbers (`writeup/numbers.tex`), the PDF build, and a report that compares every result file with the committed one. The paper types no result: every number in it is a macro from `numbers.tex`. The PDF build needs TeX Live with `latexmk`; without it, upload `writeup/` to Overleaf.
 
-Until `writeup/main.tex` is rewritten for v2, step 7 (the PDF build) fails, because `main.tex` still uses macros that no longer exist. The script stops there and prints no report. Run the steps one at a time (below), and compare with `git diff results/`.
-
 The steps, one at a time:
 
 ```bash
@@ -93,9 +91,9 @@ python scripts/write_numbers.py                  # write writeup/numbers.tex fro
 
 Measured runtimes on an Apple-silicon laptop, in the repo at commit `cc01779`:
 
-- The tests took 3 s (54 pass, 1 is an expected failure). The z check took under 1 s. The planted run took 243 s. The Foil 2 check took 233 s. The figure copy and the numbers took about 1 s each. These six steps take about 8 minutes.
-- Step 7, the PDF build, failed after 1 s, as described above.
-- `replicate.py --quick` skips the Foil 2 check, which is 233 s of that time.
+- The tests took 3 s (55 pass). The z check took under 1 s. The planted run took 243 s. The Foil 2 check took 233 s. The figure copy and the numbers took about 1 s each. These six steps take about 8 minutes.
+- The paper (`writeup/main.tex`) is written for v2. A full `replicate.py` run on the final paper, with other jobs running on the same laptop, took 643 s: tests 4 s, planted run 325 s, Foil 2 check 310 s, PDF build 2 s. It printed REPLICATED, and the rebuilt PDF was byte-identical to the committed one.
+- `replicate.py --quick` skips the Foil 2 check, which is 233 s of that time on an idle machine.
 - A second planted run after the commit changed only `ran_at` and `git_commit` in `results/planted/poc_results.json`. The files `image_points.json`, the figures and the lock file were byte-identical. The Foil 2 check file was also byte-identical after a second run. Every random stream is seeded, so a rerun reproduces every number.
 
 Pins: Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2, pytest 9.1.1. Reproducibility is part of the claim, so a rerun must match to the last digit. The file `locks/freeze-planted.txt` records the full environment of the run. It includes extra packages that the code does not import. The project does not use Mesa, pandas, or GPU libraries. The kernel is vectorized algebra.
