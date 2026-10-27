@@ -1,4 +1,4 @@
-"""Diagnostic overlay: two foils, two diagnostic points (min-I, median-I).
+"""Diagnostic overlay: two foils, three points (min-I, median-I, c_star).
 
 Foil 1 (degree arm) is the whole-village policy estimate of a SUTVA analyst:
 OLS-HC1 of Y on [1, D, X] gives beta-hat, and with no interference
@@ -10,9 +10,10 @@ t_2b7a8d8c). Compared with Theta_hm.
 Foil 2 (random arm) is the exposure-mapped Hajek spillover contrast with the
 Aronow-Samii variance (estimand.hajek_contrasts). Compared with Theta_exp.
 
-Each interval is judged against its own image (classify_interval) and gets a
-covers_truth flag: a descriptive containment indicator for that one panel, not
-repeated-sampling coverage and not a validity gate. Foil 2 is checked
+Each interval is judged against its own image (classify_interval). It gets a
+covers_truth flag (the truth at its own point) and a covers_planted_truth flag
+(the truth at c_star). Both are descriptive containment indicators for that one
+panel, not repeated-sampling coverage and not a validity gate. Foil 2 is checked
 separately by scripts/check_foil2_coverage.py (PLAN items 11, 14).
 
 Both foils use the true outcome Y. The measurement layer (m1-m3, admission,
@@ -49,6 +50,17 @@ def covers_truth(ci, truth: float) -> bool:
     """True iff the truth lies inside this one realized interval. Not coverage; never a stop."""
     lo, hi = ci
     return bool(np.isfinite(truth) and lo <= truth <= hi)
+
+
+def containment_flags(foil1_ci, foil2_ci, theta2_true: float, spill_true: float,
+                      theta2_planted: float, spill_planted: float) -> dict:
+    """Containment of each interval's point truth and the planted village truth."""
+    return {
+        "foil1_covers_truth": covers_truth(foil1_ci, theta2_true),
+        "foil2_covers_truth": covers_truth(foil2_ci, spill_true),
+        "foil1_covers_planted_truth": covers_truth(foil1_ci, theta2_planted),
+        "foil2_covers_planted_truth": covers_truth(foil2_ci, spill_planted),
+    }
 
 
 def ols_ate_hc1(y, D, X) -> dict:
@@ -149,10 +161,12 @@ def policy_gap_decomposition(world: World, c: dict, reps: int | None = None,
     return out
 
 
-def run_foils(world: World, c: dict, theta2_true: float, spill_true: float) -> dict:
-    """Both foils at one diagnostic point, on one panel each (offset FOIL_PANEL_OFFSET).
+def run_foils(world: World, c: dict, theta2_true: float, spill_true: float,
+              theta2_planted: float, spill_planted: float) -> dict:
+    """Both foils at one point, on one panel each (offset FOIL_PANEL_OFFSET).
 
-    Foil 1 on the degree arm, Foil 2 on the random arm. Outcome: true Y.
+    Foil 1 on the degree arm, Foil 2 on the random arm. Outcome: true Y. The
+    planted truths are theta2(c*) and delta_spill(c*).
     """
     off = config.FOIL_PANEL_OFFSET
     y2, d2 = simulate_panel(world, c, "degree", seed_offset=off)
@@ -162,6 +176,6 @@ def run_foils(world: World, c: dict, theta2_true: float, spill_true: float) -> d
     return {
         "foil1": foil1,
         "foil2": foil2,
-        "foil1_covers_truth": covers_truth(foil1["ci"], theta2_true),
-        "foil2_covers_truth": covers_truth(foil2["ci_spill"], spill_true),
+        **containment_flags(foil1["ci"], foil2["ci_spill"], theta2_true, spill_true,
+                            theta2_planted, spill_planted),
     }

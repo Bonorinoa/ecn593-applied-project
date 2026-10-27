@@ -1,12 +1,4 @@
-"""Moment map M(c), the targets z, and implausibility I(c).
-
-The three simulated moments mirror the three World Bank anchors one-for-one.
-Two sources of z exist:
-  planted   : z = M̂(c*) (data/planted.json, written by scripts/plant_z.py). The main run.
-  worldbank : z from data/anchors.json (written by scripts/fetch_anchors.py).
-              A historical sensitivity run; it ends in F-EMPTY. Its variance
-              terms are legacy heuristic weights (see load_worldbank_z).
-"""
+"""Moment map M(c), the planted targets z, and implausibility I(c)."""
 import json
 
 import numpy as np
@@ -15,50 +7,14 @@ from . import config
 from .kernel import World, simulate_panel
 
 # moment order is part of the frozen spec:
-MOMENT_NAMES = ("level_imm", "gradient_edu", "level_internet")
+MOMENT_NAMES = ("sq_level", "sq_corr_x1", "sq_peer_corr", "pilot_level")
 
 
 def load_z(source: str = "planted"):
-    """z and its audit dict for one source ("planted" or "worldbank")."""
+    """Load z and its audit dict. The planted source is the only v2 source."""
     if source == "planted":
         return load_frozen_z()
-    if source == "worldbank":
-        return load_worldbank_z()
     raise ValueError(f"unknown z source: {source!r}")
-
-
-def load_worldbank_z(path=None):
-    """z from the World Bank anchor summary, and legacy heuristic weights.
-
-    z: levels are cross-entity means in percent, used as level / 100; the
-    gradient is a cross-entity correlation, used as is.
-
-    The diagonal terms returned in audit["sampling_variances"] are LEGACY
-    HEURISTIC cross-entity dispersion weights, kept only so the historical
-    F-EMPTY run reproduces exactly (verifier t_1f00fc3b, item 4):
-      levels   : (sd/100)^2 / n, with sd stored at ddof = 0
-      gradient : (1 - r^2)^2 / (n - 2), an asymptotic convention
-    They are not design-based sampling variances and not village-level
-    measurement-error variances. The entity set also includes overlapping
-    regional and income aggregates (the 9-name filter misses about 39 of them).
-    """
-    path = config.DATA_DIR / "anchors.json" if path is None else path
-    raw = json.loads(path.read_text())
-    a = raw["_audit"]
-    r = float(raw["gradient_edu_corr"])
-    z = np.array([
-        raw["level_immunization_mean"] * config.ANCHOR_LEVEL_SCALE,
-        r,
-        raw["level_internet_mean"] * config.ANCHOR_LEVEL_SCALE,
-    ], dtype=float)
-    v = np.array([
-        (a["sd_immunization"] * config.ANCHOR_LEVEL_SCALE) ** 2 / a["n_immunization"],
-        (1.0 - r ** 2) ** 2 / (a["n_overlap_gradient"] - 2),
-        (a["sd_internet"] * config.ANCHOR_LEVEL_SCALE) ** 2 / a["n_internet"],
-    ], dtype=float)
-    audit = {"source": "worldbank", "anchors": raw, "sampling_variances": v,
-             "variance_label": "legacy heuristic cross-entity dispersion weights"}
-    return z, audit
 
 
 def load_frozen_z():
@@ -88,7 +44,7 @@ def plant_and_freeze(world: World, path=None) -> dict:
     path = config.DATA_DIR / "planted.json" if path is None else path
     m, mc = simulate_moments(world, config.C_STAR, reps=config.REPS_Z)
     payload = {
-        "amendment": "AMENDMENT-02",  # historical label, kept so planted.json reproduces byte for byte
+        "design": "preregistration-v2",
         "c_star": {k: float(v) for k, v in config.C_STAR.items()},
         "z": m.tolist(),
         "sampling_variances": mc.tolist(),
@@ -119,38 +75,47 @@ def v_diag_of(sampling: np.ndarray, mc: np.ndarray) -> np.ndarray:
     return np.asarray(sampling, dtype=float) + np.asarray(mc, dtype=float) + discrepancy()
 
 
+def peer_correlation(world: World, y: np.ndarray) -> float:
+    """Correlation of y with the row-normalized peer mean W y."""
+    y = np.asarray(y, dtype=float)
+    peer_mean = (world.adjacency @ y) / world.degrees
+    if float(np.std(y)) == 0.0 or float(np.std(peer_mean)) == 0.0:
+        return float("nan")
+    return float(np.corrcoef(y, peer_mean)[0, 1])
+
+
 def simulate_moments(world: World, c: dict, reps: int = None):
-    """Estimate M(c) = (level_imm, gradient_edu, level_internet) and σ²_MC.
+    """Estimate the four v2 moments and their Monte Carlo variances.
 
-    level_imm      : mean Ȳ_T under degree-seed arm (preventive behavior level)
-    gradient_edu   : corr(Y_T, education covariate) under degree-seed arm
-    level_internet : mean Ȳ_T under random-seed arm (diffusion/adoption level)
-
-    σ²_MC is the variance of the mean: sample var of the R_m reps / R_m.
-    Paired reps: rep r of every arm shares seed_offset r (state stream).
+    The control and random arms use the same state stream at each rep. The
+    degree arm is not simulated. Each variance is the sample variance of the
+    finite rep values, divided by their count.
     """
     reps = config.REPS_MOMENT if reps is None else reps
-    edu = world.X[:, 0]
-    edu_ok = float(np.std(edu)) > 0.0
+    x1 = world.X[:, 0]
+    x1_ok = float(np.std(x1)) > 0.0
 
-    levels_deg = np.empty(reps)
-    corrs = np.empty(reps)
-    levels_rand = np.empty(reps)
+    sq_levels = np.empty(reps)
+    sq_corr_x1 = np.empty(reps)
+    sq_peer_corr = np.empty(reps)
+    pilot_levels = np.empty(reps)
     for r in range(reps):
-        y_deg, _ = simulate_panel(world, c, "degree", r)
+        y_sq, _ = simulate_panel(world, c, "control", r)
         y_rnd, _ = simulate_panel(world, c, "random", r)
-        levels_deg[r] = y_deg.mean()
-        levels_rand[r] = y_rnd.mean()
-        if edu_ok and float(np.std(y_deg)) > 0.0:
-            corrs[r] = np.corrcoef(y_deg, edu)[0, 1]
+        sq_levels[r] = y_sq.mean()
+        pilot_levels[r] = y_rnd.mean()
+        if x1_ok and float(np.std(y_sq)) > 0.0:
+            sq_corr_x1[r] = np.corrcoef(y_sq, x1)[0, 1]
         else:
-            corrs[r] = np.nan
+            sq_corr_x1[r] = np.nan
+        sq_peer_corr[r] = peer_correlation(world, y_sq)
 
     m = np.array(
-        [np.mean(levels_deg), np.nanmean(corrs), np.mean(levels_rand)],
+        [np.mean(sq_levels), np.nanmean(sq_corr_x1),
+         np.nanmean(sq_peer_corr), np.mean(pilot_levels)],
         dtype=float,
     )
-    # variance of the mean; ddof=1. All-nan corr column -> inf so I rejects.
+    # Variance of the mean; ddof=1. An all-nan correlation gives inf, so I rejects.
     def _mean_var(x):
         x = x[np.isfinite(x)]
         if x.size < 2:
@@ -158,7 +123,8 @@ def simulate_moments(world: World, c: dict, reps: int = None):
         return float(np.var(x, ddof=1) / x.size)
 
     mc = np.array(
-        [_mean_var(levels_deg), _mean_var(corrs), _mean_var(levels_rand)],
+        [_mean_var(sq_levels), _mean_var(sq_corr_x1),
+         _mean_var(sq_peer_corr), _mean_var(pilot_levels)],
         dtype=float,
     )
     return m, mc

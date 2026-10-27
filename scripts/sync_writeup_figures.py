@@ -17,7 +17,6 @@ WRITEUP_FIGURES = {
     "waves.png": "figures/planted/waves.png",
     "image_points.png": "figures/planted/image_points.png",
     "overlay.png": "figures/planted/overlay.png",
-    "empty.png": "figures/worldbank/empty.png",
 }
 
 

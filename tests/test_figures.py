@@ -26,6 +26,14 @@ def test_overlay_writes_a_png(tmp_path):
                 "foil1_ci": (0.09, 0.12),
                 "foil2_ci": (0.00, 0.08),
             },
+            "c_star": {
+                "Theta_hm": (0.0, 0.2),
+                "Theta_exp": (-0.05, 0.15),
+                "theta2_true": 0.09,
+                "spill_true": 0.045,
+                "foil1_ci": (0.08, 0.10),
+                "foil2_ci": (0.01, 0.07),
+            },
         }
     }
     out = tmp_path / "overlay.png"

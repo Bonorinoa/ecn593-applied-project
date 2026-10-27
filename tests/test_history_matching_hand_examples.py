@@ -16,16 +16,17 @@ from poc_abm.history_matching import (  # noqa: E402
 )
 
 
-def test_tau_is_chi2_095_with_three_degrees_of_freedom():
-    """τ = F^{-1}_{χ²_3}(0.95). scipy.stats.chi2.ppf(0.95, 3) ≈ 7.814727903.
+def test_tau_is_chi2_095_with_four_degrees_of_freedom():
+    """τ = F^{-1}_{χ²_4}(0.95) because the v2 design has four moments.
 
-    df = N_MOMENTS = 3, not a magic 7.81.
+    The implementation derives df from the number of configured discrepancies.
     """
     from scipy.stats import chi2
 
     t = tau_threshold()
-    assert abs(t - float(chi2.ppf(config.HM_CONFIDENCE, config.N_MOMENTS))) < 1e-12
-    assert abs(t - 7.814727903270927) < 1e-9
+    assert config.N_MOMENTS == 4
+    assert abs(t - float(chi2.ppf(0.95, 4))) < 1e-12
+    assert abs(t - 9.487729036781154) < 1e-12
 
 
 def test_bbox_inflation_hand_arithmetic():
@@ -72,12 +73,12 @@ def test_empty_nroy_is_a_finding_not_a_rescue():
     I = 1²+1²+1² = 3, and τ ≈ 7.81, so 3 would SURVIVE. Use z=(10,10,10)
     so I = 300 > τ.
     """
-    z = np.array([10.0, 10.0, 10.0])
-    sampling = np.ones(3)
+    z = np.array([10.0, 10.0, 10.0, 10.0])
+    sampling = np.ones(4)
 
     def fake_moments(world, c, reps=None):
-        m = np.zeros(3)
-        mc = np.zeros(3)
+        m = np.zeros(4)
+        mc = np.zeros(4)
         return m, mc
 
     result = run_waves(
@@ -98,13 +99,13 @@ def test_nroy_is_the_union_of_points_kept_in_each_wave():
     bbox of those and keeps the same rule. Union has at least the wave-1 set.
     Fake I uses only alpha so this is arithmetic on the box, not a kernel.
     """
-    z = np.zeros(3)
-    sampling = np.ones(3)
+    z = np.zeros(4)
+    sampling = np.ones(4)
 
     def fake_moments(world, c, reps=None):
         # I = ((z0 - m0)^2)/V00 with m0 = 0 if alpha < -1.5 else 10
         m0 = 0.0 if c["alpha"] < -1.5 else 10.0
-        return np.array([m0, 0.0, 0.0]), np.zeros(3)
+        return np.array([m0, 0.0, 0.0, 0.0]), np.zeros(4)
 
     result = run_waves(
         world=None,

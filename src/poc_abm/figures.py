@@ -1,6 +1,6 @@
-"""Two-row overlay figure.
+"""Three-row overlay figure.
 
-Rows: c₀^min (top) and c₀^med (bottom).
+Rows: the min-I point, the median-I point and c*.
 Columns: policy contrast θ₂ against Θ_hm | spillover δ_spill against Θ_exp.
 Each foil is drawn against ITS OWN image. Not a posterior ribbon.
 """
@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from . import config
+from .moments import MOMENT_NAMES
 
 
 def _interval_h(ax, y, lo, hi, color, label, lw=2.5):
@@ -26,8 +27,10 @@ def draw_overlay(payload: dict, path: Path) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    fig, axes = plt.subplots(2, 2, figsize=(9.5, 5.5), sharex="col")
-    row_names = (("min_I", "min-I point"), ("median_I", "median-I point"))
+    titles = {"min_I": "min-I point", "median_I": "median-I point", "c_star": r"$c^\star$ (the village)"}
+    row_names = [(key, titles[key]) for key in payload["worlds"]]
+    fig, axes = plt.subplots(len(row_names), 2, figsize=(9.5, 2.75 * len(row_names)), sharex="col",
+                             squeeze=False)
     for r, (key, title) in enumerate(row_names):
         w = payload["worlds"][key]
         # left: policy
@@ -60,7 +63,7 @@ def draw_overlay(payload: dict, path: Path) -> Path:
         if r == 0:
             ax.legend(loc="upper right", fontsize=8, frameon=False)
 
-    fig.suptitle("Images over NROY (bands) vs one-world foil intervals (lines), at two diagnostic points", fontsize=10.5)
+    fig.suptitle("Images over NROY (bands) vs one-world foil intervals (lines), at three points", fontsize=10.5)
     fig.tight_layout()
     fig.savefig(path, dpi=140)
     plt.close(fig)
@@ -78,18 +81,18 @@ def draw_empty(info: dict, path: Path) -> Path:
     closest = info["closest"]
     m = np.asarray(closest["M"], dtype=float)
     tau = float(info["tau"])
-    names = ("level (π₂)", "corr(Y, x1)", "level (π₁)")
+    names = MOMENT_NAMES
 
     fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.8))
     ax = axes[0]
-    x = np.arange(3)
-    ax.scatter(x, z, marker="D", s=50, color="#4C78A8", label="anchor z (rescaled)")
+    x = np.arange(len(names))
+    ax.scatter(x, z, marker="D", s=50, color="#4C78A8", label="target z")
     ax.scatter(x, m, marker="o", s=50, color="#E45756", label="closest sampled M(c)")
-    ax.set_xticks(x, names)
-    ax.set_ylim(0, 1)
-    ax.set_ylabel("moment (unit interval)")
+    ax.set_xticks(x, names, fontsize=8)
+    ax.set_ylim(-1, 1)
+    ax.set_ylabel("moment value")
     ax.legend(frameon=False, fontsize=8)
-    ax.set_title("anchors vs closest kernel moments")
+    ax.set_title("targets vs closest kernel moments")
 
     ax = axes[1]
     stats = info["wave_I_stats"][0]

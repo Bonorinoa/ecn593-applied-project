@@ -1,12 +1,12 @@
 """End-to-end run: history matching, the two images, the two foils.
 
 Steps: load z -> waves -> NROY -> 400 sampled points -> Theta_hm, Theta_exp ->
-the two diagnostic points (min-I, median-I) -> both foils.
+nroy_param_spread -> three points (min-I, median-I, c_star) -> both foils at each.
 An empty NROY is a finding (F-EMPTY). tau and delta are never loosened.
 
-Usage:  python -m poc_abm.pipeline [planted|worldbank]     (default: planted)
-Outputs, per source S: results/S/poc_results.json, results/S/image_points.json,
-figures/S/{waves,overlay,image_points,empty}.png, locks/freeze-S.txt.
+Usage:  python -m poc_abm.pipeline [planted]     (default: planted)
+Outputs: results/planted/poc_results.json, results/planted/image_points.json,
+figures/planted/{waves,overlay,image_points,empty}.png, locks/freeze-planted.txt.
 """
 from __future__ import annotations
 
@@ -72,7 +72,30 @@ def _git_commit() -> str:
     return sha + ("+dirty" if dirty else "")
 
 
-SOURCES = ("planted", "worldbank")
+SOURCES = ("planted",)
+
+
+def nroy_param_spread(image_points: list, param_names) -> dict:
+    """Descriptive readout: how far the targets restrict each parameter.
+
+    For each parameter: the standard deviation (ddof = 1) over the sampled NROY
+    points, divided by the standard deviation of a uniform draw over C on that
+    axis, span / sqrt(12). A ratio near 1 means the moments do not restrict it.
+    Also the correlation matrix of the parameters over the same points.
+    """
+    names = list(param_names)
+    values = np.array([[p["c"][n] for n in names] for p in image_points], dtype=float)
+    sd = values.std(axis=0, ddof=1)
+    uniform_sd = np.array([(config.PARAM_BOX[n][1] - config.PARAM_BOX[n][0]) / np.sqrt(12.0)
+                           for n in names])
+    return {
+        "param_names": names,
+        "n_points": int(values.shape[0]),
+        "sd_sampled_nroy": {n: float(s) for n, s in zip(names, sd)},
+        "sd_uniform_box": {n: float(s) for n, s in zip(names, uniform_sd)},
+        "sd_ratio": {n: float(s / u) for n, s, u in zip(names, sd, uniform_sd)},
+        "correlation_matrix": np.corrcoef(values, rowvar=False).tolist(),
+    }
 
 
 def run_poc(source: str = "planted") -> dict:
@@ -99,7 +122,7 @@ def run_poc(source: str = "planted") -> dict:
         "z": z.tolist(),
         "z_names": list(MOMENT_NAMES),
         "sampling_variances": sampling.tolist(),
-        "delta": [config.DELTA[n] for n in ("level_imm", "gradient_edu", "level_internet")],
+        "delta": [config.DELTA[n] for n in MOMENT_NAMES],
         "tau": tau,
         "finding_hm": hm["finding"],
         "wave_kept": hm["wave_kept"],
@@ -112,15 +135,6 @@ def run_poc(source: str = "planted") -> dict:
         "spill_star": sp_star,
         "notes": [],
     }
-    if source == "worldbank":
-        payload["variance_label"] = audit["variance_label"]
-        payload["notes"].append(
-            "The World Bank sensitivity run reproduces a historical F-EMPTY calculation. "
-            "Its diagonal weights are legacy heuristic cross-entity dispersion terms, not "
-            "design-based sampling variances or village-level measurement-error variances. "
-            "The source includes overlapping regional/income aggregates, uses ddof=0 for "
-            "level dispersion, and uses an asymptotic n-2 correlation convention."
-        )
     payload["figures"] = []
 
     if hm["finding"] == "F-EMPTY":
@@ -162,24 +176,26 @@ def run_poc(source: str = "planted") -> dict:
     payload["Theta_hm"] = list(Theta_hm)
     payload["Theta_exp"] = list(Theta_exp)
     payload["n_theta_sample"] = len(image_points)
+    payload["nroy_param_spread"] = nroy_param_spread(image_points, hm["param_names"])
     print("endpoint recheck: fresh reps at the four winning points", flush=True)
     payload["endpoint_recheck"] = recheck_extremizers(world, image_points)
     _dump_json(res_dir / "image_points.json", image_points)
 
     worlds = diagnostic_worlds(hm["nroy"], hm["I"])
     findings = {}
-    for key in ("min_I", "median_I"):
+    for key in ("min_I", "median_I", "c_star"):
         print(f"foils at the {key} point", flush=True)
-        row = worlds[key]["c_row"]
-        c = row_to_c(row, hm["param_names"])
-        th = evaluate_thetas(world, c, reps=config.REPS_ESTIMAND)
-        sp = evaluate_spill(world, c, reps=config.REPS_ESTIMAND)
-        foils = run_foils(world, c, th["theta2"], sp["delta_spill"])
+        if key == "c_star":
+            c, th, sp = dict(config.C_STAR), th_star, sp_star   # the truth is already computed
+        else:
+            c = row_to_c(worlds[key]["c_row"], hm["param_names"])
+            th = evaluate_thetas(world, c, reps=config.REPS_ESTIMAND)
+            sp = evaluate_spill(world, c, reps=config.REPS_ESTIMAND)
+        foils = run_foils(world, c, th["theta2"], sp["delta_spill"],
+                          theta2_planted=th_star["theta2"], spill_planted=sp_star["delta_spill"])
         foil1, foil2 = foils["foil1"], foils["foil2"]
         decomp = policy_gap_decomposition(world, c, displayed_beta=foil1["beta"])
         findings[key] = {
-            "I": worlds[key]["I"],
-            "nroy_index": worlds[key]["index"],
             "c": c,
             "theta2_true": th["theta2"],
             "se_theta2": th["se_theta2"],
@@ -192,6 +208,7 @@ def run_poc(source: str = "planted") -> dict:
             "foil1_ci": list(foil1["ci"]),
             "foil1_vs_Theta_hm": classify_interval(foil1["ci"], Theta_hm),
             "foil1_covers_truth": foils["foil1_covers_truth"],
+            "foil1_covers_planted_truth": foils["foil1_covers_planted_truth"],
             "foil1_gap_decomposition": decomp,
             "foil2_estimate": foil2["delta_spill"],
             "foil2_se": foil2["se_spill"],
@@ -199,14 +216,19 @@ def run_poc(source: str = "planted") -> dict:
             "foil2_ci": list(foil2["ci_spill"]),
             "foil2_vs_Theta_exp": classify_interval(foil2["ci_spill"], Theta_exp),
             "foil2_covers_truth": foils["foil2_covers_truth"],
+            "foil2_covers_planted_truth": foils["foil2_covers_planted_truth"],
         }
+        if key != "c_star":
+            findings[key]["I"] = worlds[key]["I"]
+            findings[key]["nroy_index"] = worlds[key]["index"]
     payload["findings"] = findings
     payload["notes"].append(
-        "At each diagnostic point, covers_truth reports whether the displayed interval "
-        "contains the simulator truth. It is a descriptive containment indicator for that "
-        "realized panel, not an estimate of repeated-sampling coverage and not a validity "
-        "gate. Foil 2 is checked separately by the pre-declared repeated-assignment "
-        "calibration in scripts/check_foil2_coverage.py."
+        "At each of the three points, covers_truth reports whether the displayed interval "
+        "contains that point's own simulator truth, and covers_planted_truth whether it "
+        "contains the truth at c_star (the two coincide at c_star). Both are descriptive "
+        "containment indicators for one realized panel, not estimates of repeated-sampling "
+        "coverage and not validity gates. Foil 2 is checked separately by the pre-declared "
+        "repeated-assignment calibration in scripts/check_foil2_coverage.py."
     )
     payload["figures"] = draw_figures(_jsonable(payload), image_points, fig_dir)
     _dump(payload, res_dir, source)
@@ -234,8 +256,8 @@ def draw_figures(payload: dict, image_points: list | None, fig_dir: Path) -> lis
             "foil1_ci": f["foil1_ci"],
             "foil1_label": r"Foil 1: $(k/N)\times$OLS-HC1",
             "foil2_ci": f["foil2_ci"],
-            "theta2_star": payload["theta_star"]["theta2"],
-            "spill_star": payload["spill_star"]["delta_spill"],
+            "theta2_star": None if key == "c_star" else payload["theta_star"]["theta2"],
+            "spill_star": None if key == "c_star" else payload["spill_star"]["delta_spill"],
         }
     out.append(_rel(draw_overlay(overlay, fig_dir / "overlay.png")))
     return out

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Redraw every figure of a finished run from its saved results (no simulation).
 
-Usage:  python scripts/draw_figures.py [planted|worldbank]     (default: planted)
-Reads results/S/poc_results.json (+ image_points.json); writes figures/S/*.png.
+Usage:  python scripts/draw_figures.py [planted]     (default: planted)
+Reads results/planted/poc_results.json (+ image_points.json); writes figures/planted/*.png.
 """
 import json
 import sys

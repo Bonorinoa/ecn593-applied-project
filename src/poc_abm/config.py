@@ -66,9 +66,3 @@ EXPOSURE_MC_DRAWS = _foils["exposure_mc_draws"]
 SEED_FOIL2_MC = _foils["exposure_mc_seed"]
 
 FOIL2_CHECK = dict(DESIGN["foil2_check"])   # read by scripts/check_foil2_coverage.py
-
-_wb = DESIGN["worldbank"]
-WB_BASE = _wb["base_url"]
-ANCHOR_LEVEL_SCALE = _wb["level_scale"]
-AGGREGATE_NAMES_EXCLUDED = set(_wb["aggregates_excluded"])
-WB_INDICATORS = dict(_wb["indicators"])

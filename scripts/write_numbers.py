@@ -5,7 +5,7 @@ here, so a rerun followed by this script (and a LaTeX build) updates the PDF.
 Sources, in order of the table below:
   C  = config/world.toml and config/design.toml (exogenous, via poc_abm.config)
   G  = the drawn graph (endogenous, recomputed from the code in a few ms)
-  P  = results/planted/poc_results.json      W = results/worldbank/poc_results.json
+  P  = results/planted/poc_results.json
   F  = results/checks/foil2_coverage.json
 
 Format rule, one for every number: round to `dp` decimals, then drop trailing
@@ -56,23 +56,44 @@ def graph_facts():
     deg = world.degrees.astype(int)
     cut = int(deg[d == 1].min())                             # lowest degree that gets seeded
     n, p = C.N_AGENTS, C.EDGE_P
+    a = (world.adjacency > 0).astype(np.int64)               # binary, symmetric, no self-loops
+    k = a.sum(axis=1)                                         # true degrees (isolated people have 0)
+    closed = int(np.trace(a @ a @ a))                         # = 6 x triangles (each one counted 6 times)
+    triples = int((k * (k - 1)).sum()) // 2                   # connected triples: sum_i C(k_i, 2)
     return {
         "mean": float(world.degrees.mean()),
         "theory": (n - 1) * (1 - (1 - p) ** 2),
         "cut": cut,
         "at_cut": int((deg == cut).sum()),
         "seeded_at_cut": int(((deg == cut) & (d == 1)).sum()),
+        "mean_degree_true": float(k.mean()),
+        "triangles": closed // 6,
+        "triples": triples,
+        "clustering": (closed // 2) / triples,                # 3 x triangles / connected triples
+        "clustering_theory": 1 - (1 - p) ** 2,                # edge probability, the ER expectation
     }
+
+
+def yn(flag):
+    return "yes" if flag else "no"
+
+
+def verdict(label):
+    return label if label else "no verdict"
+
+
+TEXT_VALUES = {"yes", "no", "no verdict", "F-OVERCONF", "F-HONEST"}   # the only non-numeric macros
+PARAM_TAG = {"alpha": "Alpha", "beta": "Beta", "gamma": "Gamma", "kappa": "Kappa", "sigma_eps": "Sigma"}
 
 
 def table():
     P = load("results/planted/poc_results.json")
-    W = load("results/worldbank/poc_results.json")
     F = load("results/checks/foil2_coverage.json")
     G = graph_facts()
     k = n_treated()
-    lo, mi = P["findings"]["min_I"], P["findings"]["median_I"]
-    dlo, dmi = lo["foil1_gap_decomposition"], mi["foil1_gap_decomposition"]
+    lo, mi, cs = P["findings"]["min_I"], P["findings"]["median_I"], P["findings"]["c_star"]
+    dlo, dmi, dcs = (f["foil1_gap_decomposition"] for f in (lo, mi, cs))
+    spread = P["nroy_param_spread"]
     rc = P["endpoint_recheck"]["candidates"]   # 0, 1: Theta_hm lower, upper; 2, 3: Theta_exp lower, upper
     kp = F["kernel"]["points"]
     gate = F["gate"]
@@ -105,8 +126,9 @@ def table():
         ("BoxInflationPct", fmt(C.BOX_INFLATION, 0, pct=True)),
         ("Confidence", fmt(C.HM_CONFIDENCE, 2)),
         ("ConfidencePct", fmt(C.HM_CONFIDENCE, 0, pct=True)),
-        ("DeltaOne", fmt(C.DELTA["level_imm"], 2)), ("DeltaTwo", fmt(C.DELTA["gradient_edu"], 2)),
-        ("DeltaThree", fmt(C.DELTA["level_internet"], 2)),
+        ("NMoments", str(C.N_MOMENTS)),
+        ("DeltaOne", fmt(C.DELTA["sq_level"], 2)), ("DeltaTwo", fmt(C.DELTA["sq_corr_x1"], 2)),
+        ("DeltaThree", fmt(C.DELTA["sq_peer_corr"], 2)), ("DeltaFour", fmt(C.DELTA["pilot_level"], 2)),
         ("ShareCut", fmt(C.EXPOSURE_SHARE_CUT, 2)),
         ("StratumMinN", str(C.STRATUM_MIN_N)),
         ("ExposureDraws", count(C.EXPOSURE_MC_DRAWS)),
@@ -118,9 +140,15 @@ def table():
         ("DegreeCut", str(G["cut"])),
         ("DegreeCutTotal", str(G["at_cut"])),
         ("DegreeCutSeeded", str(G["seeded_at_cut"])),
+        ("MeanDegreeTrue", fmt(G["mean_degree_true"], 3)),
+        ("Triangles", count(G["triangles"])),
+        ("ConnectedTriples", count(G["triples"])),
+        ("GlobalClustering", fmt(G["clustering"], 4)),
+        ("GlobalClusteringTheory", fmt(G["clustering_theory"], 4)),
         # ---- P: planted run, history matching ----
         ("Tau", fmt(P["tau"], 4)),
         ("ZOne", fmt(P["z"][0], 4)), ("ZTwo", fmt(P["z"][1], 4, 2)), ("ZThree", fmt(P["z"][2], 4)),
+        ("ZFour", fmt(P["z"][3], 4)), ("PilotMinusSq", fmt(P["z"][3] - P["z"][0], 5)),
         ("WaveKeptOne", str(P["wave_kept"][0])), ("WaveKeptTwo", str(P["wave_kept"][1])),
         ("WaveKeptThree", str(P["wave_kept"][2])),
         ("NNroy", str(P["n_nroy"])),
@@ -150,6 +178,16 @@ def table():
         ]
     rows += [
         ("RecheckExpLoFreshAbs", fmt(rc[2]["fresh_value"], 6)),
+    ]
+    # ---- P: nroy_param_spread (sd over the sampled NROY points / sd of a uniform draw over C) ----
+    for name, tag in PARAM_TAG.items():
+        rows.append((f"SpreadRatio{tag}", fmt(spread["sd_ratio"][name], 3)))
+    names = spread["param_names"]
+    for i, a in enumerate(names):
+        for j in range(i + 1, len(names)):
+            rows.append((f"SpreadCorr{PARAM_TAG[a]}{PARAM_TAG[names[j]]}",
+                         fmt(spread["correlation_matrix"][i][j], 3, sign=True)))
+    rows += [
         # ---- P: the two diagnostic points (min-I, median-I) ----
         ("MinIThetaTwo", fmt(lo["theta2_true"], 5)), ("MedIThetaTwo", fmt(mi["theta2_true"], 5)),
         ("MinIThetaTwoShort", fmt(lo["theta2_true"], 4)),
@@ -167,8 +205,27 @@ def table():
         ("MinIFoilTwoLo", fmt(lo["foil2_ci"][0], 6)), ("MinIFoilTwoHi", fmt(lo["foil2_ci"][1], 6)),
         ("MedIFoilTwoLo", fmt(mi["foil2_ci"][0], 6)), ("MedIFoilTwoHi", fmt(mi["foil2_ci"][1], 6)),
     ]
+    # ---- P: the c_star point (the field experimenter): the same quantities ----
+    rows += [
+        ("StarPtFoilOneLo", fmt(cs["foil1_ci"][0], 5)), ("StarPtFoilOneHi", fmt(cs["foil1_ci"][1], 5)),
+        ("StarPtBetaHat", fmt(cs["foil1_beta"], 4)),
+        ("StarPtBetaLo", fmt(cs["foil1_ci_beta"][0], 4)), ("StarPtBetaHi", fmt(cs["foil1_ci_beta"][1], 4)),
+        ("StarPtFoilOneBelowPct", fmt(1 - cs["foil1_share"] * cs["foil1_beta"] / cs["theta2_true"], 1, pct=True)),
+        ("StarPtFoilTwoEst", fmt(cs["foil2_estimate"], 5)), ("StarPtFoilTwoSE", fmt(cs["foil2_se"], 5)),
+        ("StarPtFoilTwoLo", fmt(cs["foil2_ci"][0], 6)), ("StarPtFoilTwoHi", fmt(cs["foil2_ci"][1], 6)),
+    ]
+    # ---- P: verdicts and containment flags at all three points ----
+    for tag, f in (("MinI", lo), ("MedI", mi), ("StarPt", cs)):
+        rows += [
+            (f"{tag}FoilOneVerdict", verdict(f["foil1_vs_Theta_hm"])),
+            (f"{tag}FoilTwoVerdict", verdict(f["foil2_vs_Theta_exp"])),
+            (f"{tag}FoilOneCoversTruth", yn(f["foil1_covers_truth"])),
+            (f"{tag}FoilOneCoversPlanted", yn(f["foil1_covers_planted_truth"])),
+            (f"{tag}FoilTwoCoversTruth", yn(f["foil2_covers_truth"])),
+            (f"{tag}FoilTwoCoversPlanted", yn(f["foil2_covers_planted_truth"])),
+        ]
     # ---- P: Foil 1 gap decomposition (min-I, median-I) ----
-    for tag, d in (("MinI", dlo), ("MedI", dmi)):
+    for tag, d in (("MinI", dlo), ("MedI", dmi), ("StarPt", dcs)):
         rows += [
             (f"{tag}SeededPart", fmt(d["seeded_part"], 5)),
             (f"{tag}UnseededPart", fmt(d["unseeded_part"], 5)),
@@ -198,17 +255,8 @@ def table():
         ("DesignCovStar", fmt(kp["c_star"]["design_coverage"], 4, 3)),
         ("DesignCovMinI", fmt(kp["min_I"]["design_coverage"], 4, 3)),
         ("DesignCovMedI", fmt(kp["median_I"]["design_coverage"], 4, 3)),
-        # ---- W: World Bank run ----
-        ("WbZOne", fmt(W["z"][0], 4)), ("WbZTwo", fmt(W["z"][1], 4)), ("WbZThree", fmt(W["z"][2], 4)),
-        ("WbZTwoShort", fmt(W["z"][1], 2)),
-        ("WbBestI", fmt(W["wave_I_stats"][0]["min"], 2)),
-        ("WbMedianI", fmt(W["wave_I_stats"][0]["median"], 2)),
-        ("WbMaxI", fmt(W["wave_I_stats"][0]["max"], 2)),
-        ("WbClosestMOne", fmt(W["closest"]["M"][0], 4)), ("WbClosestMTwo", fmt(W["closest"]["M"][1], 4)),
-        ("WbClosestMThree", fmt(W["closest"]["M"][2], 4)),
-        ("WbClosestMTwoShort", fmt(W["closest"]["M"][1], 2)),
     ]
-    assert all(math.isfinite(float(v.replace(",", ""))) for _, v in rows)
+    assert all(v in TEXT_VALUES or math.isfinite(float(v.replace(",", ""))) for _, v in rows)
     names = [n for n, _ in rows]
     assert len(names) == len(set(names)), "duplicate macro name"
     return rows

@@ -22,9 +22,10 @@ seed = 20260814                  # one Generator for all wave designs
 # Discrepancy delta, same units as z (levels on [0, 1]; correlation unitless).
 # The order of the rows is the order of the moments.
 [history_matching.delta]
-level_imm = 0.02
-gradient_edu = 0.05
-level_internet = 0.02
+sq_level = 0.02
+sq_corr_x1 = 0.05
+sq_peer_corr = 0.05
+pilot_level = 0.02
 
 [image]
 theta_sample = 400               # NROY points sampled for the images
@@ -51,17 +52,4 @@ gate_effect_s0c = 0.03           # so the true spillover is exactly 0.03
 bootstrap_reps = 1_000
 bootstrap_seed = 20261020
 
-# World Bank sensitivity run (scripts/fetch_anchors.py; the archived F-EMPTY run)
-[worldbank]
-base_url = "https://api.worldbank.org/v2"
-level_scale = 0.01               # the API gives levels in percent; z is on [0, 1]
-aggregates_excluded = [
-    "World", "Euro area", "European Union", "OECD members", "High income",
-    "Low income", "Upper middle income", "Lower middle income",
-    "Least developed countries: UN classification",
-]
 
-[worldbank.indicators]
-immunization = "SH.IMM.IDPT"         # z1: preventive behavior level
-sec_completion = "SE.SEC.CMPT.LO.ZS" # z2: gradient source
-internet = "IT.NET.USER.ZS"          # z3: adoption/diffusion level

@@ -16,14 +16,29 @@ from poc_abm.moments import (  # noqa: E402
     implausibility,
     load_frozen_z,
     load_z,
+    peer_correlation,
     sampling_variances,
     simulate_moments,
 )
 
 
-def test_moment_names_are_the_frozen_triple():
-    """Order is part of the spec: (level_imm, gradient_edu, level_internet)."""
-    assert MOMENT_NAMES == ("level_imm", "gradient_edu", "level_internet")
+def test_moment_names_are_the_frozen_v2_order():
+    """The v2 order is status-quo level, two status-quo correlations, then pilot level."""
+    assert MOMENT_NAMES == ("sq_level", "sq_corr_x1", "sq_peer_corr", "pilot_level")
+
+
+def test_peer_correlation_on_three_person_path_by_hand():
+    """Path 0--1--2 with y=(1,2,4) has Wy=(2,2.5,2).
+
+    The centered cross-product is -1/6. The two centered sums of squares are
+    14/3 and 1/6. Thus corr(y, Wy) = (-1/6) / sqrt((14/3)(1/6)) = -1/(2 sqrt(7)).
+    """
+    from poc_abm.kernel import World
+
+    adjacency = np.array([[0.0, 1.0, 0.0], [1.0, 0.0, 1.0], [0.0, 1.0, 0.0]])
+    world = World.from_arrays(adjacency, np.zeros((3, 3)))
+    actual = peer_correlation(world, np.array([1.0, 2.0, 4.0]))
+    assert abs(actual - (-1.0 / (2.0 * np.sqrt(7.0)))) < 1e-15
 
 
 def test_c_star_is_the_center_of_the_frozen_box():
@@ -43,35 +58,16 @@ def test_planted_z_is_unit_interval_and_has_sampling_variances():
     Sampling variances are the stored MC variances of the R_z mean.
     """
     z, audit = load_frozen_z()
-    assert z.shape == (3,)
+    assert z.shape == (4,)
     assert 0.0 < z[0] < 1.0
-    assert 0.0 < z[2] < 1.0
     assert -1.0 <= z[1] <= 1.0
+    assert -1.0 <= z[2] <= 1.0
+    assert 0.0 < z[3] < 1.0
     v = sampling_variances(audit)
-    assert v.shape == (3,)
+    assert v.shape == (4,)
     assert np.all(v > 0)
     assert audit["source"] == "planted"
     assert audit["c_star"]["alpha"] == -1.5
-
-
-def test_worldbank_z_is_the_anchor_summary_rescaled_to_the_unit_interval():
-    """data/anchors.json holds percentages; z multiplies the two levels by 0.01.
-
-    Legacy heuristic cross-entity dispersion weights (NOT sampling variances for a
-    village target; the archived F-EMPTY run used exactly these):
-      levels: (sd/100)^2 / n          (sd as stored, ddof = 0)
-      gradient: (1 - r^2)^2 / (n - 2)  (an asymptotic convention)
-    Hand check for immunization: sd 12.2476, n 231 -> 0.122476^2 / 231 = 6.4937e-05.
-    """
-    z, audit = load_z("worldbank")
-    assert audit["source"] == "worldbank"
-    assert abs(z[0] - 0.8620778439267352) < 1e-15
-    assert abs(z[1] - 0.6054466836276446) < 1e-15
-    assert abs(z[2] - 0.6863872423702296) < 1e-15
-    v = sampling_variances(audit)
-    assert abs(v[0] - 6.493708854884732e-05) < 1e-18
-    assert abs(v[1] - 0.0018490277845434836) < 1e-16
-    assert abs(v[2] - 0.0003233866033433465) < 1e-17
 
 
 def test_load_z_planted_is_load_frozen_z():
@@ -83,11 +79,10 @@ def test_load_z_planted_is_load_frozen_z():
 
 
 def test_discrepancy_budget_is_frozen_delta_squared():
-    """δ = (0.02, 0.05, 0.02) in the same units as z; V gets δ² on the diagonal."""
+    """δ = (0.02, 0.05, 0.05, 0.02) in moment order; V gets δ² on the diagonal."""
     d2 = discrepancy()
-    assert abs(d2[0] - 0.02 ** 2) < 1e-18
-    assert abs(d2[1] - 0.05 ** 2) < 1e-18
-    assert abs(d2[2] - 0.02 ** 2) < 1e-18
+    np.testing.assert_array_equal(d2, np.array([0.02, 0.05, 0.05, 0.02]) ** 2)
+    assert len(config.DELTA) == len(MOMENT_NAMES)
 
 
 def test_implausibility_of_perfect_match_is_zero():
@@ -109,8 +104,8 @@ def test_implausibility_one_coordinate_hand_arithmetic():
     assert abs(implausibility(z, m, v) - 1.0) < 1e-12
 
 
-def test_simulate_moments_returns_three_means_and_mc_variances():
-    """M(c) is 3-vector; σ²_MC is the variance of the mean of R_m reps.
+def test_simulate_moments_returns_four_means_and_mc_variances():
+    """M(c) is a 4-vector; σ²_MC is the variance of the mean of R_m reps.
 
     At a smoke c we only check shape, finite-ness, and that levels sit in (0,1).
     """
@@ -119,9 +114,25 @@ def test_simulate_moments_returns_three_means_and_mc_variances():
     w = World()
     c = {"alpha": -1.0, "beta": 0.3, "gamma": 0.4, "kappa": 1.0, "sigma_eps": 0.05}
     m, mc = simulate_moments(w, c, reps=3)
-    assert m.shape == (3,)
-    assert mc.shape == (3,)
+    assert m.shape == (4,)
+    assert mc.shape == (4,)
     assert np.all(np.isfinite(m))
     assert 0.0 < m[0] < 1.0
-    assert 0.0 < m[2] < 1.0
     assert -1.0 <= m[1] <= 1.0
+    assert -1.0 <= m[2] <= 1.0
+    assert 0.0 < m[3] < 1.0
+
+
+def test_pilot_minus_status_quo_level_is_theta1_with_paired_reps():
+    """Pre-registration section 2: with paired reps, pilot_level - sq_level = theta1 exactly.
+
+    Both sides use the same three reps (offsets 0, 1, 2) of the control and random arms.
+    """
+    from poc_abm.estimand import evaluate_thetas
+    from poc_abm.kernel import World
+
+    w = World()
+    c = {"alpha": -1.0, "beta": 0.3, "gamma": 0.4, "kappa": 1.0, "sigma_eps": 0.05}
+    m, _ = simulate_moments(w, c, reps=3)
+    theta1 = evaluate_thetas(w, c, reps=3)["theta1"]
+    assert abs((m[3] - m[0]) - theta1) < 1e-14

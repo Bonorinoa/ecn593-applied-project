@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from poc_abm.diagnostic import (  # noqa: E402
     classify_interval,
+    containment_flags,
     covers_truth,
     foil1_policy,
     ols_ate_hc1,
@@ -42,6 +43,24 @@ def test_covers_truth_inside_and_outside():
     assert covers_truth((0.20, 0.40), 0.25) is True
     assert covers_truth((0.20, 0.40), 0.50) is False
     assert covers_truth((0.20, 0.40), float("nan")) is False
+
+
+def test_containment_flags_distinguish_point_and_planted_truths():
+    """Foil 1 covers its point truth but misses planted truth; Foil 2 does the reverse."""
+    flags = containment_flags(
+        foil1_ci=(0.20, 0.40),
+        foil2_ci=(-0.10, 0.10),
+        theta2_true=0.25,
+        spill_true=0.20,
+        theta2_planted=0.50,
+        spill_planted=0.00,
+    )
+    assert flags == {
+        "foil1_covers_truth": True,
+        "foil2_covers_truth": False,
+        "foil1_covers_planted_truth": False,
+        "foil2_covers_planted_truth": True,
+    }
 
 
 def test_ols_ate_is_difference_in_means_when_X_is_balanced():

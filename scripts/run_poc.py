@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-"""Run the pipeline.  Usage:  python scripts/run_poc.py [planted|worldbank]
-
-planted (default) is the main run; worldbank is the archived run (F-EMPTY).
+"""Run the pipeline.  Usage:  python scripts/run_poc.py [planted]
+planted (the default) is the only run.
 """
 import sys
 from pathlib import Path

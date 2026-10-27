@@ -1,19 +1,18 @@
 """Replicate every result and the paper with one command.
 
 Usage, from the repo root (after the one-time setup in README.md):
-    .venv/bin/python scripts/replicate.py           # full: about 13 minutes
-    .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check: about 8 minutes
+    .venv/bin/python scripts/replicate.py           # full: see README for the measured time
+    .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check
 
 Steps, in order. The script stops at the first step that fails.
   1. tests                 pytest tests
   2. z check               scripts/plant_z.py         (data/planted.json regenerates byte for byte)
-  3. World Bank run        scripts/run_poc.py worldbank
-  4. planted run           scripts/run_poc.py planted
-  5. Foil 2 check          scripts/check_foil2_coverage.py   (skipped with --quick)
-  6. paper figures         scripts/sync_writeup_figures.py
-  7. paper numbers         scripts/write_numbers.py   (writes writeup/numbers.tex)
-  8. paper PDF             latexmk in writeup/        (skipped if latexmk is not installed)
-  9. report                each result file compared with the committed one (git HEAD)
+  3. planted run           scripts/run_poc.py planted
+  4. Foil 2 check          scripts/check_foil2_coverage.py   (skipped with --quick)
+  5. paper figures         scripts/sync_writeup_figures.py
+  6. paper numbers         scripts/write_numbers.py   (writes writeup/numbers.tex)
+  7. paper PDF             latexmk in writeup/        (skipped if latexmk is not installed)
+  8. report                each result file compared with the committed one (git HEAD)
 
 The runs overwrite results/, figures/, locks/ and writeup/. Git keeps the
 committed versions: `git diff` shows any change, `git checkout .` restores them.
@@ -31,7 +30,6 @@ PY = sys.executable
 RESULT_FILES = [
     "results/planted/poc_results.json",
     "results/planted/image_points.json",
-    "results/worldbank/poc_results.json",
     "results/checks/foil2_coverage.json",
 ]
 RUN_STAMPS = {"ran_at", "git_commit"}   # fields that differ on every run by design
@@ -41,7 +39,7 @@ def step(n, name, cmd, cwd=ROOT, live=True):
     """Run one step. Its output streams live (unless live=False), each line prefixed with the seconds
     since the step started; the full text is kept and shown again on failure."""
     shown = " ".join("python" if c == PY else str(c) for c in cmd)
-    print(f"[{n}/9] {name:<16} {shown}", flush=True)
+    print(f"[{n}/8] {name:<16} {shown}", flush=True)
     t0 = time.time()
     env = dict(os.environ, PYTHONUNBUFFERED="1")   # children print as they go, not at exit
     proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -70,7 +68,7 @@ def strip_stamps(obj):
 
 
 def report(quick):
-    print("[9/9] report           each result file vs the committed version (ignoring ran_at, git_commit)")
+    print("[8/8] report           each result file vs the committed version (ignoring ran_at, git_commit)")
     all_same = True
     for path in RESULT_FILES:
         committed = subprocess.run(["git", "show", f"HEAD:{path}"], cwd=ROOT, capture_output=True, text=True)
@@ -99,19 +97,18 @@ def main():
     t0 = time.time()
     step(1, "tests", [PY, "-m", "pytest", "tests", "-q", "-p", "no:warnings"])
     step(2, "z check", [PY, "scripts/plant_z.py"])
-    step(3, "World Bank run", [PY, "scripts/run_poc.py", "worldbank"])
-    step(4, "planted run", [PY, "scripts/run_poc.py", "planted"])
+    step(3, "planted run", [PY, "scripts/run_poc.py", "planted"])
     if quick:
-        print("[5/9] Foil 2 check     skipped (--quick): the committed results/checks/foil2_coverage.json is used")
+        print("[4/8] Foil 2 check     skipped (--quick): the committed results/checks/foil2_coverage.json is used")
     else:
-        step(5, "Foil 2 check", [PY, "scripts/check_foil2_coverage.py"])
-    step(6, "paper figures", [PY, "scripts/sync_writeup_figures.py"])
-    step(7, "paper numbers", [PY, "scripts/write_numbers.py"])
+        step(4, "Foil 2 check", [PY, "scripts/check_foil2_coverage.py"])
+    step(5, "paper figures", [PY, "scripts/sync_writeup_figures.py"])
+    step(6, "paper numbers", [PY, "scripts/write_numbers.py"])
     if shutil.which("latexmk"):
-        step(8, "paper PDF", ["latexmk", "-g", "-interaction=nonstopmode"], cwd=ROOT / "writeup", live=False)
+        step(7, "paper PDF", ["latexmk", "-g", "-interaction=nonstopmode"], cwd=ROOT / "writeup", live=False)
         subprocess.run(["latexmk", "-c"], cwd=ROOT / "writeup", capture_output=True)
     else:
-        print("[8/9] paper PDF        skipped: latexmk not found (or upload writeup/ to Overleaf)")
+        print("[7/8] paper PDF        skipped: latexmk not found (or upload writeup/ to Overleaf)")
     report(quick)
     print(f"total {time.time() - t0:.0f} s")
 
