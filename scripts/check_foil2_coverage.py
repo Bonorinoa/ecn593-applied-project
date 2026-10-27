@@ -91,6 +91,8 @@ def gate(world):
         est.append(h["delta_spill"])
         se.append(h["se_spill"])
         hit.append(lo <= GATE_EFFECT_S0C <= hi)
+        if (a + 1) % 1000 == 0:
+            print(f"  gate assignments {a + 1}/{R_GATE}", flush=True)
     est, v = np.asarray(est), np.asarray(se) ** 2
     ratio = float(v.mean() / est.var(ddof=1))
     rng = np.random.default_rng(BOOT_SEED)
@@ -119,6 +121,7 @@ def gate(world):
 
 def kernel_result(world, name, c):
     """Coverage on panels from the kernel itself (reported, not gated)."""
+    print(f"{name:9s} truth, then {R} kernel panels and {R_DESIGN} design redraws", flush=True)
     truth = evaluate_spill(world, c, reps=R)["delta_spill"]
     est, se, hit = [], [], []
     for r in range(R):

@@ -87,6 +87,7 @@ def run_poc(source: str = "planted") -> dict:
     sampling = sampling_variances(audit)
     tau = tau_threshold()
     world = World()
+    print(f"{source}: truth at c* ({config.REPS_ESTIMAND} reps per arm)", flush=True)
     th_star = evaluate_thetas(world, config.C_STAR, reps=config.REPS_ESTIMAND)
     sp_star = evaluate_spill(world, config.C_STAR, reps=config.REPS_ESTIMAND)
 
@@ -138,7 +139,8 @@ def run_poc(source: str = "planted") -> dict:
     rng = np.random.default_rng(config.SEED_THETA_SAMPLE)
     idx = sample_nroy_index(hm["nroy"].shape[0], config.THETA_SAMPLE, rng)
     image_points = []
-    for i in idx:
+    print(f"images: theta2 and delta_spill at {len(idx)} sampled NROY points", flush=True)
+    for n_done, i in enumerate(idx, 1):
         c = row_to_c(hm["nroy"][i], hm["param_names"])
         th = evaluate_thetas(world, c, reps=config.REPS_ESTIMAND)
         sp = evaluate_spill(world, c, reps=config.REPS_ESTIMAND)
@@ -151,6 +153,8 @@ def run_poc(source: str = "planted") -> dict:
             "delta_spill": sp["delta_spill"],
             "se_spill": sp["se_spill"],
         })
+        if n_done % 50 == 0:
+            print(f"  image points done {n_done}/{len(idx)}", flush=True)
     theta2s = np.array([p["theta2"] for p in image_points])
     spills = np.array([p["delta_spill"] for p in image_points])
     Theta_hm = interval_image(theta2s)
@@ -158,12 +162,14 @@ def run_poc(source: str = "planted") -> dict:
     payload["Theta_hm"] = list(Theta_hm)
     payload["Theta_exp"] = list(Theta_exp)
     payload["n_theta_sample"] = len(image_points)
+    print("endpoint recheck: fresh reps at the four winning points", flush=True)
     payload["endpoint_recheck"] = recheck_extremizers(world, image_points)
     _dump_json(res_dir / "image_points.json", image_points)
 
     worlds = diagnostic_worlds(hm["nroy"], hm["I"])
     findings = {}
     for key in ("min_I", "median_I"):
+        print(f"foils at the {key} point", flush=True)
         row = worlds[key]["c_row"]
         c = row_to_c(row, hm["param_names"])
         th = evaluate_thetas(world, c, reps=config.REPS_ESTIMAND)
