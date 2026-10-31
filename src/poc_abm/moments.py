@@ -55,9 +55,14 @@ def plant_and_freeze(world: World, path=None) -> dict:
     return payload
 
 
-def discrepancy() -> np.ndarray:
-    """δ² on the moment diagonal, same units as z."""
-    return np.array([config.DELTA[name] ** 2 for name in MOMENT_NAMES], dtype=float)
+def discrepancy(delta: dict | None = None) -> np.ndarray:
+    """δ² on the moment diagonal, same units as z.
+
+    `delta` is a dict {moment name: δ}. The default is config.DELTA (the design).
+    scripts/delta_menu.py passes its own, so the design file is never edited.
+    """
+    delta = config.DELTA if delta is None else delta
+    return np.array([delta[name] ** 2 for name in MOMENT_NAMES], dtype=float)
 
 
 def implausibility(z: np.ndarray, m_hat: np.ndarray, v_diag: np.ndarray) -> float:
@@ -70,9 +75,9 @@ def implausibility(z: np.ndarray, m_hat: np.ndarray, v_diag: np.ndarray) -> floa
     return float(diff @ (inv * diff))
 
 
-def v_diag_of(sampling: np.ndarray, mc: np.ndarray) -> np.ndarray:
-    """V = diag(σ²_sampling + σ²_MC + δ²)."""
-    return np.asarray(sampling, dtype=float) + np.asarray(mc, dtype=float) + discrepancy()
+def v_diag_of(sampling: np.ndarray, mc: np.ndarray, delta: dict | None = None) -> np.ndarray:
+    """V = diag(σ²_sampling + σ²_MC + δ²). `delta` defaults to config.DELTA."""
+    return np.asarray(sampling, dtype=float) + np.asarray(mc, dtype=float) + discrepancy(delta)
 
 
 def peer_correlation(world: World, y: np.ndarray) -> float:

@@ -2,17 +2,18 @@
 
 Usage, from the repo root (after the one-time setup in README.md):
     .venv/bin/python scripts/replicate.py           # full: see README for the measured time
-    .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check
+    .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check and the delta menu
 
 Steps, in order. The script stops at the first step that fails.
   1. tests                 pytest tests
   2. z check               scripts/plant_z.py         (data/planted.json regenerates byte for byte)
   3. planted run           scripts/run_poc.py planted
   4. Foil 2 check          scripts/check_foil2_coverage.py   (skipped with --quick)
-  5. paper figures         scripts/sync_writeup_figures.py
-  6. paper numbers         scripts/write_numbers.py   (writes writeup/numbers.tex)
-  7. paper PDF             latexmk in writeup/        (skipped if latexmk is not installed)
-  8. report                each result file compared with the committed one (git HEAD)
+  5. delta menu            scripts/delta_menu.py      (amendment A1; skipped with --quick)
+  6. paper figures         scripts/sync_writeup_figures.py
+  7. paper numbers         scripts/write_numbers.py   (writes writeup/numbers.tex)
+  8. paper PDF             latexmk in writeup/        (skipped if latexmk is not installed)
+  9. report                each result file compared with the committed one (git HEAD)
 
 The runs overwrite results/, figures/, locks/ and writeup/. Git keeps the
 committed versions: `git diff` shows any change, `git checkout .` restores them.
@@ -31,6 +32,7 @@ RESULT_FILES = [
     "results/planted/poc_results.json",
     "results/planted/image_points.json",
     "results/checks/foil2_coverage.json",
+    "results/sensitivity/delta_menu.json",
 ]
 RUN_STAMPS = {"ran_at", "git_commit"}   # fields that differ on every run by design
 
@@ -39,7 +41,7 @@ def step(n, name, cmd, cwd=ROOT, live=True):
     """Run one step. Its output streams live (unless live=False), each line prefixed with the seconds
     since the step started; the full text is kept and shown again on failure."""
     shown = " ".join("python" if c == PY else str(c) for c in cmd)
-    print(f"[{n}/8] {name:<16} {shown}", flush=True)
+    print(f"[{n}/9] {name:<16} {shown}", flush=True)
     t0 = time.time()
     env = dict(os.environ, PYTHONUNBUFFERED="1")   # children print as they go, not at exit
     proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -68,7 +70,7 @@ def strip_stamps(obj):
 
 
 def report(quick):
-    print("[8/8] report           each result file vs the committed version (ignoring ran_at, git_commit)")
+    print("[9/9] report           each result file vs the committed version (ignoring ran_at, git_commit)")
     all_same = True
     for path in RESULT_FILES:
         committed = subprocess.run(["git", "show", f"HEAD:{path}"], cwd=ROOT, capture_output=True, text=True)
@@ -87,7 +89,7 @@ def report(quick):
     if not all_same:
         print("DIFFERENT: see the CHANGED or new files above (git diff shows the details).")
     elif quick:
-        print("REPLICATED, except the Foil 2 check, which --quick did not rerun.")
+        print("REPLICATED, except the Foil 2 check and the delta menu, which --quick did not rerun.")
     else:
         print("REPLICATED: every result is identical to the committed one.")
 
@@ -99,16 +101,18 @@ def main():
     step(2, "z check", [PY, "scripts/plant_z.py"])
     step(3, "planted run", [PY, "scripts/run_poc.py", "planted"])
     if quick:
-        print("[4/8] Foil 2 check     skipped (--quick): the committed results/checks/foil2_coverage.json is used")
+        print("[4/9] Foil 2 check     skipped (--quick): the committed results/checks/foil2_coverage.json is used")
+        print("[5/9] delta menu       skipped (--quick): the committed results/sensitivity/delta_menu.json is used")
     else:
         step(4, "Foil 2 check", [PY, "scripts/check_foil2_coverage.py"])
-    step(5, "paper figures", [PY, "scripts/sync_writeup_figures.py"])
-    step(6, "paper numbers", [PY, "scripts/write_numbers.py"])
+        step(5, "delta menu", [PY, "scripts/delta_menu.py"])
+    step(6, "paper figures", [PY, "scripts/sync_writeup_figures.py"])
+    step(7, "paper numbers", [PY, "scripts/write_numbers.py"])
     if shutil.which("latexmk"):
-        step(7, "paper PDF", ["latexmk", "-g", "-interaction=nonstopmode"], cwd=ROOT / "writeup", live=False)
+        step(8, "paper PDF", ["latexmk", "-g", "-interaction=nonstopmode"], cwd=ROOT / "writeup", live=False)
         subprocess.run(["latexmk", "-c"], cwd=ROOT / "writeup", capture_output=True)
     else:
-        print("[7/8] paper PDF        skipped: latexmk not found (or upload writeup/ to Overleaf)")
+        print("[8/9] paper PDF        skipped: latexmk not found (or upload writeup/ to Overleaf)")
     report(quick)
     print(f"total {time.time() - t0:.0f} s")
 

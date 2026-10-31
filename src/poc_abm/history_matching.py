@@ -83,10 +83,13 @@ def run_waves(
     n_waves: int | None = None,
     moment_fn=None,
     rng=None,
+    delta: dict | None = None,
 ):
     """The wave loop. Returns a dict with NROY, I(c), finding, τ.
 
     NROY is the UNION of points with I ≤ τ across waves.
+    `delta` ({moment name: δ}) defaults to config.DELTA; only the delta menu
+    (scripts/delta_menu.py) passes another one.
     """
     n_points = config.WAVE_POINTS if n_points is None else n_points
     n_waves = config.WAVES if n_waves is None else n_waves
@@ -114,7 +117,7 @@ def run_waves(
         for i in range(pts.shape[0]):
             c = array_to_params(pts[i], names)
             m, mc = moment_fn(world, c)
-            v = v_diag_of(sampling, mc)
+            v = v_diag_of(sampling, mc, delta)
             I = implausibility(z, m, v)
             I_this.append(I)
             if closest is None or I < closest["I"]:
