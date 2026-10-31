@@ -4,7 +4,7 @@ This document describes the code in this repo, on the branch `main`. If the docu
 
 The design is frozen in `docs/preregistration-v2.md`. The code implements it. The earlier design is the git tag `v1-worldbank-moments`.
 
-Sections 1 to 5 cover the model, the targets, the images and foils, the non-claims, and the readout `nroy_param_spread`. Section 6 lists the outputs of each script and the environment.
+Sections 1 to 5 cover the model, the targets, the images and foils, the non-claims, and the readout `nroy_param_spread`. Section 6 lists the outputs of each script and the environment. Section 7 describes amendment A1, the delta menu.
 
 ## 1. The model
 
@@ -372,13 +372,36 @@ Only alpha is strongly restricted. The ratio for gamma is 0.992, so the moments 
 | `python scripts/plant_z.py` | `data/planted.json` | `results/checks/planted_regenerated.json` (a scratch copy). Exit 0 if the bytes match, exit 1 if not. With `--write` it overwrites `data/planted.json`. |
 | `python scripts/run_poc.py planted` | `data/planted.json` | `results/planted/poc_results.json`, `results/planted/image_points.json`, `figures/planted/waves.png`, `figures/planted/image_points.png`, `figures/planted/overlay.png`, `locks/freeze-planted.txt`. If NROY is empty it draws `figures/planted/empty.png` instead of the last two. |
 | `python scripts/check_foil2_coverage.py` | `results/planted/poc_results.json` | `results/checks/foil2_coverage.json` |
-| `python scripts/replicate.py [--quick]` | everything below | all the outputs below, then a report comparing each result file with git HEAD. `--quick` skips the Foil 2 check. |
+| `python scripts/delta_menu.py` | `data/planted.json`, `results/planted/poc_results.json` | `results/sensitivity/delta_menu.json` (amendment A1, section 7) |
+| `python scripts/replicate.py [--quick]` | everything below | all the outputs below, then a report comparing each result file with git HEAD. `--quick` skips the Foil 2 check and the delta menu. |
 | `python scripts/sync_writeup_figures.py` | `figures/` | `writeup/figures/` (byte copies of the three paper figures) |
-| `python scripts/write_numbers.py` | `config/`, `results/`, the drawn graph | `writeup/numbers.tex` (every number in the paper, as a LaTeX macro) |
+| `python scripts/write_numbers.py` | `config/`, `results/`, the drawn graph | `writeup/numbers.tex` (every number in the paper, as a LaTeX macro, including the delta menu macros) |
 | `python scripts/draw_figures.py planted` | `results/planted/poc_results.json`, `results/planted/image_points.json` | the figures of that run. It runs no simulation. |
 
 The file `poc_results.json` has these keys: `git_commit`, `ran_at`, `z_source`, `z`, `z_names`, `sampling_variances`, `delta`, `tau`, `finding_hm`, `wave_kept`, `wave_I_stats`, `closest`, `n_nroy`, `param_names`, `c_star`, `theta_star`, `spill_star`, `notes` and `figures`. The run adds `Theta_hm`, `Theta_exp`, `n_theta_sample`, `nroy_param_spread`, `endpoint_recheck` and `findings` (the keys `min_I`, `median_I` and `c_star`). The key `git_commit` is the HEAD hash of the code, with `+dirty` if `config/`, `src/`, `scripts/`, `data/` or the requirements files differ from it.
 
 The run also stores `theta_star` and `spill_star`, the truth at $c^*$: theta1 = 0.03631, theta2 = 0.03826, premium = 0.00195, and delta_spill = 0.00792.
 
-The pins are Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2 and pytest 9.1.1 (before 2026-10-22: Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2; see the README). Every v2 result was produced on the new pins. The pipeline calls `uv pip freeze` to write `locks/freeze-*.txt`, so `uv` must be on the path. The tests are in `tests/`. There are 55 of them, and all 55 pass. `writeup/main.tex` and `writeup/cover.tex` use only the three synced figures; the paper no longer cites `empty.png`.
+The pins are Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2 and pytest 9.1.1 (before 2026-10-22: Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2; see the README). Every v2 result was produced on the new pins. The pipeline calls `uv pip freeze` to write `locks/freeze-*.txt`, so `uv` must be on the path. The tests are in `tests/`. There are 65 of them, and all 65 pass. `writeup/main.tex` and `writeup/cover.tex` use only the three synced figures; the paper no longer cites `empty.png`.
+
+## 7. Amendment A1: the delta menu
+
+Amendment A1 is at the bottom of `docs/preregistration-v2.md`. It was written after the v2 results were known, and the pre-registration says so. It does not test a hypothesis. It reports how the image depends on one assumption: the discrepancy delta of the two level moments. The main design and every headline result stay at delta = 0.02.
+
+**The menu.** The script `scripts/delta_menu.py` takes delta for `sq_level` and `pilot_level` from {0.02, 0.01, 0.005}. The entries are named Main, Half and Quarter. The two correlation moments keep delta = 0.05. The threshold tau, the box C, the moments, the targets z, every seed and `REPS_MOMENT` do not change. The file `config/design.toml` is never edited.
+
+**How delta is passed.** The functions `moments.discrepancy`, `moments.v_diag_of` and `history_matching.run_waves` take an optional argument `delta`, a dict from moment name to delta. The default is `config.DELTA`, so every existing call behaves as before. A test checks this.
+
+**What is rerun for each entry.** The waves (`run_waves`, same seed), NROY, the 400 sampled points (`SEED_THETA_SAMPLE`), Theta_hm, Theta_exp and `nroy_param_spread`. The script uses the pipeline's own functions for each of these. It reports `finding_hm`, `wave_kept`, `n_nroy`, both images, the spread ratios and the alpha–kappa correlation. An empty NROY (F-EMPTY) is reported as found. Such an entry has no images.
+
+**The foils.** The foils are not rerun. The intervals of the field experimenter at c* do not depend on delta. The script reads them from `results/planted/poc_results.json` and classifies them with `classify_interval` against each entry's Theta_hm (Foil 1) and Theta_exp (Foil 2). The points of the calibrator (min-I, median-I) move with delta. They are not rerun, because that would be a new design.
+
+**The consistency check.** The Main entry must equal the main run in `delta`, `tau`, `Theta_hm`, `Theta_exp`, `n_nroy`, `wave_kept` and `nroy_param_spread`, exactly. If one differs, the script exits with an error and writes no file. This check passed in the committed run.
+
+**Output.** `results/sensitivity/delta_menu.json` has the keys `git_commit`, `ran_at`, `amendment`, `moment_names`, `level_moments`, `main_entry`, `consistency_check`, `c_star_foil_intervals`, `entries` and `notes`. Each entry has `delta_level`, `delta` (four numbers, in the order of `moment_names`), `tau`, `finding_hm`, `wave_kept`, `n_nroy`, `param_names`, `n_theta_sample`, `Theta_hm`, `Theta_exp`, `nroy_param_spread`, `alpha_kappa_corr`, `foil1_vs_Theta_hm` and `foil2_vs_Theta_exp`.
+
+**Macros.** `scripts/write_numbers.py` writes `\MenuDelta<Entry><Item>` to `writeup/numbers.tex`. The entry is Main, Half or Quarter. The items are `Level`, `Finding`, `NNroy`, `ThetaHmLo`, `ThetaHmHi`, `ThetaExpLo`, `ThetaExpHi`, `SpreadRatioAlpha`, `SpreadRatioKappa`, `SpreadRatioGamma`, `FoilOneVerdict` and `FoilTwoVerdict`. Example: `\MenuDeltaHalfThetaHmLo`. The existing macros are unchanged.
+
+**Run time.** About 6 minutes per entry, and about 18 minutes for the menu. `replicate.py` runs it as step 5 and skips it with `--quick`.
+
+**What the menu is not.** It is not a test and not a way to choose delta. It shows the answer under each assumption, in the spirit of Tamer (2010). The numbers are in the JSON file and in `numbers.tex`.

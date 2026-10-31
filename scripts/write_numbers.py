@@ -7,6 +7,7 @@ Sources, in order of the table below:
   G  = the drawn graph (endogenous, recomputed from the code in a few ms)
   P  = results/planted/poc_results.json
   F  = results/checks/foil2_coverage.json
+  M  = results/sensitivity/delta_menu.json   (amendment A1: the delta menu)
 
 Format rule, one for every number: round to `dp` decimals, then drop trailing
 zeros, but keep at least `keep` decimals. Example: fmt(0.9300, 4, 3) = 0.930.
@@ -82,13 +83,44 @@ def verdict(label):
     return label if label else "no verdict"
 
 
-TEXT_VALUES = {"yes", "no", "no verdict", "F-OVERCONF", "F-HONEST"}   # the only non-numeric macros
+TEXT_VALUES = {"yes", "no", "no verdict", "none", "F-OVERCONF", "F-HONEST", "F-EMPTY", "F-SINGLETON"}   # the only non-numeric macros
 PARAM_TAG = {"alpha": "Alpha", "beta": "Beta", "gamma": "Gamma", "kappa": "Kappa", "sigma_eps": "Sigma"}
+
+
+def menu_rows(menu):
+    """Macros for the delta menu (amendment A1), one block per entry. Names are
+
+        \\MenuDelta<Entry><Item>      Entry: Main, Half, Quarter (the keys of delta_menu.json);
+                                     Item:  see the list below.
+
+    Level = delta of sq_level and pilot_level. Finding is F-EMPTY, F-SINGLETON or none.
+    NNroy = points in NROY. ThetaHm / ThetaExp = the two images (Lo, Hi endpoints).
+    SpreadRatio<Param> = nroy_param_spread sd_ratio. FoilOneVerdict / FoilTwoVerdict = the
+    classification of the c* (field experimenter) interval against this entry's image.
+    An empty entry has no image, spread or verdict, so only Level, Finding and NNroy are written.
+    """
+    rows = []
+    for entry, e in menu["entries"].items():
+        pre = f"MenuDelta{entry}"
+        rows += [(f"{pre}Level", fmt(e["delta_level"], 3, 2)), (f"{pre}Finding", e["finding_hm"] or "none"),
+                 (f"{pre}NNroy", str(e["n_nroy"]))]
+        if e["Theta_hm"] is None:
+            continue
+        rows += [
+            (f"{pre}ThetaHmLo", fmt(e["Theta_hm"][0], 5)), (f"{pre}ThetaHmHi", fmt(e["Theta_hm"][1], 5)),
+            (f"{pre}ThetaExpLo", fmt(e["Theta_exp"][0], 6)), (f"{pre}ThetaExpHi", fmt(e["Theta_exp"][1], 6)),
+        ]
+        for name in ("alpha", "kappa", "gamma"):
+            rows.append((f"{pre}SpreadRatio{PARAM_TAG[name]}", fmt(e["nroy_param_spread"]["sd_ratio"][name], 3)))
+        rows += [(f"{pre}FoilOneVerdict", verdict(e["foil1_vs_Theta_hm"])),
+                 (f"{pre}FoilTwoVerdict", verdict(e["foil2_vs_Theta_exp"]))]
+    return rows
 
 
 def table():
     P = load("results/planted/poc_results.json")
     F = load("results/checks/foil2_coverage.json")
+    M = load("results/sensitivity/delta_menu.json")
     G = graph_facts()
     k = n_treated()
     lo, mi, cs = P["findings"]["min_I"], P["findings"]["median_I"], P["findings"]["c_star"]
@@ -256,6 +288,7 @@ def table():
         ("DesignCovMinI", fmt(kp["min_I"]["design_coverage"], 4, 3)),
         ("DesignCovMedI", fmt(kp["median_I"]["design_coverage"], 4, 3)),
     ]
+    rows += menu_rows(M)
     assert all(v in TEXT_VALUES or math.isfinite(float(v.replace(",", ""))) for _, v in rows)
     names = [n for n, _ in rows]
     assert len(names) == len(set(names)), "duplicate macro name"

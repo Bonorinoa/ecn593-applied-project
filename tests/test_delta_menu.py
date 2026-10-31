@@ -134,3 +134,26 @@ def test_consistency_check_passes_on_equal_and_exits_nonzero_on_a_difference(mon
         with pytest.raises(SystemExit) as exc:
             delta_menu.check_main_entry(e, {**main, key: bad})
         assert exc.value.code not in (0, None) and key in str(exc.value.code)
+
+
+# ---- the macros (scripts/write_numbers.py) ---------------------------------------------------
+
+def test_menu_macros_on_a_made_up_menu():
+    """Names follow \\MenuDelta<Entry><Item>. An empty entry writes only Level, Finding, NNroy."""
+    from write_numbers import menu_rows
+    full = {"delta_level": 0.005, "finding_hm": None, "n_nroy": 7,
+            "Theta_hm": [0.1, 0.25], "Theta_exp": [-0.001, 0.002],
+            "nroy_param_spread": {"sd_ratio": {"alpha": 0.5, "kappa": 0.25, "gamma": 1.0}},
+            "foil1_vs_Theta_hm": "F-OVERCONF", "foil2_vs_Theta_exp": None}
+    empty = {"delta_level": 0.02, "finding_hm": "F-EMPTY", "n_nroy": 0, "Theta_hm": None}
+    rows = dict(menu_rows({"entries": {"Quarter": full, "Main": empty}}))
+    assert rows["MenuDeltaQuarterLevel"] == "0.005" and rows["MenuDeltaQuarterFinding"] == "none"
+    assert rows["MenuDeltaQuarterNNroy"] == "7"
+    assert (rows["MenuDeltaQuarterThetaHmLo"], rows["MenuDeltaQuarterThetaHmHi"]) == ("0.10000", "0.25000")
+    assert (rows["MenuDeltaQuarterThetaExpLo"], rows["MenuDeltaQuarterThetaExpHi"]) == ("-0.001000", "0.002000")
+    assert [rows[f"MenuDeltaQuarterSpreadRatio{t}"] for t in ("Alpha", "Kappa", "Gamma")] == ["0.500", "0.250", "1.000"]
+    assert rows["MenuDeltaQuarterFoilOneVerdict"] == "F-OVERCONF"
+    assert rows["MenuDeltaQuarterFoilTwoVerdict"] == "no verdict"
+    assert {k for k in rows if k.startswith("MenuDeltaMain")} == {
+        "MenuDeltaMainLevel", "MenuDeltaMainFinding", "MenuDeltaMainNNroy"}
+    assert rows["MenuDeltaMainFinding"] == "F-EMPTY"

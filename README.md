@@ -65,6 +65,10 @@ Foil 2 calibration check: the nominal 95% interval covered 93.4% of assignments 
 
 Two facts about the graph: the global clustering coefficient is 0.0096 (3 × triangles / connected triples; the edge probability, which a random graph has in expectation, is 0.0100), and the mean degree is 8.085.
 
+## Amendment A1: the delta menu
+
+The main design takes a discrepancy delta of 0.02 for the two level moments. Amendment A1 of the pre-registration was written after the v2 results were known, and it says so. It does not test a hypothesis. It shows how the image depends on that one assumption. `scripts/delta_menu.py` reruns the waves, NROY, the 400-point image sample and `nroy_param_spread` with delta for `sq_level` and `pilot_level` set to 0.02, 0.01 and 0.005. The two correlation moments keep their delta. The main design does not change, and the menu is never used to pick a delta. The foils are not rerun: the intervals at c* do not depend on delta, so they are classified against each entry's images. The entry at 0.02 must equal the main run exactly. The script stops with an error if it does not. The output is `results/sensitivity/delta_menu.json`. The paper macros for it are `\MenuDelta<Entry><Item>` in `writeup/numbers.tex`.
+
 ## How to replicate
 
 One-time setup, then one command:
@@ -73,10 +77,10 @@ One-time setup, then one command:
 uv venv .venv --python 3.14
 uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt
 .venv/bin/python scripts/replicate.py            # everything
-.venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check
+.venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check and the delta menu
 ```
 
-`replicate.py` has eight steps: the tests, the z check, the planted run, the Foil 2 check, the figure copy into `writeup/`, the paper's numbers (`writeup/numbers.tex`), the PDF build, and a report that compares every result file with the committed one. The paper types no result: every number in it is a macro from `numbers.tex`. The PDF build needs TeX Live with `latexmk`; without it, upload `writeup/` to Overleaf.
+`replicate.py` has nine steps: the tests, the z check, the planted run, the Foil 2 check, the delta menu (amendment A1), the figure copy into `writeup/`, the paper's numbers (`writeup/numbers.tex`), the PDF build, and a report that compares every result file with the committed one. The paper types no result: every number in it is a macro from `numbers.tex`. The PDF build needs TeX Live with `latexmk`; without it, upload `writeup/` to Overleaf.
 
 The steps, one at a time:
 
@@ -84,6 +88,7 @@ The steps, one at a time:
 python scripts/plant_z.py                        # check: data/planted.json reproduces byte for byte
 python scripts/run_poc.py planted                # the run -> results/planted/, figures/planted/
 python scripts/check_foil2_coverage.py           # Foil 2 calibration check -> results/checks/foil2_coverage.json
+python scripts/delta_menu.py                     # delta menu (amendment A1) -> results/sensitivity/delta_menu.json
 python scripts/draw_figures.py planted           # redraw figures from saved results (no simulation)
 python scripts/sync_writeup_figures.py           # copy the figures into writeup/figures/
 python scripts/write_numbers.py                  # write writeup/numbers.tex from config/ and results/
@@ -93,7 +98,8 @@ Measured runtimes on an Apple-silicon laptop, in the repo at commit `cc01779`:
 
 - The tests took 3 s (55 pass). The z check took under 1 s. The planted run took 243 s. The Foil 2 check took 233 s. The figure copy and the numbers took about 1 s each. These six steps take about 8 minutes.
 - The paper (`writeup/main.tex`) is written for v2. A full `replicate.py` run on the final paper, with other jobs running on the same laptop, took 643 s: tests 4 s, planted run 325 s, Foil 2 check 310 s, PDF build 2 s. It printed REPLICATED, and the rebuilt PDF was byte-identical to the committed one.
-- `replicate.py --quick` skips the Foil 2 check, which is 233 s of that time on an idle machine.
+- The delta menu (amendment A1) took 1,107 s: three entries of about 366 s each, with another job reading the repo on the same laptop. A full `replicate.py` run is now about 26 minutes.
+- `replicate.py --quick` skips the Foil 2 check (233 s) and the delta menu (about 18 minutes).
 - A second planted run after the commit changed only `ran_at` and `git_commit` in `results/planted/poc_results.json`. The files `image_points.json`, the figures and the lock file were byte-identical. The Foil 2 check file was also byte-identical after a second run. Every random stream is seeded, so a rerun reproduces every number.
 
 Pins: Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2, pytest 9.1.1. Reproducibility is part of the claim, so a rerun must match to the last digit. The file `locks/freeze-planted.txt` records the full environment of the run. It includes extra packages that the code does not import. The project does not use Mesa, pandas, or GPU libraries. The kernel is vectorized algebra.
@@ -107,9 +113,9 @@ Two cautions. `run_poc.py` calls `uv` and overwrites the committed results, figu
 - `config/`: every exogenous parameter, chosen before any run. `world.toml` is the simulated village and the policy question. `design.toml` is the analyst's choices: the Monte Carlo reps, history matching (including `delta` for each moment name), the images, the foils and the Foil 2 check. Endogenous quantities are never in config: they live in `data/planted.json` and `results/`.
 - `src/poc_abm/`: the code. The kernel, the moments, history matching, the estimands, the foils, the pipeline and the figures. `config.py` only loads the two TOML files.
 - `scripts/`: `replicate.py` and the steps it runs, plus `draw_figures.py`.
-- `tests/`: 55 tests. Most of them check hand-computed examples.
+- `tests/`: 65 tests. Most of them check hand-computed examples.
 - `data/`: the targets z (`planted.json`).
-- `results/`: the committed JSON of the run, and the Foil 2 calibration check.
+- `results/`: the committed JSON of the run, the Foil 2 calibration check, and the delta menu (`sensitivity/`).
 - `figures/`: the figures of the run (`planted/`).
 - `locks/`: the frozen package list of the run.
 - `docs/`: the frozen pre-registration (`preregistration-v2.md`) and the sprint cards.
