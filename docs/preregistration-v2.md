@@ -103,4 +103,30 @@ Removed from the code, the replication script, the results, the figures, the loc
 
 ## Amendments
 
-(none)
+### A1 (2026-10-30, written AFTER the v2 results were known): a delta sensitivity menu
+
+What was already known when A1 was written:
+- the v2 results at `cc01779`: Theta_hm = [0.00577, 0.07369], with spread ratios
+  alpha 0.26, beta 0.97, gamma 0.99, kappa 0.96, sigma 0.84;
+- the PM's reading that delta_level = 0.02 allows each level a miss of about
+  sqrt(9.49 x 0.0004) = 0.062, which is more than theta1(c*) = 0.036.
+
+A1 therefore does not test a hypothesis. It reports how the image depends on the one assumption
+that appears to bind, in the spirit of Tamer (2010): a menu of answers indexed by assumptions. The
+main design and every headline result stay at delta_level = 0.02. Nothing in sections 2–8 changes.
+
+- **Menu:** delta for the two level moments (`sq_level`, `pilot_level`) in {0.02, 0.01, 0.005}. The
+  two correlation moments keep delta = 0.05. tau, C, the moments, the targets z, every seed and
+  REPS_MOMENT are unchanged.
+- **Per menu entry**, rerun only what delta affects: the waves (`run_waves` with the same seed),
+  NROY, the 400-point image sample (`SEED_THETA_SAMPLE`), Theta_hm and Theta_exp, and
+  `nroy_param_spread`. Then report `finding_hm`, `wave_kept`, `n_nroy`, both images, the spread
+  ratios, and the alpha-kappa correlation.
+- **Foils against the menu:** the field experimenter's intervals at c* do not depend on delta.
+  Classify both of them (`classify_interval`) against each entry's images. The calibrator's points
+  (min-I, median-I) move with delta; do not rerun the foils at the new points (that would be a new
+  design). Report only the c* classification.
+- F-EMPTY or F-SINGLETON at any entry is reported as found. The menu is never used to pick a delta.
+- **Output:** `results/sensitivity/delta_menu.json`, written by `scripts/delta_menu.py` and run by
+  `scripts/replicate.py` as its own step. The entry at delta = 0.02 must reproduce the main run's
+  images and spread exactly (a built-in consistency check).
