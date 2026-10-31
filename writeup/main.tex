@@ -98,19 +98,21 @@ about the real village and how it sits against the image. Because the
 targets are planted, the true effect is known, and the test can grade
 both analysts.
 
-% HEADLINE CANDIDATE (v2), written from the results by the writer card W1.
-% It is NOT yet adopted: Augusto decides (see the W1 handoff).
+% HEADLINE CANDIDATE (v2), written from the results by the writer card W1
+% and revised by W2 for G1 FIX-5a (one panel). It is NOT yet adopted:
+% Augusto decides (see the W2 handoff).
 \medskip
 \noindent\textbf{Headline.}
 \begin{quote}
-Foil 1 misses the truth at all three points, the real village included,
-and is F-OVERCONF at all three. Foil 2 contains the truth at all three
-points, and is F-OVERCONF at both calibrated points; at the real village
-it has no verdict.
+In the one panel at each point, Foil 1 misses the truth at all three
+points, the real village included, and is F-OVERCONF at all three. Foil 2
+contains the truth at all three points, and is F-OVERCONF at both
+calibrated points; at the real village it has no verdict. Report the
+image, not one point.
 \end{quote}
 The analyst who ignores interference reports a tight interval that sits
 inside the image and misses the truth, even before any calibration. The
-analyst who models exposure contains the truth everywhere, yet at both
+analyst who models exposure contains the truth at all three points, in that one panel, yet at both
 calibrated points her interval is strictly narrower than the set of
 spillovers that the targets leave open.
 
@@ -345,11 +347,18 @@ way to check an overlay.
 
 \paragraph{The discrepancy $\delta$ and the threshold $\tau$.}
 The discrepancy is $\delta=(\DeltaOne,\,\DeltaTwo,\,\DeltaThree,\,\DeltaFour)$ in the order above: \DeltaOne{} for the
-two levels and \DeltaTwo{} for the two correlations. It is a design
-tolerance, and it is not small next to the effect of interest:
-$\delta_1$ and $\delta_4$ are of the same order as $\theta_1(c^\star)=\ThetaOneStar$.
+two levels and \DeltaTwo{} for the two correlations.
 The threshold is the \Confidence{} quantile of $\chi^2$ with $\NMoments$
 degrees of freedom, one per moment, so $\tau=\Tau$.
+The discrepancy is a design tolerance, and it is the binding one for
+$\kappa$. On a single coordinate the level allowance is the square root of
+$\tau$ times $\delta_1^2$ ($\tau=\Tau$, $\delta_1=\DeltaOne$). That allowance
+is larger than $\theta_1(c^\star)=\ThetaOneStar$, so a level match cannot
+pin a treatment effect of this size. The spread ratio for $\kappa$ is
+\SpreadRatioKappa{} (Section~\ref{sec:spread}). The peer-correlation moment
+is a separate failure: \SpreadRatioGamma{} is not a restriction, because the
+moment hardly moves with $\gamma$. Four moments against five parameters is
+not why the image is wide.
 
 \paragraph{The paired-rep identity.}
 Because the control and random arms share their state streams,
@@ -457,13 +466,20 @@ the results. The targets and $\delta$ are in Section~\ref{sec:targets}.
 The code uses the \Confidence{} quantile of $\chi^2$ with \NMoments{} degrees of
 freedom, $\tau=\Tau$, as its design threshold. This choice does not
 assert that the implemented $I(c)$ has an exact $\chi^2$ sampling law
-or define a credible region. It is a rule for ruling out. If we move $\tau$ after we see NROY, a filter becomes a fit. The same level, \ConfidencePct\%, sets both foil intervals.
+or define a credible region. It is a rule for ruling out. Two facts keep
+the quantile from being a test level. The control and random levels share
+a state stream, so those two moments are not independent, and $V$ is
+diagonal. And $\delta^2$, not the sampling variance, is what fills $V$, so
+$I(c^\star)$ sits far below $\tau$. The threshold is a tolerance, and it is not the
+critical value of a test. If we move $\tau$ after we see NROY, a filter becomes a fit. The same level, \ConfidencePct\%, sets both foil intervals.
 
 \subsection{Discrepancy \texorpdfstring{$\delta$}{delta}}
 The code adds the fixed discrepancy $\delta$ to $V$.
 In this planted exercise it is a design tolerance, not an estimated
 model-error variance. With external targets, the same slot is the
 allowance for a model that is not the world. If we loosen $\delta$ after a wave, it is the same error as moving $\tau$.
+Section~\ref{sec:menu} varies $\delta$ in the open, as a report decided
+after the results, and it picks none of the values.
 
 \subsection{The box \texorpdfstring{$C$}{C}}
 The box is wide enough for underidentification ($5>\NMoments$) but also narrow:
@@ -543,6 +559,18 @@ person by the inverse of the exposure probability,
   \frac{\sum_i \mathbf{1}\{i\in S\}\,Y_i/p_{i,S}}
        {\sum_i \mathbf{1}\{i\in S\}/p_{i,S}}.
 \end{equation}
+The Hájek mean is not the stratum mean in the previous display. It targets
+the inverse-probability exposure contrast. The kernel truth is the average
+of the unweighted realized contrasts. The exposure probabilities $p_{i,S}$
+vary widely across people in the two untreated strata, so the two
+functionals weight people differently. On this run the two are close
+enough that no containment flag depends on the difference. That closeness
+is a fact about this kernel, graph and parameter point, not an identity:
+in the panels we examined, outcomes hardly track the inverse-probability
+weights. We did not run another kernel, and we cannot say whether a
+different peer term, for example a summed-peer kernel, would keep the two
+close. The comparison was made offline on paired panels, and it is not a
+committed result.
 The first-order probabilities $p_{i,S}$ are exact: under the random arm, the
 number of treated neighbors of an untreated person of degree $d$ is
 hypergeometric. The variance is the estimator of Aronow and
@@ -602,10 +630,11 @@ and who are graded on different questions.
 
 \paragraph{The field experimenter.}
 She has one panel from the real village, which is the point $c^\star$.
-She has not calibrated anything, and she has no image. Her test is
-whether her interval is right about its own world: does it contain the
-truth at $c^\star$? This is layer~(a). It depends only on the
-identification conditions of her estimator.
+She has not calibrated anything. Her test is whether her interval
+contains the truth at $c^\star$. This is layer~(a). It depends only on the
+identification conditions of her estimator. The code also places that same
+interval against the image. That comparison is reported, including a
+verdict of none at $c^\star$. It is not a second identification test.
 \begin{itemize}
   \item Foil 1 needs SUTVA, unconfoundedness given $X$, and a linear
         (additive, constant-effect) outcome model. The deterministic
@@ -817,12 +846,13 @@ peer weight $\gamma$ is the case the design most wanted to restrict
 (through \texttt{sq\_peer\_corr}), and its ratio is \SpreadRatioGamma.
 That is below one only in the third decimal, so in practice the
 moments leave $\gamma$ open. The pre-registration expected a ratio
-below one for $\gamma$, and expected the pilot moment to restrict the trade-off between $\alpha$ and
+below one for $\gamma$ through the peer-correlation moment, and expected the pilot moment to restrict the trade-off between $\alpha$ and
 $\kappa$ more than the earlier design did. This paper does not rerun the earlier design, so it cannot
 check the second expectation against it. The sampled correlation between $\alpha$ and $\kappa$ is
 \SpreadCorrAlphaKappa, and the one between $\alpha$ and $\gamma$ is
-\SpreadCorrAlphaGamma. We report what the code found, and whether the
-expectation on $\gamma$ counts as met is a call for the author.
+\SpreadCorrAlphaGamma. We report what the code found. The expectation on $\gamma$ was not met:
+the ratio is below one only in the third decimal, and a spread ratio of
+\SpreadRatioGamma{} is not a restriction.
 
 \subsection{The image of \texorpdfstring{$\theta_2$}{theta2} is not a point}
 At the planted point, $\theta_1(c^\star)=\ThetaOneStar$ and $\theta_2(c^\star)=\ThetaTwoStar$, and the premium is $\prem(c^\star)=\PremiumStar$. In this
@@ -834,6 +864,20 @@ Over the \ThetaSample{} sampled NROY points, the headline image is $\Theta_{\hm}
 and the image of the spillover is $\Theta_{\expset}=[\ThetaExpLo,\,\ThetaExpHi]$. The honest report for $\theta_2$ is the
 range, not \ThetaTwoStar. The range is not a sampling distribution and
 not a posterior.
+
+\paragraph{Why the image is wide.}
+The width of $\Theta_{\hm}$ is largely the assumption $\delta$. With
+$\delta_1=\DeltaOne$ on a level moment, the rule lets each of the two levels
+miss by about $\sqrt{\tau\delta_1^2}$, with $\tau=\Tau$. That allowance is
+larger than $\theta_1(c^\star)=\ThetaOneStar$ itself, so the pilot level cannot
+pin $\kappa$. The spread ratio for $\kappa$,
+\SpreadRatioKappa, is what we would expect if the allowance covers the
+effect of $\kappa$ on the pilot level, and Section~\ref{sec:menu} tests
+that reading by shrinking $\delta_1$. The peer weight $\gamma$ is a
+different case. Its ratio, \SpreadRatioGamma, is no restriction, and a
+check at $c^\star$ found that the peer-correlation moment hardly moves across the
+$\gamma$ range of the box. That check is not a committed result. The count of
+moments is not the reason for the width.
 
 Figure~\ref{fig:points} shows every sampled point. Each bar is a
 pointwise Monte Carlo SE at a fixed $c$. For $\theta_2$ the bars are
@@ -854,7 +898,7 @@ Dashed lines mark the image endpoints.}
 The code evaluates again each point that sets an endpoint. It uses \RepsEstimand{}
 fresh reps on separate streams. Table~\ref{tab:recheck} gives the
 result.
-\needspace{12\baselineskip}
+\needspace{8\baselineskip}
 \begin{center}
 \small
 \captionof{table}{Independent recheck of the endpoint candidates (SE is
@@ -1103,6 +1147,95 @@ the assignment and hold the noise fixed, the coverage is \DesignCovStar, \Design
 and \DesignCovMedI. The code reports these numbers but does not gate on them.
 The gate result and these numbers are the only coverage numbers in the paper.
 
+\subsection{A menu of assumptions (amendment A1)}
+\label{sec:menu}
+\emph{This subsection was decided after the v2 results were known.}
+Amendment A1 of the pre-registration (\texttt{docs/preregistration-v2.md}) was
+written once the main run had reported $\Theta_{\hm}$ and the spread ratios,
+and once we had set the allowance $\sqrt{\tau\delta_1^2}$ beside
+$\theta_1(c^\star)$. It does not test a hypothesis, and it is not a way to
+choose $\delta$. The main design and every result above stay at
+$\delta_1=\MenuDeltaMainLevel$. The menu shows how the image depends on the
+assumption that appears to bind.
+
+The menu sets the discrepancy of the two level moments to
+\MenuDeltaMainLevel{} (Main), \MenuDeltaHalfLevel{} (Half) or
+\MenuDeltaQuarterLevel{} (Quarter). The two correlation moments keep
+$\delta=\DeltaTwo$. For each entry the code reruns the waves with the same
+seed, NROY, the \ThetaSample-point image sample and the spread ratios. The
+threshold $\tau$, the box $C$, the targets and every seed are unchanged.
+The Main entry reproduces the main run exactly, and the script stops with an
+error if it does not. The foils are not rerun at the calibrator's points,
+because those points move with $\delta$. The field experimenter's intervals
+at $c^\star$ do not depend on $\delta$, so we only classify them against each
+entry's images.
+
+\begin{center}
+\small
+\captionof{table}{The image under three level tolerances (amendment A1,
+decided after the v2 results).}
+\label{tab:menu}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+entry & $\delta_1$ & $|\NROY|$ & $\Theta_{\hm}$ & $\Theta_{\expset}$ \\
+\midrule
+Main & \MenuDeltaMainLevel & \MenuDeltaMainNNroy & $[\MenuDeltaMainThetaHmLo,\,\MenuDeltaMainThetaHmHi]$ & $[\MenuDeltaMainThetaExpLo,\,\MenuDeltaMainThetaExpHi]$ \\
+Half & \MenuDeltaHalfLevel & \MenuDeltaHalfNNroy & $[\MenuDeltaHalfThetaHmLo,\,\MenuDeltaHalfThetaHmHi]$ & $[\MenuDeltaHalfThetaExpLo,\,\MenuDeltaHalfThetaExpHi]$ \\
+Quarter & \MenuDeltaQuarterLevel & \MenuDeltaQuarterNNroy & $[\MenuDeltaQuarterThetaHmLo,\,\MenuDeltaQuarterThetaHmHi]$ & $[\MenuDeltaQuarterThetaExpLo,\,\MenuDeltaQuarterThetaExpHi]$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.8em}
+\captionof{table}{Spread ratios and the field experimenter's verdicts at
+$c^\star$ under the same entries. Finding is the history-matching finding
+(\texttt{finding\_hm}).}
+\label{tab:menu2}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+entry & $\alpha$ & $\kappa$ & $\gamma$ & finding & Foil 1 at $c^\star$ & Foil 2 at $c^\star$ \\
+\midrule
+Main & \MenuDeltaMainSpreadRatioAlpha & \MenuDeltaMainSpreadRatioKappa & \MenuDeltaMainSpreadRatioGamma & \MenuDeltaMainFinding & \MenuDeltaMainFoilOneVerdict & \MenuDeltaMainFoilTwoVerdict \\
+Half & \MenuDeltaHalfSpreadRatioAlpha & \MenuDeltaHalfSpreadRatioKappa & \MenuDeltaHalfSpreadRatioGamma & \MenuDeltaHalfFinding & \MenuDeltaHalfFoilOneVerdict & \MenuDeltaHalfFoilTwoVerdict \\
+Quarter & \MenuDeltaQuarterSpreadRatioAlpha & \MenuDeltaQuarterSpreadRatioKappa & \MenuDeltaQuarterSpreadRatioGamma & \MenuDeltaQuarterFinding & \MenuDeltaQuarterFoilOneVerdict & \MenuDeltaQuarterFoilTwoVerdict \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The tolerance matters most for $\kappa$ and $\alpha$. The sampled NROY set
+shrinks as $\delta_1$ falls, and at Quarter both images are narrower than at
+Main. The spread ratio for $\kappa$ falls to
+\MenuDeltaQuarterSpreadRatioKappa{} and the one for $\alpha$ to
+\MenuDeltaQuarterSpreadRatioAlpha, which fits the reading that the level
+allowance is what leaves $\kappa$ open. The ratio for $\gamma$ stays near one
+(\MenuDeltaQuarterSpreadRatioGamma{} at Quarter), but the menu leaves the
+correlation tolerance alone, so it says nothing new about the $\gamma$
+expectation. The entries are not nested: the upper end of both images at
+Half sits above the one at Main, because each image is the range over a
+\ThetaSample-point sample from a different finite NROY set, with the waves
+redrawn on it. We do not read small moves of an endpoint as a trend. The
+clear change is at Quarter. There the lower end of $\Theta_{\expset}$ is
+above zero (\MenuDeltaQuarterThetaExpLo), whereas under Main and Half the
+sign of the spillover is open.
+
+The verdicts do not move. At $c^\star$, Foil~1 is
+\MenuDeltaMainFoilOneVerdict{} at every entry, and Foil~2 has
+\MenuDeltaMainFoilTwoVerdict{} at every entry, as in the main run. No entry
+returns F-EMPTY or F-SINGLETON; the finding is \MenuDeltaMainFinding{} at each.
+A smaller $\delta_1$ does not hand Foil~2 a verdict at $c^\star$, even
+at Quarter, where the lower end of $\Theta_{\expset}$ has left zero.
+
+The menu is the reporting rule of Tamer (2010) applied to $\delta$: a set
+under each of several assumptions, instead of one answer. The trade is the
+one of Section~\ref{sec:pi}. A smaller $\delta_1$ is a stronger assumption,
+namely that the kernel matches the targets more closely. It gives a smaller
+set, and it asks the reader to believe more. In this planted exercise the
+targets are the simulator's own output, so the smaller tolerances are not an
+unfounded claim here. With external targets, $\delta$ is the allowance for a
+model that is not the world, and the claim would have to be defended. The
+set is still not Tamer's identified set (Section~\ref{sec:not}); the idea
+borrowed is the reporting rule. We adopt none of the entries, and the
+results of this paper stay at Main.
+
 %----------------------------------------------------------------
 \section{Relation to partial identification}
 \label{sec:pi}
@@ -1118,10 +1251,14 @@ bound the parameters without pinning them down (Tamer 2003, 2010). The
 set in this paper does not come from there. The kernel is complete:
 for each $c$ and each draw of the noise it returns one panel, and
 Section~\ref{sec:props} shows that the model has a unique stationary
-regime. The set comes from the other source. There are too few moments
-for the parameters: \NMoments{} moments against five free parameters, and
-Section~\ref{sec:spread} shows that in fact only one parameter is
-restricted. Many complete worlds fit the same targets.
+regime. The set does not come from an incomplete kernel. It comes from targets
+that do not restrict the parameters. Section~\ref{sec:spread} shows that
+only $\alpha$ is pinned, and that $\sigma_\varepsilon$
+(\SpreadRatioSigma) is only partly restricted. The count of moments,
+\NMoments{} against five free parameters, is not the binding reason. The
+level tolerance exceeds $\theta_1(c^\star)$, so the pilot cannot pin
+$\kappa$, and the peer-correlation moment does not restrict $\gamma$.
+Many complete worlds fit the same targets.
 
 \paragraph{The image is a set under assumptions.}
 The image is the set of effects under the maintained assumptions:
@@ -1133,6 +1270,7 @@ credibility: a stronger assumption gives a sharper answer and a less
 credible one. In Table~\ref{tab:foils} the sharper answer is the narrow
 interval at one point, and the credibility cost is the gap between
 $\theta_2(c_0)$ and $\theta_2(c^\star)$ at the median-I point.
+Section~\ref{sec:menu} gives the same trade for $\delta$.
 
 \paragraph{What the targets restrict.}
 How much of the set the targets remove is measured, not assumed. The
@@ -1142,11 +1280,13 @@ moments restrict.
 %----------------------------------------------------------------
 \section{Who will care, and who will not}
 
-Novelty at the level of slogans is weak. History matching already gives
-NROY in input space (Craig, Goldstein and Vernon [CITE?]). Equifinality of
-agent-based models is not new (Beven [CITE?]). Partial identification already
+Novelty at the level of slogans is weak. History matching already rules out
+regions of input space and keeps the rest, the NROY set (Craig et al.\ 1997;
+Vernon, Goldstein and Bower 2010). Equifinality, where different parameter
+sets fit the data equally well, is not new in simulation modelling
+(Beven 2006). Partial identification already
 says: report the set. Interference already has overall and direct
-effects (Halloran, Hudgens and Halloran [CITE?]). A regression with robust
+effects (Halloran and Struchiner 1995; Hudgens and Halloran 2008). A regression with robust
 standard errors already gives an interval for a given panel. None of
 these pieces is new, so the remaining wedge is the composition: a named
 policy contrast under interference is reported as the image of a
@@ -1215,8 +1355,28 @@ population and a transport model. The threshold $\tau$ must not move.
         Those papers give coverage guarantees under their
         assumptions. Nothing here claims one, and $V$ contains the
         discrepancy $\delta$, which is a tolerance and not a sampling variance.
+  \item Not a calibrated test. The threshold $\tau$ is the
+        \Confidence{} quantile of $\chi^2_{\NMoments}$, but $V$ is diagonal while
+        the four moments are not independent: the control and random levels
+        share a state stream. And $\delta^2$, not the sampling variance, fills
+        $V$. So $\tau$ is a heuristic tolerance. It is not a test level, and
+        $I(c^\star)$ sits far below it.
+  \item Not independent of the targets. The foils' panel is rep~0, and rep~0
+        is also one of the \RepsZ{} reps whose mean defines $z$. The foils
+        therefore see data that helped set the targets. Rep~0 carries a
+        weight of $1/\RepsZ$ in $z$, and we did not rerun the pipeline
+        without it. We have not enumerated the rejected wave points that sit
+        just above $\tau$, which would be the ones a small shift in $z$ could
+        move into NROY.
+  \item Not the same estimand for Foil~2 and its truth. The Hájek estimator
+        targets the inverse-probability exposure contrast, and the truth is
+        the mean of the unweighted realized stratum contrasts
+        (Section~\ref{sec:design}). On this run they are close, and no
+        containment flag depends on the difference. That is a fact about this
+        kernel, not an identity, and it was not tested on another kernel.
   \item Not a guarantee that the image is wide: its width is measured,
-        not assumed.
+        not assumed. The width is largely the assumption $\delta$
+        (Section~\ref{sec:menu}).
   \item Not a claim that the closest NROY point recovers $c^\star$, which it
         does not: fit does not pick the truth.
   \item Not a coverage claim for either foil: F-OVERCONF is about interval
@@ -1239,11 +1399,17 @@ population and a transport model. The threshold $\tau$ must not move.
 
 \noindent Baird, S., J.~A. Bohren, C.~McIntosh and B.~\"Ozler (2018). Optimal design of experiments in the presence of interference. \textit{Review of Economics and Statistics} 100(5), 844--860. \href{https://doi.org/10.1162/rest_a_00716}{doi:10.1162/rest\_a\_00716}
 
+\noindent Beven, K. (2006). A manifesto for the equifinality thesis. \textit{Journal of Hydrology} 320(1--2), 18--36. \href{https://doi.org/10.1016/j.jhydrol.2005.07.007}{doi:10.1016/j.jhydrol.2005.07.007}
+
 \noindent Bramoull\'e, Y., H.~Djebbari and B.~Fortin (2009). Identification of peer effects through social networks. \textit{Journal of Econometrics} 150(1), 41--55. \href{https://doi.org/10.1016/j.jeconom.2008.12.021}{doi:10.1016/j.jeconom.2008.12.021}
 
 \noindent Brock, W.~A. and S.~N. Durlauf (2001). Discrete choice with social interactions. \textit{Review of Economic Studies} 68(2), 235--260. \href{https://doi.org/10.1111/1467-937X.00168}{doi:10.1111/1467-937X.00168}
 
 \noindent Chernozhukov, V., H.~Hong and E.~Tamer (2007). Estimation and confidence regions for parameter sets in econometric models. \textit{Econometrica} 75(5), 1243--1284. \href{https://doi.org/10.1111/j.1468-0262.2007.00794.x}{doi:10.1111/j.1468-0262.2007.00794.x}
+
+\noindent Craig, P.~S., M.~Goldstein, A.~H. Seheult and J.~A. Smith (1997). Pressure matching for hydrocarbon reservoirs: a case study in the use of Bayes linear strategies for large computer experiments. In \textit{Case Studies in Bayesian Statistics III}, Lecture Notes in Statistics 121, 37--93. Springer. \href{https://doi.org/10.1007/978-1-4612-2290-3_2}{doi:10.1007/978-1-4612-2290-3\_2}
+
+\noindent Halloran, M.~E. and C.~J. Struchiner (1995). Causal inference in infectious diseases. \textit{Epidemiology} 6(2), 142--151. \href{https://doi.org/10.1097/00001648-199503000-00010}{doi:10.1097/00001648-199503000-00010}
 
 \noindent Hudgens, M.~G. and M.~E. Halloran (2008). Toward causal inference with interference. \textit{Journal of the American Statistical Association} 103(482), 832--842. \href{https://doi.org/10.1198/016214508000000292}{doi:10.1198/016214508000000292}
 
@@ -1258,6 +1424,8 @@ population and a transport model. The threshold $\tau$ must not move.
 \noindent Tamer, E. (2003). Incomplete simultaneous discrete response model with multiple equilibria. \textit{Review of Economic Studies} 70(1), 147--165. \href{https://doi.org/10.1111/1467-937X.00240}{doi:10.1111/1467-937X.00240}
 
 \noindent Tamer, E. (2010). Partial identification in econometrics. \textit{Annual Review of Economics} 2, 167--195. \href{https://doi.org/10.1146/annurev.economics.050708.143401}{doi:10.1146/annurev.economics.050708.143401}
+
+\noindent Vernon, I., M.~Goldstein and R.~G. Bower (2010). Galaxy formation: a Bayesian uncertainty analysis. \textit{Bayesian Analysis} 5(4), 619--669. \href{https://doi.org/10.1214/10-BA524}{doi:10.1214/10-BA524}
 }
 
 \vspace{1.2em}

@@ -61,6 +61,8 @@ The readout `nroy_param_spread` shows which parameters the targets restrict. It 
 |---|---|---|---|---|---|
 | Ratio | 0.259 | 0.965 | 0.992 | 0.962 | 0.839 |
 
+The pre-registration expected the peer-correlation moment to give a gamma ratio below 1. That expectation was not met: a ratio of 0.992 is no restriction.
+
 Foil 2 calibration check: the nominal 95% interval covered 93.4% of assignments (exact 95% binomial interval 92.9%–93.9%). The average estimated variance was 1.034 times the empirical design variance.
 
 Two facts about the graph: the global clustering coefficient is 0.0096 (3 × triangles / connected triples; the edge probability, which a random graph has in expectation, is 0.0100), and the mean degree is 8.085.
@@ -130,6 +132,10 @@ Two cautions. `run_poc.py` calls `uv` and overwrites the committed results, figu
 - F-OVERCONF for Foil 1 is about interval geometry under the analyst's assumptions. It is not a coverage claim.
 - The `covers_truth` and `covers_planted_truth` flags describe one realized panel. They are not repeated-sampling coverage.
 - The sampled image can understate the true NROY image. The three waves are finite.
+- The threshold tau is not a test level. V is diagonal, but the four moments are not independent: the control and random level moments share a state stream. And delta squared, not the sampling variance, fills V. So tau is a heuristic tolerance, not the critical value of a test.
+- The foils' panel (rep 0) is also one of the 200 reps whose mean defines z. The foils see data that helped set the targets. The pipeline was not rerun without rep 0.
+- Foil 2 and its truth are not the same estimand. The Hajek estimator targets the inverse-probability exposure contrast. The truth is the mean of the unweighted realized stratum contrasts. On this run no containment flag depends on the difference. This was not tested on another kernel.
+- The width of Theta_hm is largely the assumption delta, not the count of moments. The level allowance (the square root of tau times delta squared) is larger than theta1(c*), so the pilot cannot pin kappa. The delta menu (amendment A1, written after the v2 results) shows how the image changes. It is a report, not a way to choose delta.
 - The project has one planted world, one graph, and one set of targets. It claims no external validity.
 
 ## Planned extensions

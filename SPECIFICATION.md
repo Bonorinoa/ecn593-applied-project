@@ -351,6 +351,10 @@ The check is implementation-specific. It does not test the theorem of Aronow and
 - F-OVERCONF for Foil 1 is about interval geometry under the analyst's assumptions. It is not a coverage claim.
 - The `covers_truth` and `covers_planted_truth` flags describe one realized panel. They are not repeated-sampling coverage.
 - The sampled image can understate the true NROY image. The three waves are finite.
+- The threshold $\tau$ is not a test level. $V$ is diagonal, but the four moments are not independent: the control and random level moments share a state stream. And $\delta^2$, not the sampling variance, fills $V$. So $\tau$ is a heuristic tolerance, not the critical value of a test.
+- The foils' panel (offset 0, rep 0) is also one of the 200 reps whose mean defines $z$. The foils see data that helped set the targets. The pipeline was not rerun without rep 0.
+- Foil 2 and its truth are not the same estimand. `estimand.hajek_contrasts` targets the inverse-probability exposure contrast. `estimand.evaluate_spill` averages the unweighted realized stratum contrasts. On this run no containment flag depends on the difference. This was not tested on another kernel.
+- The width of $\Theta_{hm}$ is largely the assumption $\delta$, not the count of moments. The level allowance, $\sqrt{\tau\delta_1^2}$, is larger than $\theta_1(c^*)$, so the pilot cannot pin $\kappa$. Section 7 (amendment A1) shows how the image changes with $\delta$.
 - The project has one planted world, one graph, and one set of targets. It claims no external validity.
 
 ## 5. The readout nroy_param_spread
@@ -363,7 +367,7 @@ The JSON key is `nroy_param_spread` in `results/planted/poc_results.json`. It ha
 |---|---|---|---|---|---|
 | `sd_ratio` | 0.259 | 0.965 | 0.992 | 0.962 | 0.839 |
 
-Only alpha is strongly restricted. The ratio for gamma is 0.992, so the moments do not restrict gamma. The largest correlations are alpha with gamma (−0.345) and alpha with kappa (−0.305). The code reports these numbers. It does not gate on them.
+Only alpha is strongly restricted. The ratio for gamma is 0.992, so the moments do not restrict gamma. The pre-registration expected a gamma ratio below 1 from `sq_peer_corr`. That expectation was not met: a ratio of 0.992 is no restriction. The largest correlations are alpha with gamma (−0.345) and alpha with kappa (−0.305). The code reports these numbers. It does not gate on them.
 
 ## 6. Outputs per script, and the environment
 
