@@ -77,7 +77,7 @@ One-time setup, then one command:
 
 ```bash
 uv venv .venv --python 3.14
-uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt
+uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt -c locks/freeze-planted.txt
 .venv/bin/python scripts/replicate.py            # everything
 .venv/bin/python scripts/replicate.py --quick    # everything except the Foil 2 check and the delta menu
 ```
