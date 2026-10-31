@@ -100,7 +100,7 @@ Measured runtimes on an Apple-silicon laptop, in the repo at commit `cc01779`:
 
 - The tests took 3 s (55 pass). The z check took under 1 s. The planted run took 243 s. The Foil 2 check took 233 s. The figure copy and the numbers took about 1 s each. These six steps take about 8 minutes.
 - The paper (`writeup/main.tex`) is written for v2. A full `replicate.py` run on the final paper, with other jobs running on the same laptop, took 643 s: tests 4 s, planted run 325 s, Foil 2 check 310 s, PDF build 2 s. It printed REPLICATED, and the rebuilt PDF was byte-identical to the committed one.
-- The delta menu (amendment A1) took 1,107 s: three entries of about 366 s each, with another job reading the repo on the same laptop. A full `replicate.py` run is now about 26 minutes.
+- The delta menu (amendment A1) took 1,107 s: three entries of about 366 s each, with another job reading the repo on the same laptop. A full `replicate.py` run after the final paper edits (commit `442aa83`) took 1,793 s, about 30 minutes: tests 6 s, planted run 363 s, Foil 2 check 346 s, delta menu 1,075 s, PDF build 2 s. It printed REPLICATED, and the PDF was byte-identical to the committed one.
 - `replicate.py --quick` skips the Foil 2 check (233 s) and the delta menu (about 18 minutes).
 - A second planted run after the commit changed only `ran_at` and `git_commit` in `results/planted/poc_results.json`. The files `image_points.json`, the figures and the lock file were byte-identical. The Foil 2 check file was also byte-identical after a second run. Every random stream is seeded, so a rerun reproduces every number.
 
