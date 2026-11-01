@@ -198,3 +198,9 @@ reproduce byte for byte (apart from run stamps). The exposure cut, merge rule, M
 the confidence level and the bins H/L are fixed above and are never chosen after an A2 result.
 **Output:** `results/interference/tradeoff.json`, written by `scripts/interference_tradeoff.py`,
 run by `scripts/replicate.py` as its own step (skipped with `--quick`).
+
+**Erratum to A2 (2026-11-01 16:40, wording only; no design element changes).** "So no pilot ever
+realizes the policy" overstates: the event has probability 1 / C(800, 80) > 0. Read instead: "So a
+pilot realizes the policy with negligible probability; in practice it never does, and positivity
+holds for the policy vector only in this negligible sense." Found by verifier card VV
+(`reviews/video-script.md`, item 3).
