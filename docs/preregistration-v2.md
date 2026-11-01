@@ -130,3 +130,71 @@ main design and every headline result stay at delta_level = 0.02. Nothing in sec
 - **Output:** `results/sensitivity/delta_menu.json`, written by `scripts/delta_menu.py` and run by
   `scripts/replicate.py` as its own step. The entry at delta = 0.02 must reproduce the main run's
   images and spread exactly (a built-in consistency check).
+
+### A2 (2026-11-01, written AFTER the v2 and A1 results were known): the price of allowing interference
+
+Approved by Augusto on 2026-11-01. This file's commit that adds A2 is its timestamp. No A2 code
+existed and no A2 number had been computed when it was written.
+
+What was already known when A2 was written:
+- every v2 and A1 result at `0db57c7` (images, foil intervals, flags, the delta menu);
+- Foil 1's gap decomposition: about 90% of the gap between theta2 and (k/N) x beta-hat is the
+  effect on unseeded people, at all three points;
+- Foil 2 targets delta_spill on the random arm, not theta2, and its repeated-sampling coverage is a
+  little under 95% (the Foil 2 check).
+
+**Question.** What does an analyst gain and lose by allowing for interference when the target is
+theta2, the effect of seeding the 80 highest-degree people against no campaign?
+
+**Why theta2 needs more than a randomized pilot.** theta2 compares two whole assignment vectors:
+the degree vector d2 and the zero vector. Under the pilot design (80 of 800 seeded at random), d2
+has probability 1 / C(800, 80), so no pilot ever realizes the policy. Any estimate of theta2 from
+the pilot needs (i) an exposure map (a person's outcome depends on the assignment only through a
+low-dimensional exposure) and (ii) transport (the exposure-specific outcomes measured on the pilot's
+people apply to the people who would hold those exposures under d2).
+
+**Analysts (a ladder of decreasing assumption strength), all reporting an interval for theta2 at
+level `HM_CONFIDENCE` (two-sided normal quantile, as both foils):**
+- **A0 (SUTVA)** = Foil 1, unchanged: (k/N) x the OLS-HC1 interval on the degree-arm panel.
+- **A1 (exposure transport).** On the random-arm panel, the Foil 2 strata (S1, S0a, S0b, S0c, with
+  the same cut 0.25 and the same per-panel merge rule) and the Hajek means mu_s with exact
+  first-order probabilities. Let w_s = n_s(d2) / N, the share of people in stratum s under the
+  degree vector d2 (the analyst knows the graph, so w is a known constant; under a merged panel the
+  shares use the merged strata). The estimate is
+  theta2_A1 = sum over s != S0a of w_s (mu_s - mu_S0a).
+  It is a fixed linear combination of Hajek means. Its variance is the existing linearized
+  Aronow-Samii covariance (`ht_cov` with joint probabilities from the same simulated assignments),
+  summed over all pairs of strata with the combination's coefficients.
+- **A2 (degree-binned transport).** As A1, with every stratum split into two bins fixed by the
+  graph: H = the 80 people d2 seeds, L = everyone else. Under d2 every person in H is in S1, so
+  theta2_A2 = (80/N)(mu_{S1,H} - mu_{S0a,H}) + sum over s != S0a of (n_{s,L}(d2)/N)(mu_{s,L} - mu_{S0a,L}).
+  Same variance machinery, with each cell's indicators restricted to its bin. No merging across
+  bins. If a cell the formula needs is empty in a panel, A2 is undefined for that panel; that is
+  counted and reported, never imputed.
+
+**Truth and evaluation.** The truth is theta2(c) from `evaluate_thetas` (unchanged). At each of the
+three diagnostic points (`min_I`, `median_I`, `c_star`):
+1. **One panel** (offset `FOIL_PANEL_OFFSET`): each analyst's interval, `covers_truth`,
+   `covers_planted_truth`, and `classify_interval` against Theta_hm. Descriptive, as before.
+2. **Repeated sampling:** R = 200 panels on a fresh block of stream offsets 2,000,000 + r
+   (disjoint from every existing block). Each panel redraws the noise and, for A1 and A2, the
+   random assignment. Report per analyst: mean estimate, bias (mean - truth), SD, RMSE, mean
+   reported SE, SE/SD, coverage of the truth with an exact Clopper-Pearson 95% interval, mean
+   interval width, width relative to the width of Theta_hm, and the undefined count (A2).
+
+**Readouts.** A table per point, and one figure: |bias| against mean interval width, one marker
+per analyst per point, with the width of Theta_hm as a reference line and coverage printed beside
+each marker.
+
+**Expectations written now, to be checked, not tuned.** At every point:
+(a) |bias| falls from A0 to A1 to A2; (b) SD and width rise from A0 to A1 to A2;
+(c) A0 coverage is far below nominal; A2 coverage is the closest to nominal of the three;
+(d) A1 and A2 stay biased downward, because two-hop spillover raises the S0a people above the
+true control level; (e) every interval is narrower than Theta_hm. Any of these may fail; a failure
+is reported as found.
+
+**Locks.** Nothing in sections 2–8 or A1 changes. The main run's results and the delta menu must
+reproduce byte for byte (apart from run stamps). The exposure cut, merge rule, Monte Carlo draws,
+the confidence level and the bins H/L are fixed above and are never chosen after an A2 result.
+**Output:** `results/interference/tradeoff.json`, written by `scripts/interference_tradeoff.py`,
+run by `scripts/replicate.py` as its own step (skipped with `--quick`).

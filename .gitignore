@@ -36,3 +36,20 @@ writeup/*.xdv
 *.sav
 *.rds
 # --- end model weights & raw data ---
+
+# --- A2 sprint (2026-11-01): thesis/ LaTeX build products and video/ renders ---
+/thesis/*.aux
+/thesis/*.log
+/thesis/*.out
+/thesis/*.toc
+/thesis/*.fdb_latexmk
+/thesis/*.fls
+/thesis/*.xdv
+/thesis/*.bbl
+/thesis/*.blg
+/thesis/*.bcf
+/thesis/*.run.xml
+/thesis/*.synctex.gz
+/video/build/
+/video/media/
+/video/.venv/
