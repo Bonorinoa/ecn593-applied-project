@@ -1,0 +1,260 @@
+% main.tex: the ECN 593 applied-project paper (arXiv preprint).
+% This folder is a self-contained Overleaf project. Compiler: pdfLaTeX.
+% Bibliography: natbib + BibTeX (refs.bib). Locally, from thesis/: latexmk
+%
+% THIS IS THE TEMPLATE SAMPLE. Every paragraph below is placeholder text that
+% exercises one element of ecnthesis.cls. It contains no result numbers.
+% Result numbers enter only as macros from numbers.tex (generated; see README).
+%
+% Look: \documentclass{ecnthesis} is the Kaffeehaus look (default);
+%       \documentclass[mono]{ecnthesis} is the monospaced grey look.
+\documentclass{ecnthesis}
+
+% ---- generated number macros (scripts/write_numbers.py, copied in by E3).
+% Guarded so the template builds before the file exists.
+\InputIfFileExists{numbers}{}{\typeout{ecnthesis: numbers.tex not found; number macros not loaded yet}}
+
+% ---- project notation (same as writeup/main.tex)
+\newcommand{\NROY}{\mathrm{NROY}}
+\newcommand{\hm}{\mathrm{hm}}
+\newcommand{\expset}{\mathrm{exp}}
+\newcommand{\prem}{\psi}
+\newcommand{\interior}{\operatorname{int}}
+\newcommand{\Jone}{J_1}
+\newcommand{\Jtwo}{J_2}
+\newcommand{\dspill}{\delta_{\mathrm{spill}}}
+\newcommand{\ddir}{\delta_{\mathrm{dir}}}
+
+% ---- title page
+\title{Not-ruled-out images\\of policy contrasts}
+\subtitle{A village agent-based model, calibrated by history matching, and the
+analysts it can grade}
+\shorttitle{Not-ruled-out images of policy contrasts}
+\author{Augusto Gonz\'alez-Bonorino}
+\affiliation{Arizona State University}
+\course{ECN 593 \textperiodcentered\ Applied Project}
+\date{Draft, November 2026}
+\keywords{partial identification; history matching; interference; agent-based models; calibration}
+\jel{C15, C18, C31, C63, D85}
+\titlenote{Placeholder title note: repository, replication command and a short
+acknowledgement go here. \url{https://github.com/Bonorinoa/ecn593-applied-project}}
+
+\begin{abstract}
+Placeholder abstract. This paragraph stands in for a summary of about one
+hundred and fifty words: the question, the design, the two analysts, what the
+evaluation finds and what a reader should take away. It sits on the title page
+between two hairlines, set slightly smaller than the body, and it is followed by
+the keywords and the JEL codes. A second sentence is here only so that the block
+wraps over several lines and the justification can be judged by eye. A third
+sentence closes the paragraph.
+\end{abstract}
+
+\begin{document}
+\maketitle
+
+%================================================================
+\section{Introduction}\label{sec:intro}
+
+Placeholder introduction. A calibrated simulator gives a policy effect for each
+parameter point that fits the targets. When many points fit equally well, the
+reporting logic of a partially identified set applies \citep{manski2003,tamer2010},
+and the object to report is the image of the effect over the points the targets
+do not rule out. This sentence also shows a textual citation, as in
+\citet{vernon2010}, and a cross-reference to Section~\ref{sec:design}.
+
+A second paragraph shows the first-line indent and the measure. It carries an
+inline formula, $\theta(\pi,\pi';c)$, a footnote,\footnote{Footnotes are set in
+the body face at footnote size.} and \emph{emphasis}. The text is placeholder;
+the paper's own sentences replace it in the writing card.
+
+\begin{statusbox}[Status]
+Placeholder disclosure. A short box for the status of a claim, a pre-registration
+note, or what the reader should not infer. It uses the accent rule and the wash
+fill, and it breaks across pages if it must.
+\end{statusbox}
+
+The contributions are listed below, to exercise the list style.
+\begin{itemize}
+  \item A first contribution, stated in one line.
+  \item A second contribution, stated in a sentence long enough to wrap onto a
+        second line so the hanging indent can be checked.
+  \item A third contribution.
+\end{itemize}
+
+%================================================================
+\section{The planner's problem}\label{sec:planner}
+
+Placeholder. Under interference, the outcome of person $i$ depends on the whole
+assignment vector \citep{hudgens2008}, so the natural estimand is a contrast of
+assignment rules,
+\begin{equation}\label{eq:theta}
+  \theta(\pi,\pi';c)
+  \;=\;
+  \mathbb{E}_c\!\left[\bar Y_T(\pi)\right]
+  \;-\;
+  \mathbb{E}_c\!\left[\bar Y_T(\pi')\right],
+\end{equation}
+where $c$ indexes a complete data-generating process. Equation~\eqref{eq:theta}
+is placeholder notation carried over from the current write-up.
+
+\begin{definition}[Not-ruled-out set]\label{def:nroy}
+Placeholder. Given an implausibility measure $I(c)$ and a cutoff $\tau$, the
+not-ruled-out-yet set is $\NROY = \{c \in C : I(c) \le \tau\}$.
+\end{definition}
+
+\begin{assumption}[Exposure mapping]\label{ass:exposure}
+Placeholder. Outcomes depend on the assignment only through own treatment and an
+exposure summary of the neighbours' treatments \citep{aronow2017}.
+\end{assumption}
+
+\begin{remark}
+Placeholder. Definition~\ref{def:nroy} is not a posterior, and
+Assumption~\ref{ass:exposure} is a modelling choice of one analyst, not a property
+of the simulator.
+\end{remark}
+
+\subsection{Two analysts}\label{sec:analysts}
+
+Placeholder subsection. It shows the second heading level, which carries its
+number in the accent colour. Each analyst reports an interval, and the evaluation
+grades the interval against the truth and against the image.
+
+\paragraph{A run-in paragraph heading} Placeholder text after a run-in heading,
+for short labelled passages inside a subsection.
+
+%================================================================
+\section{Design}\label{sec:design}
+
+Placeholder. The order of operations is fixed before any run, as
+Figure~\ref{fig:pipe} shows. The diagram uses the shared TikZ styles of the
+class, so it takes the colours of whichever look is active.
+
+\begin{figure}[htb]
+\centering
+\begin{tikzpicture}[ecn, node distance=7mm and 6mm]
+  \node[ecn box, text width=100mm] (freeze) {1~~fix $f$, $C$, $z$, $\tau$ and the estimands};
+  \node[ecn box, text width=100mm, below=of freeze] (hm)
+    {2~~history matching: $\NROY=\{c:I(c)\le\tau\}$\\[0.15em]
+     {\scriptsize not a posterior; an empty set is a finding}};
+  \node[ecn box, text width=46mm, below=of hm, xshift=-27mm] (A)
+    {\textbf{3~~Leg A: image}\\[0.15em]$\Theta_{\hm}=\{\theta(c): c\in\NROY\}$};
+  \node[ecn box, text width=46mm, below=of hm, xshift=27mm] (B)
+    {\textbf{4~~Leg B: two analysts}\\[0.15em]an interval at one point $c_0$};
+  \node[ecn mark, text width=100mm, below=13mm of hm |- A.south] (ov)
+    {overlay: each interval against the truth and against its own image};
+  \draw[ecn arrow] (freeze) -- (hm);
+  \draw[ecn arrow] (hm.south) -- ++(0,-0.25) -| (A.north);
+  \draw[ecn arrow] (hm.south) -- ++(0,-0.25) -| (B.north);
+  \draw[ecn arrow] (A.south) -- ++(0,-0.3) -| (ov.north);
+  \draw[ecn arrow] (B.south) -- ++(0,-0.3) -| (ov.north);
+\end{tikzpicture}
+\caption{Order of operations (placeholder diagram). Legs A and B are two reports
+and do not merge into one object.}
+\label{fig:pipe}
+\end{figure}
+
+Placeholder paragraph after the figure. The design section of the paper lists
+the exogenous quantities, the targets and the cutoff, each with its source in the
+configuration files.
+
+%================================================================
+\section{Results}\label{sec:results}
+
+Placeholder. Table~\ref{tab:verdicts} shows the zebra table style: booktabs
+rules in the table-rule colour, a light stripe on every second body row, and
+column heads in the heading face. Every cell here is a placeholder symbol; in the
+paper, each number is a macro from \texttt{numbers.tex}.
+
+\begin{table}[t]
+\centering
+\caption{Verdicts by analyst and diagnostic point (placeholder).}
+\label{tab:verdicts}
+\begin{zebratabularx}{\linewidth}{Xccc}
+\toprule
+\colhead{Analyst and quantity} & \colhead{Point $c^\star$} & \colhead{min-I} & \colhead{median-I} \\
+\midrule
+Foil 1: interval        & $[\,\cdot\,,\,\cdot\,]$ & $[\,\cdot\,,\,\cdot\,]$ & $[\,\cdot\,,\,\cdot\,]$ \\
+Foil 1: contains truth  & ---  & ---  & ---  \\
+Foil 1: verdict         & ---  & ---  & ---  \\
+Foil 2: interval        & $[\,\cdot\,,\,\cdot\,]$ & $[\,\cdot\,,\,\cdot\,]$ & $[\,\cdot\,,\,\cdot\,]$ \\
+Foil 2: contains truth  & ---  & ---  & ---  \\
+Foil 2: verdict         & ---  & ---  & ---  \\
+Image $\Theta_{\hm}$    & \multicolumn{3}{c}{$[\,\cdot\,,\,\cdot\,]$} \\
+\bottomrule
+\end{zebratabularx}
+\tablenote{Notes: placeholder. Source: \texttt{results/*.json} through
+\texttt{numbers.tex}. A dash marks a cell the writing card fills with a macro.}
+\end{table}
+
+Figure~\ref{fig:image} shows a figure slot. The command
+\verb|\includefigure{image_points.png}| includes \texttt{figures/image\_points.png}
+when it exists and draws a labelled placeholder until then, so the paper compiles
+before the figures are generated.
+
+\begin{figure}[t]
+\centering
+\includefigure[width=0.92\linewidth]{image_points.png}
+\caption{The image of the policy effect over the sampled points (placeholder
+caption). Captions sit below figures and above tables.}
+\label{fig:image}
+\end{figure}
+
+Placeholder paragraph. A results section would discuss the table and the figure
+here, in the order the reader meets them, and point to Appendix~\ref{app:extra}
+for robustness material.
+
+%================================================================
+\section{Conclusion}\label{sec:conclusion}
+
+Placeholder conclusion. One paragraph restates the question, one the answer,
+and one what the procedure is not.
+
+\begin{enumerate}
+  \item A first limitation, in one line.
+  \item A second limitation, long enough to wrap so the numbered list's hanging
+        indent can be checked by eye.
+\end{enumerate}
+
+%================================================================
+\bibliographystyle{aer}
+\bibliography{refs}
+
+%================================================================
+\appendix
+
+\section{Additional material}\label{app:extra}
+
+Placeholder appendix. Sections in the appendix are lettered, start on a new page,
+and number their equations, tables and figures as A.1, A.2 and so on, as in
+\begin{equation}\label{eq:app}
+  \Theta_{\hm} \;=\; \bigl[\,\min_{c\in\NROY}\theta(c),\; \max_{c\in\NROY}\theta(c)\,\bigr].
+\end{equation}
+Equation~\eqref{eq:app} is placeholder notation.
+
+\begin{table}[h]
+\centering
+\caption{An appendix table (placeholder).}
+\label{tab:app}
+\begin{zebratabular}{lcc}
+\toprule
+\colhead{Setting} & \colhead{Value} & \colhead{Source} \\
+\midrule
+Number of agents        & ---  & config \\
+Seeded share            & ---  & config \\
+Horizon                 & ---  & config \\
+Cutoff $\tau$           & ---  & config \\
+\bottomrule
+\end{zebratabular}
+\end{table}
+
+\begin{remark}
+Placeholder. Theorem-like environments keep one counter each throughout the
+paper, including the appendix.
+\end{remark}
+
+\subsection{An appendix subsection}
+
+Placeholder text for an appendix subsection, to check the heading level and the
+running header, which reads ``Appendix A'' on these pages.
+
+\end{document}

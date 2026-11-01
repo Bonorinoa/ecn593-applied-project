@@ -1,0 +1,9 @@
+# Overleaf and local latexmk: compile main.tex with pdfLaTeX, bibliography with BibTeX.
+$pdf_mode = 1;
+$bibtex_use = 2;          # run BibTeX when refs.bib changes; clean .bbl with -c
+@default_files = ('main.tex');
+# Reproducible PDF: a fixed timestamp and ID, so two builds of the same source
+# give the same bytes (TeX Live honours these two variables). Note: this also
+# fixes \today, so the paper sets its date with \date{...}.
+$ENV{'SOURCE_DATE_EPOCH'} = '1793491200';   # 2026-11-01, the template's date
+$ENV{'FORCE_SOURCE_DATE'} = '1';
