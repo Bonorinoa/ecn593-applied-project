@@ -1,0 +1,320 @@
+{
+  "git_commit": "746f1989826aa3c59906b631eef280f519d3a330",
+  "ran_at": "2026-11-01T23:34:39.694748+00:00",
+  "repetitions": 200,
+  "offset_base": 2000000,
+  "foil_panel_offset": 0,
+  "Theta_hm": [
+    0.005770726773630053,
+    0.07369219669944571
+  ],
+  "theta_hm_width": 0.06792146992581566,
+  "points": {
+    "min_I": {
+      "c": {
+        "alpha": -1.5955601337359993,
+        "beta": 0.470890989163331,
+        "gamma": 0.6852897639936496,
+        "kappa": 1.2495974589671517,
+        "sigma_eps": 0.21498116417985064
+      },
+      "theta2_true": 0.03933156590323958,
+      "theta2_planted": 0.03826272807494016,
+      "one_panel": {
+        "A0": {
+          "estimate": 0.03170906963893631,
+          "se": 0.0005810318927148858,
+          "interval": [
+            0.030570268055345996,
+            0.03284787122252663
+          ],
+          "covers_truth": false,
+          "covers_planted_truth": false,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        },
+        "A1": {
+          "estimate": 0.038145517988480135,
+          "se": 0.00613968660915097,
+          "interval": [
+            0.026111953358181388,
+            0.05017908261877888
+          ],
+          "covers_truth": true,
+          "covers_planted_truth": true,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        },
+        "A2": {
+          "estimate": 0.03827106230367021,
+          "se": 0.006825866775648033,
+          "interval": [
+            0.02489260926013152,
+            0.051649515347208894
+          ],
+          "covers_truth": true,
+          "covers_planted_truth": true,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        }
+      },
+      "repeated": {
+        "A0": {
+          "mean": 0.0313982892023388,
+          "bias": -0.007933276700900778,
+          "sd": 0.0006018737789787356,
+          "rmse": 0.007955961286899793,
+          "mean_se": 0.0006053561927990347,
+          "se_over_sd": 1.0057859537031304,
+          "coverage": 0.0,
+          "coverage_clopper_pearson_95": [
+            0.0,
+            0.01827534035513624
+          ],
+          "mean_width": 0.002372952671408787,
+          "width_over_theta_hm": 0.03493670961480286,
+          "undefined_count": 0,
+          "n_defined": 200
+        },
+        "A1": {
+          "mean": 0.03765138901963068,
+          "bias": -0.0016801768836088998,
+          "sd": 0.002147045326453737,
+          "rmse": 0.002722085409367478,
+          "mean_se": 0.006304392202629645,
+          "se_over_sd": 2.9363107173161427,
+          "coverage": 1.0,
+          "coverage_clopper_pearson_95": [
+            0.9817246596448638,
+            1.0
+          ],
+          "mean_width": 0.02471276332313849,
+          "width_over_theta_hm": 0.36384317580479275,
+          "undefined_count": 0,
+          "n_defined": 200
+        },
+        "A2": {
+          "mean": 0.0380332412050883,
+          "bias": -0.0012983246981512764,
+          "sd": 0.003118577302158118,
+          "rmse": 0.003370837253475421,
+          "mean_se": 0.007063127316473432,
+          "se_over_sd": 2.264855615919992,
+          "coverage": 1.0,
+          "coverage_clopper_pearson_95": [
+            0.9817246596448638,
+            1.0
+          ],
+          "mean_width": 0.027686950317017935,
+          "width_over_theta_hm": 0.40763178928927524,
+          "undefined_count": 0,
+          "n_defined": 200
+        }
+      }
+    },
+    "median_I": {
+      "c": {
+        "alpha": -1.449123436531,
+        "beta": 0.34278808188275234,
+        "gamma": 0.5234025715429946,
+        "kappa": 1.9202430602269984,
+        "sigma_eps": 0.2050713391898727
+      },
+      "theta2_true": 0.056418974480922285,
+      "theta2_planted": 0.03826272807494016,
+      "one_panel": {
+        "A0": {
+          "estimate": 0.0475187211936108,
+          "se": 0.0004508386852255516,
+          "interval": [
+            0.046635093607731326,
+            0.04840234877949027
+          ],
+          "covers_truth": false,
+          "covers_planted_truth": false,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        },
+        "A1": {
+          "estimate": 0.05534218810497356,
+          "se": 0.006361127615578781,
+          "interval": [
+            0.042874607077376,
+            0.06780976913257111
+          ],
+          "covers_truth": true,
+          "covers_planted_truth": false,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        },
+        "A2": {
+          "estimate": 0.05525492648890565,
+          "se": 0.006912180853251602,
+          "interval": [
+            0.04170730096190517,
+            0.06880255201590613
+          ],
+          "covers_truth": true,
+          "covers_planted_truth": false,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        }
+      },
+      "repeated": {
+        "A0": {
+          "mean": 0.04729719368164449,
+          "bias": -0.009121780799277793,
+          "sd": 0.00047794354055140804,
+          "rmse": 0.00913423082847637,
+          "mean_se": 0.00047529685492451513,
+          "se_over_sd": 0.9944623466950941,
+          "coverage": 0.0,
+          "coverage_clopper_pearson_95": [
+            0.0,
+            0.01827534035513624
+          ],
+          "mean_width": 0.0018631294352344171,
+          "width_over_theta_hm": 0.02743064066883919,
+          "undefined_count": 0,
+          "n_defined": 200
+        },
+        "A1": {
+          "mean": 0.05484906063913481,
+          "bias": -0.0015699138417874722,
+          "sd": 0.0020986079744909365,
+          "rmse": 0.0026166322103191885,
+          "mean_se": 0.00651976412595565,
+          "se_over_sd": 3.1067089257283333,
+          "coverage": 1.0,
+          "coverage_clopper_pearson_95": [
+            0.9817246596448638,
+            1.0
+          ],
+          "mean_width": 0.02555700574913868,
+          "width_over_theta_hm": 0.37627286006990474,
+          "undefined_count": 0,
+          "n_defined": 200
+        },
+        "A2": {
+          "mean": 0.055179334196445676,
+          "bias": -0.0012396402844766091,
+          "sd": 0.002782091175126493,
+          "rmse": 0.0030394142832263545,
+          "mean_se": 0.00713409205841241,
+          "se_over_sd": 2.564291250479253,
+          "coverage": 1.0,
+          "coverage_clopper_pearson_95": [
+            0.9817246596448638,
+            1.0
+          ],
+          "mean_width": 0.02796512699376309,
+          "width_over_theta_hm": 0.41172735254856546,
+          "undefined_count": 0,
+          "n_defined": 200
+        }
+      }
+    },
+    "c_star": {
+      "c": {
+        "alpha": -1.5,
+        "beta": 0.325,
+        "gamma": 0.42500000000000004,
+        "kappa": 1.375,
+        "sigma_eps": 0.20500000000000002
+      },
+      "theta2_true": 0.03826272807494016,
+      "theta2_planted": 0.03826272807494016,
+      "one_panel": {
+        "A0": {
+          "estimate": 0.03372690284077714,
+          "se": 0.0005406500845427634,
+          "interval": [
+            0.03266724814683478,
+            0.03478655753471949
+          ],
+          "covers_truth": false,
+          "covers_planted_truth": false,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        },
+        "A1": {
+          "estimate": 0.03786738638347538,
+          "se": 0.005871932894615844,
+          "interval": [
+            0.026358609390392296,
+            0.049376163376558466
+          ],
+          "covers_truth": true,
+          "covers_planted_truth": true,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        },
+        "A2": {
+          "estimate": 0.03794341832813822,
+          "se": 0.006511669206979022,
+          "interval": [
+            0.025180781203220842,
+            0.05070605545305559
+          ],
+          "covers_truth": true,
+          "covers_planted_truth": true,
+          "vs_Theta_hm": "F-OVERCONF",
+          "undefined": false
+        }
+      },
+      "repeated": {
+        "A0": {
+          "mean": 0.03343482322658908,
+          "bias": -0.004827904848351078,
+          "sd": 0.0005693175254180204,
+          "rmse": 0.004861189880806571,
+          "mean_se": 0.0005694175050551814,
+          "se_over_sd": 1.000175613138007,
+          "coverage": 0.0,
+          "coverage_clopper_pearson_95": [
+            0.0,
+            0.01827534035513624
+          ],
+          "mean_width": 0.0022320756041496193,
+          "width_over_theta_hm": 0.03286259273522068,
+          "undefined_count": 0,
+          "n_defined": 200
+        },
+        "A1": {
+          "mean": 0.03741903192591687,
+          "bias": -0.0008436961490232917,
+          "sd": 0.002027665586682023,
+          "rmse": 0.002191504913212427,
+          "mean_se": 0.006028632298099859,
+          "se_over_sd": 2.973188644960351,
+          "coverage": 1.0,
+          "coverage_clopper_pearson_95": [
+            0.9817246596448638,
+            1.0
+          ],
+          "mean_width": 0.023631804360621324,
+          "width_over_theta_hm": 0.34792834116270094,
+          "undefined_count": 0,
+          "n_defined": 200
+        },
+        "A2": {
+          "mean": 0.03775430806678951,
+          "bias": -0.0005084200081506493,
+          "sd": 0.0029426582434373097,
+          "rmse": 0.00297899853216968,
+          "mean_se": 0.006740888068252641,
+          "se_over_sd": 2.290747858092631,
+          "coverage": 1.0,
+          "coverage_clopper_pearson_95": [
+            0.9817246596448638,
+            1.0
+          ],
+          "mean_width": 0.026423795675181903,
+          "width_over_theta_hm": 0.38903450858825894,
+          "undefined_count": 0,
+          "n_defined": 200
+        }
+      }
+    }
+  }
+}
