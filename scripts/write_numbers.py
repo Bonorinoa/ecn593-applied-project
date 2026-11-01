@@ -1,4 +1,4 @@
-"""Write writeup/numbers.tex: every number in the paper, read from the code's outputs.
+"""Write byte-identical writeup/numbers.tex and thesis/numbers.tex.
 
 The paper never types a result. main.tex and cover.tex use the macros defined
 here, so a rerun followed by this script (and a LaTeX build) updates the PDF.
@@ -8,6 +8,7 @@ Sources, in order of the table below:
   P  = results/planted/poc_results.json
   F  = results/checks/foil2_coverage.json
   M  = results/sensitivity/delta_menu.json   (amendment A1: the delta menu)
+  T  = results/interference/tradeoff.json    (amendment A2: three analysts)
 
 Format rule, one for every number: round to `dp` decimals, then drop trailing
 zeros, but keep at least `keep` decimals. Example: fmt(0.9300, 4, 3) = 0.930.
@@ -27,6 +28,7 @@ from poc_abm import config as C  # noqa: E402
 from poc_abm.kernel import World, assign, n_treated  # noqa: E402
 
 OUT = ROOT / "writeup" / "numbers.tex"
+THESIS_OUT = ROOT / "thesis" / "numbers.tex"
 
 
 def fmt(x, dp, keep=None, sign=False, pct=False):
@@ -83,7 +85,7 @@ def verdict(label):
     return label if label else "no verdict"
 
 
-TEXT_VALUES = {"yes", "no", "no verdict", "none", "F-OVERCONF", "F-HONEST", "F-EMPTY", "F-SINGLETON"}   # the only non-numeric macros
+TEXT_VALUES = {"yes", "no", "undefined", "no verdict", "none", "F-OVERCONF", "F-HONEST", "F-EMPTY", "F-SINGLETON"}   # the only non-numeric macros
 PARAM_TAG = {"alpha": "Alpha", "beta": "Beta", "gamma": "Gamma", "kappa": "Kappa", "sigma_eps": "Sigma"}
 
 
@@ -117,10 +119,63 @@ def menu_rows(menu):
     return rows
 
 
+def tradeoff_rows(tradeoff):
+    """A2 macros use ``Tradeoff<Point><Analyst><Item>``.
+
+    Point is MinI, MedI or Star. Analyst is AZero, AOne or ATwo. One-panel
+    items start with OnePanel. The remaining items are repeated-panel readouts.
+    A NaN from an undefined cell is written as the text ``undefined``.
+    """
+    point_tags = {"min_I": "MinI", "median_I": "MedI", "c_star": "Star"}
+    analyst_tags = {"A0": "AZero", "A1": "AOne", "A2": "ATwo"}
+
+    def number(value, dp=5, keep=None):
+        return fmt(value, dp, keep) if math.isfinite(float(value)) else "undefined"
+
+    rows = [
+        ("TradeoffR", str(tradeoff["repetitions"])),
+        ("TradeoffOffsetBase", str(tradeoff["offset_base"])),
+        ("TradeoffThetaHmWidth", number(tradeoff["theta_hm_width"])),
+    ]
+    for point, point_tag in point_tags.items():
+        block = tradeoff["points"][point]
+        for analyst, analyst_tag in analyst_tags.items():
+            prefix = f"Tradeoff{point_tag}{analyst_tag}"
+            one = block["one_panel"][analyst]
+            rows += [
+                (f"{prefix}OnePanelEstimate", number(one["estimate"])),
+                (f"{prefix}OnePanelSE", number(one["se"])),
+                (f"{prefix}OnePanelLo", number(one["interval"][0])),
+                (f"{prefix}OnePanelHi", number(one["interval"][1])),
+                (f"{prefix}OnePanelCoversTruth", yn(one["covers_truth"])),
+                (f"{prefix}OnePanelCoversPlanted", yn(one["covers_planted_truth"])),
+                (f"{prefix}OnePanelVerdict", verdict(one["vs_Theta_hm"])),
+                (f"{prefix}OnePanelUndefined", yn(one["undefined"])),
+            ]
+            repeated = block["repeated"][analyst]
+            rows += [
+                (f"{prefix}Mean", number(repeated["mean"])),
+                (f"{prefix}Bias", number(repeated["bias"])),
+                (f"{prefix}SD", number(repeated["sd"])),
+                (f"{prefix}RMSE", number(repeated["rmse"])),
+                (f"{prefix}MeanSE", number(repeated["mean_se"])),
+                (f"{prefix}SEOverSD", number(repeated["se_over_sd"], 3)),
+                (f"{prefix}Coverage", number(repeated["coverage"], 3)),
+                (f"{prefix}CoverageLo", number(repeated["coverage_clopper_pearson_95"][0], 3)),
+                (f"{prefix}CoverageHi", number(repeated["coverage_clopper_pearson_95"][1], 3)),
+                (f"{prefix}MeanWidth", number(repeated["mean_width"])),
+                (f"{prefix}WidthRatio", number(repeated["width_over_theta_hm"], 3)),
+                (f"{prefix}UndefinedCount", str(repeated["undefined_count"])),
+                (f"{prefix}NDefined", str(repeated["n_defined"])),
+            ]
+    return rows
+
+
 def table():
     P = load("results/planted/poc_results.json")
     F = load("results/checks/foil2_coverage.json")
     M = load("results/sensitivity/delta_menu.json")
+    T = load("results/interference/tradeoff.json")
     G = graph_facts()
     k = n_treated()
     lo, mi, cs = P["findings"]["min_I"], P["findings"]["median_I"], P["findings"]["c_star"]
@@ -289,6 +344,7 @@ def table():
         ("DesignCovMedI", fmt(kp["median_I"]["design_coverage"], 4, 3)),
     ]
     rows += menu_rows(M)
+    rows += tradeoff_rows(T)
     assert all(v in TEXT_VALUES or math.isfinite(float(v.replace(",", ""))) for _, v in rows)
     names = [n for n, _ in rows]
     assert len(names) == len(set(names)), "duplicate macro name"
@@ -300,8 +356,11 @@ def main():
     lines = ["% numbers.tex: GENERATED by scripts/write_numbers.py from config/ and results/.",
              "% Do not edit by hand. Rerun the script after any run.", ""]
     lines += [f"\\newcommand{{\\{name}}}{{{value}}}" for name, value in rows]
-    OUT.write_text("\n".join(lines) + "\n")
-    print(f"wrote {OUT.relative_to(ROOT)}: {len(rows)} numbers")
+    text = "\n".join(lines) + "\n"
+    OUT.write_text(text)
+    THESIS_OUT.parent.mkdir(parents=True, exist_ok=True)
+    THESIS_OUT.write_text(text)
+    print(f"wrote {OUT.relative_to(ROOT)} and {THESIS_OUT.relative_to(ROOT)}: {len(rows)} numbers")
 
 
 if __name__ == "__main__":

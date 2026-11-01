@@ -41,6 +41,11 @@ stratum_min_n = 20               # merge S0b into S0c if any cell is thinner (de
 exposure_mc_draws = 10_000       # Foil 2 variance: simulated random-arm assignments
 exposure_mc_seed = 20260817
 
+# Amendment A2: fresh repeated-panel block for the three theta2 analysts.
+[interference]
+repetitions = 200
+offset_base = 2_000_000
+
 # scripts/check_foil2_coverage.py (declared before its first run; PLAN item 11)
 [foil2_check]
 kernel_panels = 200              # R: kernel panels per point (reported result)

@@ -161,17 +161,20 @@ def exposure_indicators(world: World, D_rows: np.ndarray, cut: float, merged: bo
     """Exposure of every person under many assignments at once (one row per assignment).
 
     The same map as stratum_labels, vectorized. Returns boolean (rows, n) arrays
-    for S1 (treated), S0a (untreated, no treated neighbor) and S0c (untreated,
-    treated share >= cut). If merged, S0b joins S0c, as in maybe_merge_s0b.
+    for S1 (treated), S0a (untreated, no treated neighbor), S0b (untreated,
+    treated share below cut) and S0c (untreated, treated share at least cut).
+    If merged, S0b joins S0c, as in maybe_merge_s0b.
     """
     D_rows = np.atleast_2d(np.asarray(D_rows, dtype=float))
     share = (D_rows @ world.adjacency.T) / world.degrees
     treated = D_rows > 0.5
     untreated = ~treated
+    s0b = untreated & (share > 0.0) & (share < cut)
     s0c = untreated & (share >= cut)
     if merged:
-        s0c = s0c | (untreated & (share > 0.0) & (share < cut))
-    return {"S1": treated, "S0a": untreated & (share == 0.0), "S0c": s0c}
+        s0c = s0c | s0b
+        s0b = np.zeros_like(s0b)
+    return {"S1": treated, "S0a": untreated & (share == 0.0), "S0b": s0b, "S0c": s0c}
 
 
 def joint_probs(ind: dict) -> dict:
@@ -319,6 +322,86 @@ def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
         "merged_s0b": merged,
         "variance": f"Aronow-Samii 2017, joint exposure probabilities from {config.EXPOSURE_MC_DRAWS} draws",
     }
+
+
+def hajek_linear_contrast(world, Y, D, cells, coefficients, cut=None, min_n=None) -> dict:
+    """A linear contrast of exposure-cell Hajek means on one random-arm panel.
+
+    Each cell is ``{"stratum": name}`` or adds a fixed boolean ``nodes`` mask.
+    A node restriction is part of the cell: its first- and second-order
+    probabilities are zero outside that fixed set. The panel uses the same S0b
+    merge rule as :func:`hajek_contrasts`. An observed empty cell makes the
+    contrast undefined.
+    """
+    if len(cells) != len(coefficients) or not cells:
+        raise ValueError("cells and coefficients must have the same nonzero length")
+    cut = config.EXPOSURE_SHARE_CUT if cut is None else cut
+    min_n = config.STRATUM_MIN_N if min_n is None else min_n
+    Y = np.asarray(Y, dtype=float)
+    D = np.asarray(D, dtype=float)
+    labels = stratum_labels(D, exposure_share(world, D), cut)
+    labels, merged = maybe_merge_s0b(labels, min_n)
+    k_treat = n_treated(world.n)
+    p_base = _exposure_probs_cached(world, k_treat, cut)
+    if merged:
+        p_base = dict(p_base)
+        p_base["S0c"] = p_base["S0c"] + p_base["S0b"]
+        p_base["S0b"] = np.zeros_like(p_base["S0b"])
+    pi_base = _exposure_mc_cached(world, k_treat, cut, merged)["pi"]
+
+    prepared = []
+    for cell in cells:
+        name = cell["stratum"]
+        if name not in ("S1", "S0a", "S0b", "S0c"):
+            raise ValueError(f"unknown exposure stratum: {name}")
+        nodes = np.asarray(cell.get("nodes", np.ones(world.n, dtype=bool)), dtype=bool)
+        if nodes.shape != (world.n,):
+            raise ValueError("a cell's nodes mask must have one entry per node")
+        indicator = (labels == name) & nodes
+        probability = np.where(nodes, p_base[name], 0.0)
+        mean = hajek_mean(Y, indicator, probability)
+        n_hat = float((indicator / np.where(probability > 0, probability, 1.0)).sum())
+        prepared.append({"name": name, "nodes": nodes, "indicator": indicator,
+                         "p": probability, "mean": mean, "n_hat": n_hat,
+                         "a": indicator * (Y - mean)})
+
+    sizes = [int(c["indicator"].sum()) for c in prepared]
+    if any(size == 0 or not np.isfinite(c["mean"]) or c["n_hat"] <= 0
+           for size, c in zip(sizes, prepared)):
+        nan = float("nan")
+        return {"estimate": nan, "se": nan, "ci": (nan, nan), "merged_s0b": merged,
+                "means": [c["mean"] for c in prepared], "cell_sizes": sizes,
+                "undefined": True}
+
+    def _cov(i, j):
+        left, right = prepared[i], prepared[j]
+        joint = pi_base[(left["name"], right["name"])] * np.outer(left["nodes"], right["nodes"])
+        if left["name"] == right["name"]:
+            joint = joint.copy()
+            diagonal = p_base[left["name"]] * left["nodes"] * right["nodes"]
+            np.fill_diagonal(joint, diagonal)
+        # Fixed node sets are domains, not zero-probability members of a domain.
+        # Crop structural zeros before the Young correction in ht_cov.
+        rows = left["nodes"] if "nodes" in cells[i] else np.ones(world.n, dtype=bool)
+        cols = right["nodes"] if "nodes" in cells[j] else np.ones(world.n, dtype=bool)
+        value = ht_cov(left["a"][rows], right["a"][cols], left["p"][rows], right["p"][cols],
+                       joint[np.ix_(rows, cols)], same=(i == j))
+        return value / (left["n_hat"] * right["n_hat"])
+
+    # Diagonals first, then twice each upper-triangle covariance. This order
+    # makes (+1, -1) exactly identical to hajek_contrasts, not only close.
+    variance = 0.0
+    for i, coefficient in enumerate(coefficients):
+        variance += float(coefficient) ** 2 * _cov(i, i)
+    for i in range(len(prepared)):
+        for j in range(i + 1, len(prepared)):
+            variance += 2.0 * float(coefficients[i]) * float(coefficients[j]) * _cov(i, j)
+    estimate = float(sum(float(a) * c["mean"] for a, c in zip(coefficients, prepared)))
+    se = float(np.sqrt(max(variance, 0.0)))
+    z = float(norm.ppf(0.5 + 0.5 * config.HM_CONFIDENCE))
+    return {"estimate": estimate, "se": se, "ci": (estimate - z * se, estimate + z * se),
+            "merged_s0b": merged, "means": [c["mean"] for c in prepared],
+            "cell_sizes": sizes, "undefined": False}
 
 
 def evaluate_spill(world: World, c: dict, reps: int | None = None, cut=None, offset0: int = 0) -> dict:

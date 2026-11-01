@@ -4,7 +4,7 @@ This document describes the code in this repo, on the branch `main`. If the docu
 
 The design is frozen in `docs/preregistration-v2.md`. The code implements it. The earlier design is the git tag `v1-worldbank-moments`.
 
-Sections 1 to 5 cover the model, the targets, the images and foils, the non-claims, and the readout `nroy_param_spread`. Section 6 lists the outputs of each script and the environment. Section 7 describes amendment A1, the delta menu.
+Sections 1 to 5 cover the model, targets, images, foils, non-claims, and `nroy_param_spread`. Section 6 lists outputs and the environment. Sections 7 and 8 describe amendments A1 and A2.
 
 ## 1. The model
 
@@ -80,6 +80,7 @@ The function `kernel.stream_seed(label, offset)` returns the crc32 of the key `"
 | seeds 1,000,000 and up | `GATE_SEED` | the assignments of the Foil 2 calibration check |
 | seeds 10,000 and up | in `check_foil2_coverage.py` | the assignment-only redraws of the check |
 | seed 20261020 | `BOOT_SEED` | the bootstrap of the check |
+| offsets 2,000,000 to 2,000,199 | `INTERFERENCE_OFFSET_BASE`, `INTERFERENCE_REPETITIONS` | the A2 repeated panels |
 
 ### 1.5 The estimands
 
@@ -377,16 +378,17 @@ Only alpha is strongly restricted. The ratio for gamma is 0.992, so the moments 
 | `python scripts/run_poc.py planted` | `data/planted.json` | `results/planted/poc_results.json`, `results/planted/image_points.json`, `figures/planted/waves.png`, `figures/planted/image_points.png`, `figures/planted/overlay.png`, `locks/freeze-planted.txt`. If NROY is empty it draws `figures/planted/empty.png` instead of the last two. |
 | `python scripts/check_foil2_coverage.py` | `results/planted/poc_results.json` | `results/checks/foil2_coverage.json` |
 | `python scripts/delta_menu.py` | `data/planted.json`, `results/planted/poc_results.json` | `results/sensitivity/delta_menu.json` (amendment A1, section 7) |
-| `python scripts/replicate.py [--quick]` | everything below | all the outputs below, then a report comparing each result file with git HEAD. `--quick` skips the Foil 2 check and the delta menu. |
-| `python scripts/sync_writeup_figures.py` | `figures/` | `writeup/figures/` (byte copies of the three paper figures) |
-| `python scripts/write_numbers.py` | `config/`, `results/`, the drawn graph | `writeup/numbers.tex` (every number in the paper, as a LaTeX macro, including the delta menu macros) |
-| `python scripts/draw_figures.py planted` | `results/planted/poc_results.json`, `results/planted/image_points.json` | the figures of that run. It runs no simulation. |
+| `python scripts/interference_tradeoff.py` | `results/planted/poc_results.json` | `results/interference/tradeoff.json` (amendment A2, section 8) |
+| `python scripts/replicate.py [--quick]` | everything below | all outputs and a comparison with git HEAD. `--quick` skips the Foil 2 check and amendments A1/A2. |
+| `python scripts/sync_writeup_figures.py` | `figures/` | figure copies in `writeup/figures/` and `thesis/figures/` |
+| `python scripts/write_numbers.py` | `config/`, `results/`, the drawn graph | byte-identical `writeup/numbers.tex` and `thesis/numbers.tex` |
+| `python scripts/draw_figures.py planted` | saved JSON results | all planted figures, including `tradeoff.png`. It runs no simulation. |
 
 The file `poc_results.json` has these keys: `git_commit`, `ran_at`, `z_source`, `z`, `z_names`, `sampling_variances`, `delta`, `tau`, `finding_hm`, `wave_kept`, `wave_I_stats`, `closest`, `n_nroy`, `param_names`, `c_star`, `theta_star`, `spill_star`, `notes` and `figures`. The run adds `Theta_hm`, `Theta_exp`, `n_theta_sample`, `nroy_param_spread`, `endpoint_recheck` and `findings` (the keys `min_I`, `median_I` and `c_star`). The key `git_commit` is the HEAD hash of the code, with `+dirty` if `config/`, `src/`, `scripts/`, `data/` or the requirements files differ from it.
 
 The run also stores `theta_star` and `spill_star`, the truth at $c^*$: theta1 = 0.03631, theta2 = 0.03826, premium = 0.00195, and delta_spill = 0.00792.
 
-The pins are Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2 and pytest 9.1.1 (before 2026-10-22: Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2; see the README). Every v2 result was produced on the new pins. The pipeline calls `uv pip freeze` to write `locks/freeze-*.txt`, so `uv` must be on the path. The tests are in `tests/`. There are 65 of them, and all 65 pass. `writeup/main.tex` and `writeup/cover.tex` use only the three synced figures; the paper no longer cites `empty.png`.
+The pins are Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2 and pytest 9.1.1 (before 2026-10-22: Python 3.11, numpy 2.4.6, scipy 1.15.3, matplotlib 3.10.3 and pytest 8.4.2; see the README). Every v2 result was produced on the new pins. The pipeline calls `uv pip freeze` to write `locks/freeze-*.txt`, so `uv` must be on the path. The tests are in `tests/`. There are 72 tests, and all 72 pass. `writeup/main.tex` and `writeup/cover.tex` use only the three synced figures; the paper no longer cites `empty.png`.
 
 ## 7. Amendment A1: the delta menu
 
@@ -409,3 +411,23 @@ Amendment A1 is at the bottom of `docs/preregistration-v2.md`. It was written af
 **Run time.** About 6 minutes per entry, and about 18 minutes for the menu. `replicate.py` runs it as step 5 and skips it with `--quick`.
 
 **What the menu is not.** It is not a test and not a way to choose delta. It shows the answer under each assumption, in the spirit of Tamer (2010). The numbers are in the JSON file and in `numbers.tex`.
+
+## 8. Amendment A2: three analysts for theta2
+
+Amendment A2 is at the bottom of `docs/preregistration-v2.md`. It was written after the v2 and A1 results were known. The amendment asks about the cost of weaker interference assumptions. All three analysts report an interval for theta2.
+
+**The general contrast.** `estimand.hajek_linear_contrast` takes exposure cells and coefficients. A cell can also have a fixed node mask. The function computes the weighted sum of the Hájek means. It uses exact first-order exposure probabilities and the cached simulated joint probabilities. A node mask sets probabilities to zero outside its fixed set. The variance sums every pairwise linearized Aronow–Samii covariance. The panel uses the same S0b merge rule as `hajek_contrasts`.
+
+**A0.** The script calls `diagnostic.foil1_policy`. Thus A0 is the existing Foil 1 implementation. It does not duplicate the OLS-HC1 code.
+
+**A1.** `analyst_a1` uses the random-arm panel. Its weights are exposure shares under the deterministic degree assignment. If the panel merges S0b, the degree-policy shares use the same merged labels.
+
+**A2.** `analyst_a2` uses the same exposure strata. It also fixes two graph bins. H contains the people seeded by the degree policy. L contains all other people. The function never merges H with L. If a required observed cell is empty, the estimate and interval are undefined. The repeated-panel summary counts these panels and does not impute them.
+
+**Evaluation.** `scripts/interference_tradeoff.py` reads the points, truths, and Theta_hm from the main saved result. It does not rerun the waves. The one-panel readout uses `FOIL_PANEL_OFFSET`. The repeated readout uses `INTERFERENCE_REPETITIONS` fresh offsets from `INTERFERENCE_OFFSET_BASE`.
+
+The repeated readout reports the mean, bias, SD, RMSE, mean SE, SE/SD, and coverage. It also reports an exact Clopper–Pearson 95% interval, mean width, width ratio, and the undefined count. The denominator for A2 statistics is the number of defined panels.
+
+**Output and figure.** The JSON file is `results/interference/tradeoff.json`. The function `figures.draw_tradeoff` reads this file through `scripts/draw_figures.py`. It plots absolute bias against mean width. Coverage appears beside each marker. A vertical line shows the width of Theta_hm.
+
+**Macros.** `scripts/write_numbers.py` uses `\Tradeoff<Point><Analyst><Item>`. Point is MinI, MedI, or Star. Analyst is AZero, AOne, or ATwo. One-panel item names start with OnePanel. The other item names are the repeated-panel readouts. Existing macro names do not change.

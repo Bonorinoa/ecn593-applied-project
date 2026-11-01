@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from poc_abm import config  # noqa: E402
+from poc_abm.figures import draw_tradeoff  # noqa: E402
 from poc_abm.pipeline import draw_figures  # noqa: E402
 
 
@@ -23,6 +24,12 @@ def main():
     points = json.loads(pts_path.read_text()) if pts_path.exists() else None
     for f in draw_figures(payload, points, config.FIGURES_DIR / source):
         print(f"wrote {f}")
+    if source == "planted":
+        tradeoff_path = config.RESULTS_DIR / "interference" / "tradeoff.json"
+        if tradeoff_path.exists():
+            tradeoff = json.loads(tradeoff_path.read_text())
+            f = draw_tradeoff(tradeoff, config.FIGURES_DIR / source / "tradeoff.png")
+            print(f"wrote {f}")
 
 
 if __name__ == "__main__":

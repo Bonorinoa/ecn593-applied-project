@@ -179,3 +179,39 @@ def draw_image_points(points: list, Theta_hm, Theta_exp, path: Path) -> Path:
     fig.savefig(path, dpi=140)
     plt.close(fig)
     return path
+
+
+def draw_tradeoff(payload: dict, path: Path) -> Path:
+    """A2 readout: absolute bias against mean interval width at three points."""
+    import matplotlib.pyplot as plt
+
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    titles = {"min_I": "min-I", "median_I": "median-I", "c_star": r"$c^\star$"}
+    colors = {"A0": "#F58518", "A1": "#4C78A8", "A2": "#54A24B"}
+    markers = {"A0": "o", "A1": "s", "A2": "^"}
+    fig, axes = plt.subplots(1, 3, figsize=(6.5, 2.55), sharex=True, sharey=True)
+    for ax, point_name in zip(axes, ("min_I", "median_I", "c_star")):
+        repeated = payload["points"][point_name]["repeated"]
+        ax.axvline(payload["theta_hm_width"], color="#777777", lw=1.0, ls="--",
+                   label=r"width of $\Theta_{\mathrm{hm}}$")
+        for analyst in ("A0", "A1", "A2"):
+            row = repeated[analyst]
+            ax.scatter(row["mean_width"], abs(row["bias"]), s=35, marker=markers[analyst],
+                       color=colors[analyst], label=analyst, zorder=3)
+            label_offsets = {"A0": (3, 3), "A1": (3, 3), "A2": (3, -10)}
+            ax.annotate(f'{100 * row["coverage"]:.0f}%',
+                        (row["mean_width"], abs(row["bias"])), xytext=label_offsets[analyst],
+                        textcoords="offset points", fontsize=6.5)
+        ax.set_title(titles[point_name], fontsize=9)
+        ax.set_xlabel("mean interval width", fontsize=8)
+        ax.tick_params(labelsize=7)
+        ax.spines[["top", "right"]].set_visible(False)
+    axes[0].set_ylabel("absolute bias", fontsize=8)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, fontsize=7,
+               bbox_to_anchor=(0.5, 1.03))
+    fig.tight_layout(rect=(0, 0, 1, 0.91), w_pad=0.5)
+    fig.savefig(path, dpi=180)
+    plt.close(fig)
+    return path

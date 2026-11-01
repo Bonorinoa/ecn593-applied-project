@@ -65,4 +65,8 @@ STRATUM_MIN_N = _foils["stratum_min_n"]
 EXPOSURE_MC_DRAWS = _foils["exposure_mc_draws"]
 SEED_FOIL2_MC = _foils["exposure_mc_seed"]
 
+_interference = DESIGN["interference"]
+INTERFERENCE_REPETITIONS = _interference["repetitions"]
+INTERFERENCE_OFFSET_BASE = _interference["offset_base"]
+
 FOIL2_CHECK = dict(DESIGN["foil2_check"])   # read by scripts/check_foil2_coverage.py

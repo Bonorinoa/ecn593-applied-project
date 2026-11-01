@@ -18,14 +18,20 @@ WRITEUP_FIGURES = {
     "image_points.png": "figures/planted/image_points.png",
     "overlay.png": "figures/planted/overlay.png",
 }
+THESIS_FIGURES = {**WRITEUP_FIGURES, "tradeoff.png": "figures/planted/tradeoff.png"}
 
 
 def main():
-    out = REPO / "writeup" / "figures"
-    out.mkdir(parents=True, exist_ok=True)
+    writeup_out = REPO / "writeup" / "figures"
+    writeup_out.mkdir(parents=True, exist_ok=True)
     for name, source in WRITEUP_FIGURES.items():
-        shutil.copyfile(REPO / source, out / name)
+        shutil.copyfile(REPO / source, writeup_out / name)
         print(f"{source} -> writeup/figures/{name}")
+    thesis_out = REPO / "thesis" / "figures"
+    thesis_out.mkdir(parents=True, exist_ok=True)
+    for name, source in THESIS_FIGURES.items():
+        shutil.copyfile(REPO / source, thesis_out / name)
+        print(f"{source} -> thesis/figures/{name}")
 
 
 if __name__ == "__main__":
