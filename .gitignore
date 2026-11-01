@@ -53,3 +53,4 @@ writeup/*.xdv
 /video/build/
 /video/media/
 /video/.venv/
+/thesis/main-mono.pdf
