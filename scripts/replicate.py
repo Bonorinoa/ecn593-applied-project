@@ -15,7 +15,8 @@ Steps, in order. The script stops at the first step that fails.
   8. draw figures          scripts/draw_figures.py
   9. sync figures          scripts/sync_writeup_figures.py
  10. paper numbers         scripts/write_numbers.py   (writes both numbers.tex copies)
- 11. paper PDF             latexmk in writeup/        (skipped if latexmk is not installed)
+ 11. paper PDFs            latexmk in writeup/ (v2 report), then thesis/ (the paper)
+                           (skipped if latexmk is not installed)
  12. report                each result file compared with the committed one (git HEAD)
 
 The runs overwrite results/, figures/, locks/ and writeup/. Git keeps the
@@ -119,10 +120,11 @@ def main():
     step(9, "sync figures", [PY, "scripts/sync_writeup_figures.py"])
     step(10, "paper numbers", [PY, "scripts/write_numbers.py"])
     if shutil.which("latexmk"):
-        step(11, "paper PDF", ["latexmk", "-g", "-interaction=nonstopmode"], cwd=ROOT / "writeup", live=False)
-        subprocess.run(["latexmk", "-c"], cwd=ROOT / "writeup", capture_output=True)
+        for folder in ("writeup", "thesis"):   # the v2 report and the paper; both byte-reproducible
+            step(11, f"{folder} PDF", ["latexmk", "-g", "-interaction=nonstopmode"], cwd=ROOT / folder, live=False)
+            subprocess.run(["latexmk", "-c"], cwd=ROOT / folder, capture_output=True)
     else:
-        print("[11/12] paper PDF          skipped: latexmk not found (or upload writeup/ to Overleaf)")
+        print("[11/12] paper PDFs         skipped: latexmk not found (or upload writeup/ or thesis/ to Overleaf)")
     report(quick)
     print(f"total {time.time() - t0:.0f} s")
 

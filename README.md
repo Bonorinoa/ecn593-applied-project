@@ -19,7 +19,14 @@ The design is frozen in `docs/preregistration-v2.md`. The code implements it. Th
 - **Three points, two analysts.** The calibrator fits the model and works at one best-fitting point. The code uses the min-I point and the median-I point of NROY. They are chosen by I only, never by the effect. The field experimenter has one panel from the real village, which is the planted point c*.
 - **Two containment flags.** At every point, each foil gets `covers_truth` (the truth at that point) and `covers_planted_truth` (the truth at c*). At c* the two flags are equal. Both are descriptive indicators for one realized panel. They are not repeated-sampling coverage.
 
-The v1 headline is retired. A v2 headline is not adopted yet: that decision is the project owner's.
+The v1 headline is retired. A v2 headline is not adopted yet: that decision is the project owner's. The paper (`thesis/main.pdf`) proposes one, marked as the owner's decision.
+
+## Deliverables
+
+- **The paper:** `thesis/` is a self-contained Overleaf project (pdfLaTeX + BibTeX, arXiv-ready). `thesis/main.pdf` is the built paper. It covers v2, amendment A1 (the delta menu), amendment A2 (three analysts for theta2) and addendum A2.1 (the variance split). Its class has two looks: `kaffeehaus` (default) and `mono`.
+- **The v2 report:** `writeup/` is the earlier, verified v2 report. It is kept as the record of v2; the paper supersedes it.
+- **The lecture video:** `video/` holds the sources of a 10-minute architecture walkthrough (Manim scenes, the script with a source for every claim, Phonon 31m narration). `video/README.md` says how to render it. The rendered mp4 is not in git.
+- **Reviews:** every result and both papers were checked by a verifier from another model family. Verdicts are in `reviews/` (A2: `a2-code.md`; the paper: `thesis-paper.md`; the video script: `video-script.md`).
 
 ![Images and one-world intervals at the three points](figures/planted/overlay.png)
 
