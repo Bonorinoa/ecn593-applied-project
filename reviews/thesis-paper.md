@@ -119,3 +119,111 @@ Rendered PDF pages 15, 17, and 19 (Figures 2, 3, and 4) at 130 dpi and looked at
 - `env -u PYTHONPATH .venv/bin/python -u reviews/probes/V4/probe_v4_cite.py` — exit 0. Log: `reviews/probes/V4/probe_v4_cite.log`.
 - HEAD-script byte identity, `main()` not called — exit 0, `thesis_equals_HEAD_script True`.
 - `latexmk -pdf -g -interaction=nonstopmode main.tex` in the scratch copy — exit 0. Log flags as in item 6.
+
+## Round 2
+
+CLOSE
+
+Independent close of the paper and addendum A2.1 at `4ffb45b`. Fresh clone of `origin/main` at that sha. This review: `model=grok-4.7 provider=xai-oauth` (verifier log, session `local-770b2c2aaec90da23e556031a364c42abef7584bae4812cdcdf067872f6d3e45`, API calls #18–#45). Producers, from their logs at the commit minute, not from the handoff: E4 `gpt-5.6-sol` / `openai-codex` (engineer log, session `local-77b4e5ce0d0434ff701cebeaa06791de0211d2a4abc08911ac59e81b48987cca`, API call #61 at 18:36:30, the `8831e5d` minute); W4 `claude-opus-5-5` / `anthropic` (writer log, session `local-657051f187511ff16ce7bfeb6bea3a9045c1108ba442365fd5f68c32281fa5c2`, API calls #26–#32, commit `4ffb45b` at 18:42:58).
+
+Ruling on W4's premise. The W4 card's "(i) bias removed" conflicts with V3's must-not-say list (`reviews/a2-code.md:111`) and with the paper's own sentence (`07-results.tex:245-246`: "does not remove the bias. It shrinks it"). W4 wrote "It shrinks the bias but does not remove it" (`07-results.tex:288`). That wording holds. It is not a failure to apply a required replacement.
+
+## 1. Round-1 items
+
+All six replacements are applied. The placeholders are gone.
+
+1. `07-results.tex:260` uses `\YoungShareAOneStar`.
+2. `07-results.tex:261` uses `\YoungShareATwoStar`.
+3. `07-results.tex:265` uses `\DesignRedrawsAOneStar`.
+4. `07-results.tex:267` uses `\DesignMainTermRatioAOneStar`.
+5. `07-results.tex:268` uses `\DesignFullRatioAOneStar`.
+6. `C-foil2-check.tex:52` uses `\YoungShareSpillStar`.
+
+Probe: `V4_REPLACEMENTS applied`, `MISSING_CALLS none`. The token `\MISSING` remains only as an unused definition at `thesis/main.tex:41`. Nothing calls it, so nothing prints in red. Not a required deletion.
+
+The round-1 note that A0's intervals "almost never reach the truth" is still there. Round 1 said that was not a required replacement. I do not reopen it.
+
+## 2. A2.1
+
+Stated against `docs/preregistration-v2.md:208-223` and the code. The code implements the addendum.
+
+| Rule | Where | Result |
+|---|---|---|
+| Points `min_I`, `median_I`, `c_star`; analysts A1, A2, and Foil 2's spill contrast | `scripts/a2_variance_split.py:21-22`; JSON keys | Match |
+| One panel at `FOIL_PANEL_OFFSET` | line 61; JSON `foil_panel_offset` is 0 | Match |
+| Split into the positive-joint term, the Young term, and the Young share | `_split` | All 9 cells: sum gap 0, share gap 0 |
+| Fixed-noise redraw; noise at `FOIL_PANEL_OFFSET`; R = 400; block `3_000_000 + r` | `_design_panel` call; `config/design.toml:48-49`; JSON `R_design` 400, `offset_base` 3000000 | Match |
+| Design SD, mean main-term SE^2 over design variance, mean full SE^2 over design variance | `_design_summary` | Present; `n_defined` 400 on every cell |
+| Output `variance_split.json`; `replicate.py` step 7; `--quick` skips it | `scripts/replicate.py:14,112,117` | Match. `F-replication.tex:17-18` says the same |
+| No expectation; changes no estimator, interval, or verdict | addendum; `git diff 10d7cfa 8831e5d` does not touch `results/interference/tradeoff.json` | Match. The split's reported variance equals the committed one-panel SE^2 |
+
+`config/design.toml:54` sets `design_redraws = 300` under `[foil2_check]`. That is Foil 2's own redraw count, not A2.1. The interference block at lines 48-49 is 400 and `3_000_000`. No conflict.
+
+Independent A1 `c_star` Young share. Own degree weights (top-k by degree, ties by index), own labels, own Hájek means, own quadratic form from the Aronow-Samii formula. A two-node hand example of that formula gives main = 2 and young = 2 before the village run. The probability tables come from the locked `exposure_probs` and `exposure_mc`. The probe does not call `hajek_linear_contrast` or `a2_variance_split.py` for the share.
+
+Own share `0.8859942799650679`, the own Young term, and the own reported variance match `results/interference/variance_split.json` to the bit. Gaps 0. The panel is not merged. Cells are S1, S0b, S0c, S0a with weights 0.1, 0.385, 0.26625, and −0.75125. The main term differs by one ulp (`8.47e-22`). That is summation order. It does not move the share or any macro.
+
+Macros. `thesis/numbers.tex` is byte-identical to `writeup/numbers.tex`. 54 A2.1 macros match a fresh rounding of the JSON. The rounding rule is written out in the probe; it is not imported from `write_numbers.py`. Zero mismatches. The cited endpoints are the min and the max across A1 and A2 at the three points: Young share from A2 at min-I to A1 at median-I, main-term ratio from A2 at min-I to A1 at min-I, full ratio from A2 at min-I to A1 at median-I. Every A1/A2 main-term ratio is below 1 and every full ratio is above 1, so "the same pattern" holds. "Smaller", not "slightly smaller", is the right weakening. The committed `c_star` A1 main-term ratio is 0.801. V3's 0.685 came from a different assignment stream (`20261101 + r`). The paper cites the committed macro.
+
+`git diff 10d7cfa 8831e5d` does not touch `tradeoff.json`, the planted file, the Foil 2 check, or the delta menu. The optional `return_variance_parts` flag defaults to false. The split is of the variance the paper already reported.
+
+## 3. Labels and typed numbers
+
+No call of `\MISSING`. The added lines in `git diff 8831e5d 4ffb45b -- thesis/sections` that contain a digit are labels (A2.1, A0, A1, A2), not result numerals. Every new result number in those sections is a macro.
+
+A2.1 is labelled descriptive, not pre-registered, and designed after the A2 results, with no expectation and no change to an estimator or a verdict: `07-results.tex:255-259`, `C-foil2-check.tex:49-50`, `06-evaluation.tex:91-93`, `F-replication.tex:11-12`, `G-disclosures.tex:6-20`.
+
+The three-part reading is the paragraph "A post hoc reading of the trade-off" (`07-results.tex:285-287`). It says it was formed after the results, was not pre-registered, and tests nothing. Part (iii) "depends on the exposure map" (line 295) and uses the Foil 2 Young share as the contrast. The intervals "are not calibrated" (line 300). The other hits on "calibrated" in these sections are negations ("should not be read as calibrated coverage", "not evidence that either interval is calibrated", "does not deliver a calibrated interval"), the calibrator persona, or Foil 2's pre-registered calibration check. None call the A1 or A2 intervals calibrated. I read the card's "no calibrated" as that ban, not as a ban on the word inside a negation. V3 required the negation.
+
+## 4. Build and budget
+
+Forced rebuild of a copy of `thesis/` at HEAD:
+
+`cp -a thesis $SCRATCH/v5-thesis && cd $SCRATCH/v5-thesis && latexmk -pdf -g -interaction=nonstopmode main.tex`
+
+Exit 0. `main.log` has 0 lines starting with `!`, 0 "undefined", 0 Overfull, 0 Underfull, and 0 Float too large. `pdfinfo`: 32 pages.
+
+Printed numbering: PDF page 2 is printed page 1. The conclusion and the References heading share PDF page 23, which is printed page 22. Appendix A starts on PDF page 26 (printed page 25). Main text is printed pages 1-22, with references starting on the last of those. The whole PDF is 32 pages.
+
+The W4 budget is "about 20" and "about 30". Round 1 accepted 31 pages, and about 21 pages of main text, as inside that budget. This PDF is one page longer because of the required A2.1 split and the post hoc paragraph. I do not require a trim of that required text, or of round-1 prose, to recover the page. 32 remains inside the same "about" reading. Not a block.
+
+## 5. Fresh clone
+
+`git clone --branch main` of `origin/main` into scratch. HEAD `4ffb45bc93d8ee1ecda37fae8ea744471b2573c5`. Setup per README: `uv venv .venv --python 3.14`, then `uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt -c locks/freeze-planted.txt`. Setup exit 0.
+
+`env -u PYTHONPATH .venv/bin/python -u scripts/replicate.py`, background. Exit 0. Log: `reviews/probes/V5/replicate-full.log`.
+
+- Tests: 78 passed.
+- z check: byte for byte.
+- Planted run: ok in 317 s.
+- Foil 2 check: ok in 318 s, gate pass true.
+- Delta menu: ok in 806 s. The delta = 0.02 entry reproduces the main run.
+- Interference: ok in 52 s.
+- Variance split: ok in 123 s. The built-in V3 check agrees.
+- Figures, numbers (545), and the write-up PDF: ok.
+- Report: all six result files identical. Other changed files: none.
+- Printed `REPLICATED: every result is identical to the committed one.`
+- Total 1633 s.
+
+## Non-blocking
+
+- The unused `\newcommand{\MISSING}` at `thesis/main.tex:41`. No call. Not a required deletion.
+- One ulp on the independently recomputed main term, above. The share matches.
+- The page count, above. No trim required.
+- The largest-piece claim (S0b–S0a) is still attributed to `reviews/a2-code.md`. The JSON has no per-pair field. That attribution is right. I did not re-rank the pairs in this round.
+
+## What I did not verify
+
+- A second implementation of the 400-redraw design ratios. `replicate.py` re-runs the committed script and requires stamp-free identity. That is determinism of that script, not a second quadratic form on every redraw. The one-panel A1 `c_star` share was re-derived independently.
+- The probability tables. They come from the locked exposure engine. The weights, labels, means, and quadratic form are mine.
+- The per-pair Young ranking. V3 did that. This JSON does not store it.
+- The Hájek-versus-unweighted comparison and the peer-correlation sentence. The paper still marks both as not committed results (round 1).
+- Volume, issue, and page ranges in `refs.bib`. Round 1 checked authors, years, titles, and DOIs.
+
+## Commands
+
+- `env -u PYTHONPATH .venv/bin/python -u reviews/probes/V5/probe_v5.py` — exit 0. Log: `reviews/probes/V5/probe_v5.log`.
+- `latexmk -pdf -g -interaction=nonstopmode main.tex` in the scratch copy — exit 0. Flag counts as in item 4.
+- Fresh-clone `scripts/replicate.py` — exit 0. Log: `reviews/probes/V5/replicate-full.log`. Printed `REPLICATED`.
+
+Premise. The card says commit only `reviews/thesis-paper.md` and `reviews/probes/V5/`. The common-rules progress file would be another path. The card fence wins; this file is the progress record.

@@ -1,0 +1,336 @@
+[1/12] tests                python -m pytest tests -q -p no:warnings
+        11s | ........................................................................ [ 92%]
+        12s | ......                                                                   [100%]
+        12s | 78 passed in 11.49s
+      ok in 12 s   78 passed in 11.49s
+[2/12] z check              python scripts/plant_z.py
+         0s | data/planted.json reproduces byte for byte (regenerated copy: results/checks/planted_regenerated.json)
+      ok in 0 s   data/planted.json reproduces byte for byte (regenerated copy: results/checks/planted_regenerated.jso
+[3/12] planted run          python scripts/run_poc.py planted
+         0s | planted: truth at c* (200 reps per arm)
+         4s |   evaluated 100/1000
+         8s |   evaluated 200/1000
+        12s |   evaluated 300/1000
+        16s |   evaluated 400/1000
+        19s |   evaluated 500/1000
+        23s |   evaluated 600/1000
+        27s |   evaluated 700/1000
+        30s |   evaluated 800/1000
+        34s |   evaluated 900/1000
+        37s |   evaluated 1000/1000
+        37s | wave 1: 181 kept of 1000 (I min=0.03 med=51.01)
+        41s |   evaluated 100/1000
+        44s |   evaluated 200/1000
+        49s |   evaluated 300/1000
+        53s |   evaluated 400/1000
+        57s |   evaluated 500/1000
+        61s |   evaluated 600/1000
+        64s |   evaluated 700/1000
+        68s |   evaluated 800/1000
+        72s |   evaluated 900/1000
+        76s |   evaluated 1000/1000
+        76s | wave 2: 449 kept of 1000 (I min=0.09 med=11.23)
+        80s |   evaluated 100/1000
+        84s |   evaluated 200/1000
+        88s |   evaluated 300/1000
+        92s |   evaluated 400/1000
+        96s |   evaluated 500/1000
+        99s |   evaluated 600/1000
+       103s |   evaluated 700/1000
+       107s |   evaluated 800/1000
+       111s |   evaluated 900/1000
+       114s |   evaluated 1000/1000
+       114s | wave 3: 408 kept of 1000 (I min=0.01 med=13.54)
+       114s | images: theta2 and delta_spill at 400 sampled NROY points
+       137s |   image points done 50/400
+       161s |   image points done 100/400
+       186s |   image points done 150/400
+       214s |   image points done 200/400
+       240s |   image points done 250/400
+       263s |   image points done 300/400
+       287s |   image points done 350/400
+       313s |   image points done 400/400
+       313s | endpoint recheck: fresh reps at the four winning points
+       314s | wrote /Users/bonorinoa/.hermes/profiles/verifier/cache/scratch/v5-clone/results/planted/image_points.json
+       314s | foils at the min_I point
+       315s | foils at the median_I point
+       316s | foils at the c_star point
+       317s | wrote /Users/bonorinoa/.hermes/profiles/verifier/cache/scratch/v5-clone/results/planted/poc_results.json
+       317s | lock file /Users/bonorinoa/.hermes/profiles/verifier/cache/scratch/v5-clone/locks/freeze-planted.txt
+       317s | {
+       317s |   "finding_hm": null,
+       317s |   "n_nroy": 1038,
+       317s |   "tau": 9.487729036781154,
+       317s |   "notes": [
+       317s |     "At each of the three points, covers_truth reports whether the displayed interval contains that point's ow
+       317s |   ]
+       317s | }
+      ok in 317 s       "At each of the three points, covers_truth reports whether the displayed interval contains that 
+[4/12] Foil 2 check         python scripts/check_foil2_coverage.py
+        30s |   gate assignments 1000/10000
+        55s |   gate assignments 2000/10000
+        82s |   gate assignments 3000/10000
+       109s |   gate assignments 4000/10000
+       138s |   gate assignments 5000/10000
+       166s |   gate assignments 6000/10000
+       195s |   gate assignments 7000/10000
+       224s |   gate assignments 8000/10000
+       251s |   gate assignments 9000/10000
+       277s |   gate assignments 10000/10000
+       278s | GATE      mean(SE^2)/Var=1.0345 (boot SE 0.0154)  coverage=0.9343 CP95=[0.9293, 0.9391]  pass=True
+       278s | c_star    truth, then 200 kernel panels and 300 design redraws
+       291s | c_star    coverage=0.920 design=0.930 SE/SD=0.93
+       291s | min_I     truth, then 200 kernel panels and 300 design redraws
+       303s | min_I     coverage=0.925 design=0.927 SE/SD=0.93
+       303s | median_I  truth, then 200 kernel panels and 300 design redraws
+       317s | median_I  coverage=0.920 design=0.927 SE/SD=0.93
+       317s | wrote results/checks/foil2_coverage.json  gate pass=True
+      ok in 318 s   wrote results/checks/foil2_coverage.json  gate pass=True
+[5/12] delta menu           python scripts/delta_menu.py
+         1s | entry Main: delta_level = 0.02 (sq_level, pilot_level); corr deltas 0.05, 0.05
+         5s |   evaluated 100/1000
+         9s |   evaluated 200/1000
+        13s |   evaluated 300/1000
+        17s |   evaluated 400/1000
+        20s |   evaluated 500/1000
+        24s |   evaluated 600/1000
+        28s |   evaluated 700/1000
+        32s |   evaluated 800/1000
+        35s |   evaluated 900/1000
+        39s |   evaluated 1000/1000
+        39s | wave 1: 181 kept of 1000 (I min=0.03 med=51.01)
+        43s |   evaluated 100/1000
+        47s |   evaluated 200/1000
+        50s |   evaluated 300/1000
+        54s |   evaluated 400/1000
+        57s |   evaluated 500/1000
+        61s |   evaluated 600/1000
+        65s |   evaluated 700/1000
+        69s |   evaluated 800/1000
+        73s |   evaluated 900/1000
+        76s |   evaluated 1000/1000
+        76s | wave 2: 449 kept of 1000 (I min=0.09 med=11.23)
+        80s |   evaluated 100/1000
+        83s |   evaluated 200/1000
+        87s |   evaluated 300/1000
+        91s |   evaluated 400/1000
+        94s |   evaluated 500/1000
+        98s |   evaluated 600/1000
+       102s |   evaluated 700/1000
+       106s |   evaluated 800/1000
+       110s |   evaluated 900/1000
+       114s |   evaluated 1000/1000
+       114s | wave 3: 408 kept of 1000 (I min=0.01 med=13.54)
+       114s | Main: images: theta2 and delta_spill at 400 sampled NROY points
+       139s |   Main: image points done 50/400
+       162s |   Main: image points done 100/400
+       189s |   Main: image points done 150/400
+       212s |   Main: image points done 200/400
+       234s |   Main: image points done 250/400
+       257s |   Main: image points done 300/400
+       280s |   Main: image points done 350/400
+       301s |   Main: image points done 400/400
+       301s | entry Main: finding None, wave_kept [181, 449, 408], n_nroy 1038, Theta_hm [0.005770726773630053, 0.0736921966
+       301s | check: the delta = 0.02 entry reproduces the main run (Theta_hm, Theta_exp, n_nroy, wave_kept, nroy_param_spre
+       301s | entry Half: delta_level = 0.01 (sq_level, pilot_level); corr deltas 0.05, 0.05
+       305s |   evaluated 100/1000
+       308s |   evaluated 200/1000
+       311s |   evaluated 300/1000
+       314s |   evaluated 400/1000
+       317s |   evaluated 500/1000
+       320s |   evaluated 600/1000
+       323s |   evaluated 700/1000
+       326s |   evaluated 800/1000
+       329s |   evaluated 900/1000
+       332s |   evaluated 1000/1000
+       332s | wave 1: 82 kept of 1000 (I min=0.05 med=189.54)
+       335s |   evaluated 100/1000
+       338s |   evaluated 200/1000
+       341s |   evaluated 300/1000
+       345s |   evaluated 400/1000
+       348s |   evaluated 500/1000
+       351s |   evaluated 600/1000
+       354s |   evaluated 700/1000
+       357s |   evaluated 800/1000
+       360s |   evaluated 900/1000
+       363s |   evaluated 1000/1000
+       363s | wave 2: 321 kept of 1000 (I min=0.14 med=20.18)
+       366s |   evaluated 100/1000
+       369s |   evaluated 200/1000
+       372s |   evaluated 300/1000
+       375s |   evaluated 400/1000
+       378s |   evaluated 500/1000
+       382s |   evaluated 600/1000
+       385s |   evaluated 700/1000
+       388s |   evaluated 800/1000
+       391s |   evaluated 900/1000
+       394s |   evaluated 1000/1000
+       394s | wave 3: 264 kept of 1000 (I min=0.00 med=23.96)
+       394s | Half: images: theta2 and delta_spill at 400 sampled NROY points
+       414s |   Half: image points done 50/400
+       434s |   Half: image points done 100/400
+       455s |   Half: image points done 150/400
+       475s |   Half: image points done 200/400
+       495s |   Half: image points done 250/400
+       515s |   Half: image points done 300/400
+       536s |   Half: image points done 350/400
+       556s |   Half: image points done 400/400
+       556s | entry Half: finding None, wave_kept [82, 321, 264], n_nroy 667, Theta_hm [0.006372398351789099, 0.074321302969
+       556s | entry Quarter: delta_level = 0.005 (sq_level, pilot_level); corr deltas 0.05, 0.05
+       559s |   evaluated 100/1000
+       562s |   evaluated 200/1000
+       565s |   evaluated 300/1000
+       568s |   evaluated 400/1000
+       571s |   evaluated 500/1000
+       575s |   evaluated 600/1000
+       578s |   evaluated 700/1000
+       581s |   evaluated 800/1000
+       584s |   evaluated 900/1000
+       587s |   evaluated 1000/1000
+       587s | wave 1: 23 kept of 1000 (I min=0.13 med=738.57)
+       590s |   evaluated 100/1000
+       593s |   evaluated 200/1000
+       596s |   evaluated 300/1000
+       599s |   evaluated 400/1000
+       602s |   evaluated 500/1000
+       605s |   evaluated 600/1000
+       608s |   evaluated 700/1000
+       612s |   evaluated 800/1000
+       615s |   evaluated 900/1000
+       618s |   evaluated 1000/1000
+       618s | wave 2: 222 kept of 1000 (I min=0.15 med=27.66)
+       621s |   evaluated 100/1000
+       624s |   evaluated 200/1000
+       627s |   evaluated 300/1000
+       630s |   evaluated 400/1000
+       633s |   evaluated 500/1000
+       636s |   evaluated 600/1000
+       639s |   evaluated 700/1000
+       642s |   evaluated 800/1000
+       645s |   evaluated 900/1000
+       648s |   evaluated 1000/1000
+       648s | wave 3: 187 kept of 1000 (I min=0.39 med=30.47)
+       648s | Quarter: images: theta2 and delta_spill at 400 sampled NROY points
+       668s |   Quarter: image points done 50/400
+       689s |   Quarter: image points done 100/400
+       709s |   Quarter: image points done 150/400
+       730s |   Quarter: image points done 200/400
+       750s |   Quarter: image points done 250/400
+       769s |   Quarter: image points done 300/400
+       787s |   Quarter: image points done 350/400
+       806s |   Quarter: image points done 400/400
+       806s | entry Quarter: finding None, wave_kept [23, 222, 187], n_nroy 432, Theta_hm [0.015734499912565647, 0.061857934
+       806s | wrote /Users/bonorinoa/.hermes/profiles/verifier/cache/scratch/v5-clone/results/sensitivity/delta_menu.json
+      ok in 806 s   wrote /Users/bonorinoa/.hermes/profiles/verifier/cache/scratch/v5-clone/results/sensitivity/delta_me
+[6/12] interference         python scripts/interference_tradeoff.py
+         0s | interference tradeoff: 200 panels at each of 3 points
+         3s |   min_I: panels 25/200
+         5s |   min_I: panels 50/200
+         7s |   min_I: panels 75/200
+         9s |   min_I: panels 100/200
+        12s |   min_I: panels 125/200
+        14s |   min_I: panels 150/200
+        16s |   min_I: panels 175/200
+        18s |   min_I: panels 200/200
+        20s |   median_I: panels 25/200
+        23s |   median_I: panels 50/200
+        25s |   median_I: panels 75/200
+        27s |   median_I: panels 100/200
+        29s |   median_I: panels 125/200
+        31s |   median_I: panels 150/200
+        33s |   median_I: panels 175/200
+        35s |   median_I: panels 200/200
+        37s |   c_star: panels 25/200
+        39s |   c_star: panels 50/200
+        42s |   c_star: panels 75/200
+        44s |   c_star: panels 100/200
+        46s |   c_star: panels 125/200
+        48s |   c_star: panels 150/200
+        50s |   c_star: panels 175/200
+        52s |   c_star: panels 200/200
+        52s | wrote results/interference/tradeoff.json
+      ok in 52 s   wrote results/interference/tradeoff.json
+[7/12] variance split       python scripts/a2_variance_split.py
+         0s | A2.1 variance split: 400 fixed-noise design redraws at each of 3 points
+         3s |   min_I: design redraws 25/400
+         6s |   min_I: design redraws 50/400
+         9s |   min_I: design redraws 75/400
+        11s |   min_I: design redraws 100/400
+        14s |   min_I: design redraws 125/400
+        16s |   min_I: design redraws 150/400
+        19s |   min_I: design redraws 175/400
+        21s |   min_I: design redraws 200/400
+        24s |   min_I: design redraws 225/400
+        27s |   min_I: design redraws 250/400
+        29s |   min_I: design redraws 275/400
+        32s |   min_I: design redraws 300/400
+        34s |   min_I: design redraws 325/400
+        37s |   min_I: design redraws 350/400
+        40s |   min_I: design redraws 375/400
+        42s |   min_I: design redraws 400/400
+        45s |   median_I: design redraws 25/400
+        47s |   median_I: design redraws 50/400
+        50s |   median_I: design redraws 75/400
+        53s |   median_I: design redraws 100/400
+        55s |   median_I: design redraws 125/400
+        58s |   median_I: design redraws 150/400
+        60s |   median_I: design redraws 175/400
+        63s |   median_I: design redraws 200/400
+        65s |   median_I: design redraws 225/400
+        68s |   median_I: design redraws 250/400
+        70s |   median_I: design redraws 275/400
+        73s |   median_I: design redraws 300/400
+        75s |   median_I: design redraws 325/400
+        78s |   median_I: design redraws 350/400
+        80s |   median_I: design redraws 375/400
+        83s |   median_I: design redraws 400/400
+        85s |   c_star: design redraws 25/400
+        88s |   c_star: design redraws 50/400
+        90s |   c_star: design redraws 75/400
+        93s |   c_star: design redraws 100/400
+        95s |   c_star: design redraws 125/400
+        98s |   c_star: design redraws 150/400
+       100s |   c_star: design redraws 175/400
+       103s |   c_star: design redraws 200/400
+       106s |   c_star: design redraws 225/400
+       108s |   c_star: design redraws 250/400
+       111s |   c_star: design redraws 275/400
+       113s |   c_star: design redraws 300/400
+       116s |   c_star: design redraws 325/400
+       118s |   c_star: design redraws 350/400
+       121s |   c_star: design redraws 375/400
+       123s |   c_star: design redraws 400/400
+       123s | V3 check A1 c_star: ours sd=0.00214847, main=0.80144, full=7.74157; V3 sd=0.00231072, main=0.685475, full=6.77
+       123s | wrote results/interference/variance_split.json
+      ok in 123 s   wrote results/interference/variance_split.json
+[8/12] draw figures         python scripts/draw_figures.py
+         1s | wrote figures/planted/waves.png
+         1s | wrote figures/planted/image_points.png
+         1s | wrote figures/planted/overlay.png
+         1s | wrote /Users/bonorinoa/.hermes/profiles/verifier/cache/scratch/v5-clone/figures/planted/tradeoff.png
+      ok in 1 s   wrote /Users/bonorinoa/.hermes/profiles/verifier/cache/scratch/v5-clone/figures/planted/tradeoff.png
+[9/12] sync figures         python scripts/sync_writeup_figures.py
+         0s | figures/planted/waves.png -> writeup/figures/waves.png
+         0s | figures/planted/image_points.png -> writeup/figures/image_points.png
+         0s | figures/planted/overlay.png -> writeup/figures/overlay.png
+         0s | figures/planted/waves.png -> thesis/figures/waves.png
+         0s | figures/planted/image_points.png -> thesis/figures/image_points.png
+         0s | figures/planted/overlay.png -> thesis/figures/overlay.png
+         0s | figures/planted/tradeoff.png -> thesis/figures/tradeoff.png
+      ok in 0 s   figures/planted/tradeoff.png -> thesis/figures/tradeoff.png
+[10/12] paper numbers        python scripts/write_numbers.py
+         1s | wrote writeup/numbers.tex and thesis/numbers.tex: 545 numbers
+      ok in 1 s   wrote writeup/numbers.tex and thesis/numbers.tex: 545 numbers
+[11/12] paper PDF            latexmk -g -interaction=nonstopmode
+      ok in 2 s   Latexmk: All targets (main.xdv main.pdf) are up-to-date
+[12/12] report              each result file vs the committed version (ignoring ran_at, git_commit)
+      identical   results/planted/poc_results.json
+      identical   results/planted/image_points.json
+      identical   results/checks/foil2_coverage.json
+      identical   results/sensitivity/delta_menu.json
+      identical   results/interference/tradeoff.json
+      identical   results/interference/variance_split.json
+      other changed files (figures, writeup, thesis, locks): none
+REPLICATED: every result is identical to the committed one.
+total 1633 s
+EXIT=0

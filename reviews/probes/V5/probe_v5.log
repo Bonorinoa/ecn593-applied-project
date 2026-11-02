@@ -1,0 +1,74 @@
+HAND main=2.0 young=2.0
+SPLIT min_I A1 sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT min_I A2 sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT min_I Spill sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT median_I A1 sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT median_I A2 sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT median_I Spill sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT c_star A1 sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT c_star A2 sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT c_star Spill sum_gap=0.000e+00 share_gap=0.000e+00 redraws=400 n_defined=400
+SPLIT_IDENTITY ok
+RANGE young (0.8161020026960397, 'A2', 'min_I') (0.8964738297511772, 'A1', 'median_I')
+RANGE main (0.7194107782176344, 'A2', 'min_I') (0.8025349783611642, 'A1', 'min_I')
+RANGE full (5.080367882759504, 'A2', 'min_I') (8.300306571480338, 'A1', 'median_I')
+RANGES ok
+NUMBERS_BYTE_IDENTICAL True
+MACRO_CHECKED 54 mismatches 0
+CITED YoungShareAOneStar 0.886
+CITED YoungShareATwoStar 0.828
+CITED YoungShareSpillStar 0.127
+CITED DesignRedrawsAOneStar 400
+CITED DesignMainTermRatioAOneStar 0.801
+CITED DesignFullRatioAOneStar 7.742
+CITED YoungShareATwoMinI 0.816
+CITED YoungShareAOneMedI 0.896
+CITED DesignMainTermRatioATwoMinI 0.719
+CITED DesignMainTermRatioAOneMinI 0.803
+CITED DesignFullRatioATwoMinI 5.080
+CITED DesignFullRatioAOneMedI 8.300
+CITED DesignFullRatioSpillStar 1.048
+REPORTED min_I A1 se2_gap=0.000e+00
+REPORTED min_I A2 se2_gap=0.000e+00
+REPORTED median_I A1 se2_gap=6.776e-21
+REPORTED median_I A2 se2_gap=1.355e-20
+REPORTED c_star A1 se2_gap=0.000e+00
+REPORTED c_star A2 se2_gap=6.776e-21
+REPORTED_IS_COMMITTED_SE2 ok
+MISSING_CALLS none
+V4_REPLACEMENTS applied
+LABELS ok
+ADDED_DIGIT_LINES_WITHOUT_MACRO 12
+DIGIT +point that generated the panels. Addendum A2.1, written after these results were seen,
+DIGIT +splits A1's and A2's reported variance into its parts; it is descriptive and is
+DIGIT +descriptive and is not a pre-registered result. It comes from addendum A2.1, which
+DIGIT +was designed after the A2 results and the independent review of the code were
+DIGIT +interpretation, formed after the A2 results and the A2.1 split were seen; it was
+DIGIT +not pre-registered and it tests nothing. Moving from A0 to A1 and A2 does three
+DIGIT +descriptive variance split of addendum A2.1, designed after the A2 results, the
+DIGIT +(amendment A1), the interference trade-off (amendment A2) and its descriptive
+DIGIT +variance split (addendum A2.1), redraws the figures
+DIGIT +was already known when it was written. Amendment A1, the sensitivity menu of
+DIGIT +wording had said that it never does. Addendum A2.1 was written after the A2
+DIGIT +results and after the independent review of the A2 code, which had found the Young
+CALIBRATED_HITS 14
+CAL thesis/sections/07-results.tex:99: experimenter; the other two are the calibrator. Each analyst row gives the
+CAL thesis/sections/07-results.tex:146: This failure needs no calibration. It is layer~(a), and it comes from the
+CAL thesis/sections/07-results.tex:156: \paragraph{The calibrator, at min-I and median-I} At both points the A0 interval
+CAL thesis/sections/07-results.tex:175: image at once. A calibrator who reports such an interval as her uncertainty about
+CAL thesis/sections/07-results.tex:222: intervals, not calibration.}
+CAL thesis/sections/07-results.tex:233: the Young bound and should not be read as calibrated coverage.}
+CAL thesis/sections/07-results.tex:280: either interval is calibrated. Every repeated-sample mean width is narrower than
+CAL thesis/sections/07-results.tex:300: and the containment rate of one comes from the bound. They are not calibrated.
+CAL thesis/sections/07-results.tex:333: it does not deliver a calibrated interval at any rung. More important for the
+CAL thesis/sections/C-foil2-check.tex:2: \section{Foil 2: the estimand and the calibration check}\label{app:foil2}
+CAL thesis/sections/C-foil2-check.tex:19: \paragraph{The pre-registered calibration check} The script
+CAL thesis/sections/06-evaluation.tex:46: point $\cstar$, and she has calibrated nothing. Her question is whether her
+CAL thesis/sections/06-evaluation.tex:53: \paragraph{The calibrator} She fits the model to the targets and works at one
+CAL thesis/sections/G-disclosures.tex:11: known, including A0's gap decomposition and Foil~2's calibration check, and before
+OWN_A1_CSTAR {'merged': False, 'cells': ['S1', 'S0b', 'S0c', 'S0a'], 'coefs': [0.1, 0.385, 0.26625, -0.75125], 'share': 0.8859942799650679, 'reported': 3.44795959188716e-05, 'young': 3.0548724759627136e-05, 'main': 3.930871159244461e-06}
+JSON_A1_CSTAR {'reported_variance': 3.44795959188716e-05, 'positive_joint_probability_term': 3.930871159244462e-06, 'young_bound_term': 3.0548724759627136e-05, 'young_share': 0.8859942799650679}
+degree_assignment_matches_assign True
+OWN_GAPS share=0.000e+00 reported=0.000e+00 young=0.000e+00
+OWN_YOUNG_SHARE ok
+PROBE_OK
