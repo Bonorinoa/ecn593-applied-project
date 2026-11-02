@@ -1,0 +1,180 @@
+
+===== 1 numbers byte identity =====
+fresh_bytes=19623 thesis_bytes=19623 writeup_bytes=19623
+thesis_equals_fresh=True
+writeup_equals_fresh=True
+n_macros=454
+
+===== 1b macro resolution and typed literals =====
+camel_used=375 unresolved=['Bigl', 'Bigr', 'Lambda', 'Pr', 'Theta']
+  UNRESOLVED Bigl at ['05-analysts.tex:42', '05-analysts.tex:43', '03-model.tex:22']
+  UNRESOLVED Bigr at ['05-analysts.tex:43', '05-analysts.tex:43', '03-model.tex:28']
+  UNRESOLVED Lambda at ['03-model.tex:22', '03-model.tex:30']
+  UNRESOLVED Pr at ['02-estimand.tex:64']
+  UNRESOLVED Theta at ['09-limitations.tex:7', 'D-endpoint-recheck.tex:19', 'D-endpoint-recheck.tex:20', 'D-endpoint-recheck.tex:21']
+MISSING_count=6
+  MISSING 07-results.tex:256 YoungShareAOneStar
+  MISSING 07-results.tex:257 YoungShareATwoStar
+  MISSING 07-results.tex:261 DesignRedrawsAOneStar
+  MISSING 07-results.tex:262 DesignMainTermRatioAOneStar
+  MISSING 07-results.tex:263 DesignFullRatioAOneStar
+  MISSING C-foil2-check.tex:51 YoungShareSpillStar
+literal_hits=85
+  LIT 02-estimand.tex:36 995 | \citet{halloran1995} and \citet{hudgens2008}. The code defines three such
+  LIT 02-estimand.tex:103 952 | there \citep{horvitz1952,aronow2017}.
+  LIT 02-estimand.tex:143 980 | seeding alone \citep{rubin1980}. Under that assumption, $\theta_2$ equals the
+  LIT 01-introduction.tex:12 996 | simulator \citep{kydland1996}. The answer is then one number: the policy effect
+  LIT 01-introduction.tex:19 996 | long raised about calibration \citep{hansen1996}. If those points imply different
+  LIT 01-introduction.tex:23 997 | not-ruled-out-yet (NROY) set \citep{craig1997,vernon2010,andrianakis2015}. The
+  LIT 01-introduction.tex:32 995 | hubs and the one that seeds no one \citep{halloran1995,hudgens2008,manski2013}.
+  LIT 04-history-matching.tex:84 120 | \node[ecn box, text width=120mm] (freeze)
+  LIT 04-history-matching.tex:86 120 | \node[ecn box, text width=120mm, below=of freeze] (hm)
+  LIT 04-history-matching.tex:87 0.15 | {2~~history matching: $I(c)\le\tau$ over three waves $\;\to\;$ NROY\\[0.15em]
+  LIT 04-history-matching.tex:89 56 | \node[ecn box, text width=56mm, below=of hm, xshift=-32mm] (A)
+  LIT 04-history-matching.tex:90 0.15 | {\textbf{3~~image}\\[0.15em]
+  LIT 04-history-matching.tex:93 56 | \node[ecn box, text width=56mm, below=of hm, xshift=32mm] (B)
+  LIT 04-history-matching.tex:94 0.15 | {\textbf{4~~analysts}\\[0.15em]
+  LIT 04-history-matching.tex:97 120 | \node[ecn mark, text width=120mm, below=11mm of hm |- A.south] (ov)
+  LIT 04-history-matching.tex:100 0.25 | \draw[ecn arrow] (hm.south) -- ++(0,-0.25) -| (A.north);
+  LIT 04-history-matching.tex:101 0.25 | \draw[ecn arrow] (hm.south) -- ++(0,-0.25) -| (B.north);
+  LIT 04-history-matching.tex:102 0.3 | \draw[ecn arrow] (A.south) -- ++(0,-0.3) -| (ov.north);
+  LIT 04-history-matching.tex:103 0.3 | \draw[ecn arrow] (B.south) -- ++(0,-0.3) -| (ov.north);
+  LIT 07-results.tex:72 0.92 | \includefigure[width=0.92\linewidth]{image_points.png}
+  LIT 07-results.tex:74 96 | $I(c)$. Left: $\theta_2(c)$. Right: $\dspill(c)$. Bars show $\pm1.96$ pointwise
+  LIT 07-results.tex:133 0.86 | \includefigure[width=0.86\linewidth]{overlay.png}
+  LIT 07-results.tex:195 3.2 | \setlength{\tabcolsep}{3.2pt}
+  LIT 07-results.tex:199 95 | & \colhead{Containment [CP 95\
+  LIT 07-results.tex:221 95 | exact Clopper--Pearson $95\
+  LIT C-foil2-check.tex:24 1.645 | estimated variance to the empirical variance, plus $1.645$ bootstrap standard
+  LIT 06-evaluation.tex:82 95 | interval contains $\theta_2(c_0)$ with an exact Clopper--Pearson $95\
+  LIT 06-evaluation.tex:83 934 | \citep{clopper1934}, the mean interval width, that width relative to the width of
+  LIT 05-analysts.tex:39 985 | \citep{mackinnon1985},
+  LIT 03-model.tex:33 993 | linear-in-means model of \citet{manski1993}, the row-normalized peer mean on a
+  LIT main.tex:50 593 | \course{ECN 593 \textperiodcentered\ Applied Project}
+  LIT main.tex:55 93 | \titlenote{Code and replication: \url{https://github.com/Bonorinoa/ecn593-applied-project}
+
+===== 2-4 claims against JSON =====
+Theta_hm=[0.005770726773630053, 0.07369219669944571] width=0.06792146992581566 R=200
+
+-- min_I theta2_true=0.03933156590323958 planted=0.03826272807494016
+  one A0 est=0.0317091 iv=[0.030570268055345996, 0.03284787122252663] covers_truth=False covers_planted=False verdict=F-OVERCONF
+  one A1 est=0.0381455 iv=[0.026111953358181388, 0.05017908261877888] covers_truth=True covers_planted=True verdict=F-OVERCONF
+  one A2 est=0.0382711 iv=[0.02489260926013152, 0.051649515347208894] covers_truth=True covers_planted=True verdict=F-OVERCONF
+  bias={'A0': -0.007933, 'A1': -0.00168, 'A2': -0.001298}
+  sd={'A0': 0.000602, 'A1': 0.002147, 'A2': 0.003119}
+  width={'A0': 0.002373, 'A1': 0.024713, 'A2': 0.027687}
+  coverage={'A0': 0.0, 'A1': 1.0, 'A2': 1.0}
+  rmse={'A0': 0.007956, 'A1': 0.002722, 'A2': 0.003371}
+  se_over_sd={'A0': 1.0058, 'A1': 2.9363, 'A2': 2.2649}
+  width_ratio={'A0': 0.0349, 'A1': 0.3638, 'A2': 0.4076}
+  undefined={'A0': 0, 'A1': 0, 'A2': 0}
+
+-- median_I theta2_true=0.056418974480922285 planted=0.03826272807494016
+  one A0 est=0.0475187 iv=[0.046635093607731326, 0.04840234877949027] covers_truth=False covers_planted=False verdict=F-OVERCONF
+  one A1 est=0.0553422 iv=[0.042874607077376, 0.06780976913257111] covers_truth=True covers_planted=False verdict=F-OVERCONF
+  one A2 est=0.0552549 iv=[0.04170730096190517, 0.06880255201590613] covers_truth=True covers_planted=False verdict=F-OVERCONF
+  bias={'A0': -0.009122, 'A1': -0.00157, 'A2': -0.00124}
+  sd={'A0': 0.000478, 'A1': 0.002099, 'A2': 0.002782}
+  width={'A0': 0.001863, 'A1': 0.025557, 'A2': 0.027965}
+  coverage={'A0': 0.0, 'A1': 1.0, 'A2': 1.0}
+  rmse={'A0': 0.009134, 'A1': 0.002617, 'A2': 0.003039}
+  se_over_sd={'A0': 0.9945, 'A1': 3.1067, 'A2': 2.5643}
+  width_ratio={'A0': 0.0274, 'A1': 0.3763, 'A2': 0.4117}
+  undefined={'A0': 0, 'A1': 0, 'A2': 0}
+
+-- c_star theta2_true=0.03826272807494016 planted=0.03826272807494016
+  one A0 est=0.0337269 iv=[0.03266724814683478, 0.03478655753471949] covers_truth=False covers_planted=False verdict=F-OVERCONF
+  one A1 est=0.0378674 iv=[0.026358609390392296, 0.049376163376558466] covers_truth=True covers_planted=True verdict=F-OVERCONF
+  one A2 est=0.0379434 iv=[0.025180781203220842, 0.05070605545305559] covers_truth=True covers_planted=True verdict=F-OVERCONF
+  bias={'A0': -0.004828, 'A1': -0.000844, 'A2': -0.000508}
+  sd={'A0': 0.000569, 'A1': 0.002028, 'A2': 0.002943}
+  width={'A0': 0.002232, 'A1': 0.023632, 'A2': 0.026424}
+  coverage={'A0': 0.0, 'A1': 1.0, 'A2': 1.0}
+  rmse={'A0': 0.004861, 'A1': 0.002192, 'A2': 0.002979}
+  se_over_sd={'A0': 1.0002, 'A1': 2.9732, 'A2': 2.2907}
+  width_ratio={'A0': 0.0329, 'A1': 0.3479, 'A2': 0.389}
+  undefined={'A0': 0, 'A1': 0, 'A2': 0}
+expectations_met_as_paper_states={'a': True, 'b': True, 'c': True, 'd': True, 'e': True}
+A1A2_se_over_sd_min=2.26486 max=3.10671
+se_over_sd_detail=min_I:A1=2.93631, min_I:A2=2.26486, median_I:A1=3.10671, median_I:A2=2.56429, c_star:A1=2.97319, c_star:A2=2.29075
+
+===== headline clauses =====
+cstar_A0_misses=True
+cstar_A0_verdict=F-OVERCONF
+min_I A0 covers_truth=False covers_planted=False verdict=F-OVERCONF
+min_I A1 covers_truth=True covers_planted=True verdict=F-OVERCONF
+min_I A2 covers_truth=True covers_planted=True verdict=F-OVERCONF
+median_I A0 covers_truth=False covers_planted=False verdict=F-OVERCONF
+median_I A1 covers_truth=True covers_planted=False verdict=F-OVERCONF
+median_I A2 covers_truth=True covers_planted=False verdict=F-OVERCONF
+abs_bias_falls_all_points=True sd_rises=True
+
+===== planted foil flags and image =====
+planted_top_keys=Theta_exp,Theta_hm,c_star,closest,delta,endpoint_recheck,figures,finding_hm,findings,git_commit,n_nroy,n_theta_sample,notes,nroy_param_spread,param_names,ran_at,sampling_variances,spill_star,tau,theta_star,wave_I_stats,wave_kept,z,z_names,z_source
+planted.theta_star.premium=0.0019484982831188269
+planted.spill_star.delta_spill=0.007921687736219114
+planted.spill_star.se_spill=0.00031807876238736126
+planted.Theta_hm=[0.005770726773630053, 0.07369219669944571]
+planted.Theta_exp=[-0.0005783221759119487, 0.026525400203309787]
+planted.endpoint_recheck.candidates[0].image=Theta_hm
+planted.endpoint_recheck.candidates[1].image=Theta_hm
+planted.endpoint_recheck.candidates[2].image=Theta_exp
+planted.endpoint_recheck.candidates[3].image=Theta_exp
+planted.findings.min_I.spill_true=0.012711961996060107
+planted.findings.min_I.se_spill=0.0003364733877928505
+planted.findings.min_I.foil1_estimator=OLS-HC1 x k/N (SUTVA policy estimate)
+planted.findings.min_I.foil1_beta=0.3170906963893631
+planted.findings.min_I.foil1_ci_beta=[0.30570268055345995, 0.32847871222526626]
+planted.findings.min_I.foil1_share=0.1
+planted.findings.min_I.foil1_ci=[0.030570268055345996, 0.03284787122252663]
+planted.findings.min_I.foil1_vs_Theta_hm=F-OVERCONF
+planted.findings.min_I.foil1_covers_truth=False
+planted.findings.min_I.foil1_covers_planted_truth=False
+planted.findings.min_I.foil2_estimate=0.013303569749628513
+planted.findings.min_I.foil2_se=0.005263169607824724
+planted.findings.min_I.foil2_merged_s0b=False
+planted.findings.min_I.foil2_ci=[0.002987946873766252, 0.023619192625490774]
+planted.findings.min_I.foil2_vs_Theta_exp=F-OVERCONF
+planted.findings.min_I.foil2_covers_truth=True
+planted.findings.min_I.foil2_covers_planted_truth=True
+planted.findings.median_I.spill_true=0.01520038590605576
+planted.findings.median_I.se_spill=0.0003386385140281826
+planted.findings.median_I.foil1_estimator=OLS-HC1 x k/N (SUTVA policy estimate)
+planted.findings.median_I.foil1_beta=0.47518721193610797
+planted.findings.median_I.foil1_ci_beta=[0.46635093607731326, 0.4840234877949027]
+planted.findings.median_I.foil1_share=0.1
+planted.findings.median_I.foil1_ci=[0.046635093607731326, 0.04840234877949027]
+planted.findings.median_I.foil1_vs_Theta_hm=F-OVERCONF
+planted.findings.median_I.foil1_covers_truth=False
+planted.findings.median_I.foil1_covers_planted_truth=False
+planted.findings.median_I.foil2_estimate=0.0158663081673725
+planted.findings.median_I.foil2_se=0.005239097607625065
+planted.findings.median_I.foil2_merged_s0b=False
+planted.findings.median_I.foil2_ci=[0.005597865544937413, 0.026134750789807586]
+planted.findings.median_I.foil2_vs_Theta_exp=F-OVERCONF
+planted.findings.median_I.foil2_covers_truth=True
+planted.findings.median_I.foil2_covers_planted_truth=True
+planted.findings.c_star.spill_true=0.007921687736219114
+planted.findings.c_star.se_spill=0.00031807876238736126
+planted.findings.c_star.foil1_estimator=OLS-HC1 x k/N (SUTVA policy estimate)
+planted.findings.c_star.foil1_beta=0.33726902840777134
+planted.findings.c_star.foil1_ci_beta=[0.3266724814683478, 0.34786557534719487]
+planted.findings.c_star.foil1_share=0.1
+planted.findings.c_star.foil1_ci=[0.03266724814683478, 0.03478655753471949]
+planted.findings.c_star.foil1_vs_Theta_hm=F-OVERCONF
+planted.findings.c_star.foil1_covers_truth=False
+planted.findings.c_star.foil1_covers_planted_truth=False
+planted.findings.c_star.foil2_estimate=0.008116724207525877
+planted.findings.c_star.foil2_se=0.004857888710834489
+planted.findings.c_star.foil2_merged_s0b=False
+planted.findings.c_star.foil2_ci=[-0.0014045627066134343, 0.017638011121665187]
+planted.findings.c_star.foil2_vs_Theta_exp=None
+planted.findings.c_star.foil2_covers_truth=True
+planted.findings.c_star.foil2_covers_planted_truth=True
+planted_hit_count=60
+
+===== sixth-decimal and allowance =====
+recheck_files=
+config_names=BOX_INFLATION,C_STAR,DATA_DIR,DELTA,DESIGN,EDGE_P,ETA_FIXED,EXPOSURE_MC_DRAWS,EXPOSURE_SHARE_CUT,FIGURES_DIR,FOIL2_CHECK,FOIL_PANEL_OFFSET,HM_CONFIDENCE,HORIZON,INTERFERENCE_OFFSET_BASE,INTERFERENCE_REPETITIONS,INTERVENTION_TIME,N_AGENTS,N_COVARIATES,N_MOMENTS,PARAM_BOX,RECHECK_OFFSET,REPS_ESTIMAND,REPS_MOMENT,REPS_Z,RESULTS_DIR,ROOT,SEED_FOIL2_MC,SEED_FRACTION,SEED_GRAPH,SEED_HM,SEED_THETA_SAMPLE,SEED_X,SINGLETON_SPAN_FRACTION,STRATUM_MIN_N,THETA_SAMPLE,WAVES,WAVE_POINTS,WORLD
+
+PROBE_EXIT_INTENT=0

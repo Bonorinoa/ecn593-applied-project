@@ -1,0 +1,41 @@
+n_entries=31
+OK key=andrianakis2015 doi=10.1371/journal.pcbi.1003968 bib_year=2015 cr_year=2015 bib_author=andrianakis cr_author=andrianakis title_ok=True
+OK key=aronow2017 doi=10.1214/16-AOAS1005 bib_year=2017 cr_year=2017 bib_author=aronow cr_author=aronow title_ok=True
+MISMATCH key=athey2018 doi=10.1080/01621459.2016.1241178 bib_year=2018 cr_year=2018 bib_author=athey cr_author=athey title_ok=False
+  bib_title=Exact $p$-Values for Network Interference
+  cr_title=Exact<i>p</i>-Values for Network Interference
+OK key=baird2018 doi=10.1162/rest_a_00716 bib_year=2018 cr_year=2018 bib_author=baird cr_author=baird title_ok=True
+OK key=banerjee2013 doi=10.1126/science.1236498 bib_year=2013 cr_year=2013 bib_author=banerjee cr_author=banerjee title_ok=True
+OK key=beven2006 doi=10.1016/j.jhydrol.2005.07.007 bib_year=2006 cr_year=2006 bib_author=beven cr_author=beven title_ok=True
+OK key=bramoulle2009 doi=10.1016/j.jeconom.2008.12.021 bib_year=2009 cr_year=2009 bib_author=bramoull e cr_author=bramoull title_ok=True
+OK key=brock2001 doi=10.1111/1467-937X.00168 bib_year=2001 cr_year=2001 bib_author=brock cr_author=brock title_ok=True
+OK key=chernozhukov2007 doi=10.1111/j.1468-0262.2007.00794.x bib_year=2007 cr_year=2007 bib_author=chernozhukov cr_author=chernozhukov title_ok=True
+OK key=clopper1934 doi=10.1093/biomet/26.4.404 bib_year=1934 cr_year=1934 bib_author=clopper cr_author=clopper title_ok=True
+OK key=craig1997 doi=10.1007/978-1-4612-2290-3_2 bib_year=1997 cr_year=1997 bib_author=craig cr_author=craig title_ok=True
+OK key=halloran1995 doi=10.1097/00001648-199503000-00010 bib_year=1995 cr_year=1995 bib_author=halloran cr_author=halloran title_ok=True
+OK key=hansen1996 doi=10.1257/jep.10.1.87 bib_year=1996 cr_year=1996 bib_author=hansen cr_author=hansen title_ok=True
+OK key=horvitz1952 doi=10.1080/01621459.1952.10483446 bib_year=1952 cr_year=1952 bib_author=horvitz cr_author=horvitz title_ok=True
+OK key=hudgens2008 doi=10.1198/016214508000000292 bib_year=2008 cr_year=2008 bib_author=hudgens cr_author=hudgens title_ok=True
+OK key=imbens2004 doi=10.1111/j.1468-0262.2004.00555.x bib_year=2004 cr_year=2004 bib_author=imbens cr_author=imbens title_ok=True
+OK key=kaido2019 doi=10.3982/ECTA14075 bib_year=2019 cr_year=2019 bib_author=kaido cr_author=kaido title_ok=True
+OK key=kennedy2001 doi=10.1111/1467-9868.00294 bib_year=2001 cr_year=2001 bib_author=kennedy cr_author=kennedy title_ok=True
+OK key=kim2015 doi=10.1016/S0140-6736(15)60095-2 bib_year=2015 cr_year=2015 bib_author=kim cr_author=kim title_ok=True
+OK key=kydland1996 doi=10.1257/jep.10.1.69 bib_year=1996 cr_year=1996 bib_author=kydland cr_author=kydland title_ok=True
+OK key=leung2020 doi=10.1162/rest_a_00818 bib_year=2020 cr_year=2020 bib_author=leung cr_author=leung title_ok=True
+OK key=mackinnon1985 doi=10.1016/0304-4076(85)90158-7 bib_year=1985 cr_year=1985 bib_author=mackinnon cr_author=mackinnon title_ok=True
+OK key=manski1993 doi=10.2307/2298123 bib_year=1993 cr_year=1993 bib_author=manski cr_author=manski title_ok=True
+MISMATCH key=manski2003 doi=10.1007/b97478 bib_year=2003 cr_year=2003 bib_author=manski cr_author= title_ok=True
+  bib_title=Partial Identification of Probability Distributions
+  cr_title=Partial Identification of Probability Distributions
+OK key=manski2013 doi=10.1111/j.1368-423X.2012.00368.x bib_year=2013 cr_year=2013 bib_author=manski cr_author=manski title_ok=True
+MISMATCH key=molinari2020 doi=10.1016/bs.hoe.2020.05.002 bib_year=2020 cr_year=2020 bib_author=molinari cr_author= title_ok=True
+  bib_title=Microeconometrics with Partial Identification
+  cr_title=Microeconometrics with partial identification
+OK key=rubin1980 doi=10.2307/2287653 bib_year=1980 cr_year=1980 bib_author=rubin cr_author=rubin title_ok=True
+MISMATCH key=savje2021 doi=10.1214/20-AOS1973 bib_year=2021 cr_year=2021 bib_author=s a cr_author=s vje title_ok=True
+  bib_title=Average Treatment Effects in the Presence of Unknown Interference
+  cr_title=Average treatment effects in the presence of unknown interference
+OK key=tamer2003 doi=10.1111/1467-937X.00240 bib_year=2003 cr_year=2003 bib_author=tamer cr_author=tamer title_ok=True
+OK key=tamer2010 doi=10.1146/annurev.economics.050708.143401 bib_year=2010 cr_year=2010 bib_author=tamer cr_author=tamer title_ok=True
+OK key=vernon2010 doi=10.1214/10-BA524 bib_year=2010 cr_year=2010 bib_author=vernon cr_author=vernon title_ok=True
+checked=31 mismatches=4 no_doi=[]
