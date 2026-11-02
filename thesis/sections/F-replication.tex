@@ -1,0 +1,22 @@
+%================================================================
+\section{Replication}\label{app:replication}
+
+Everything in the paper reruns with one command from the repository root, after a
+one-time setup of the pinned environment described in \texttt{README.md}:
+\begin{quote}
+\texttt{.venv/bin/python scripts/replicate.py}
+\end{quote}
+The script runs the test suite, checks that the planted targets regenerate byte for
+byte, runs the planted pipeline, the Foil~2 calibration check, the sensitivity menu
+(amendment A1) and the interference trade-off (amendment A2), redraws the figures
+from the saved results, copies them into \texttt{writeup/figures/} and
+\texttt{thesis/figures/}, writes both copies of \texttt{numbers.tex}, builds the
+earlier write-up, and compares every result file with the committed version. Every
+random stream is seeded, so a rerun reproduces every digit; a mismatch means that
+the code or the environment changed. The option \texttt{--quick} skips the Foil~2
+check and both amendments. This paper is then built from \texttt{thesis/} with
+\texttt{latexmk}. The measured runtimes and package pins are in
+\texttt{README.md}. The exogenous design lives in \texttt{config/world.toml} and
+\texttt{config/design.toml}; the targets in \texttt{data/planted.json}; the results
+in \texttt{results/}.
+

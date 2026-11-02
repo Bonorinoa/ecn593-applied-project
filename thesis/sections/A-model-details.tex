@@ -1,0 +1,54 @@
+%================================================================
+\section{Model and design details}\label{app:model}
+
+\paragraph{The graph and the policy vector} The code draws
+$A_{ij}\sim\mathrm{Bernoulli}(p)$ with $p=\EdgeRate/N$ for every ordered pair,
+takes $A\lor A^\top$ and sets the diagonal to zero, so an edge appears with
+probability $1-(1-p)^2\approx 2p$. The drawn graph has $\Triangles$ triangles over
+$\ConnectedTriples$ connected triples, a global clustering coefficient of
+$\GlobalClustering$ against $\GlobalClusteringTheory$ expected for a random graph
+of this density. The graph is close to tree-like: two people with a common friend
+are rarely friends themselves. In the policy vector $\dtwo$, ties in degree go to the lower
+index: $\DegreeCutSeeded$ of the $\DegreeCutTotal$ people with degree
+$\DegreeCut$ are seeded, and everyone above that degree is seeded. Given the graph,
+$\dtwo$ is deterministic.
+
+\paragraph{The update map is a contraction} The logistic function has slope at
+most $1/4$, and the peer mean $(AY)_i/k_i$ is an average, so its sup norm is at
+most that of $Y$. For two states under the same assignment and the same shocks,
+one step of Equation~\eqref{eq:kernel} therefore shrinks their sup-norm distance by
+a factor of at most $(\beta+\gamma)/4\le(\BoxBetaHi+\BoxGammaHi)/4<1$ over the
+whole box. For a fixed assignment the process has a unique stationary regime and
+forgets its starting state geometrically; after $T=\Horizon$ steps the starting
+state matters by at most that factor to the power $T$, far less than the smallest
+Monte Carlo standard error in Table~\ref{tab:recheck}. With a sum of neighbors'
+outcomes in place of the average, the peer slope would grow with degree and the
+bound would fail for parts of the box. The bound uses only the kernel, the box and
+the horizon, all fixed before any run.
+
+\paragraph{Random streams} Every random stream is seeded. Rep $r$ of every arm
+shares one state stream, the starting state and all shocks, and each arm has its
+own assignment stream, so contrasts between arms are paired. The image
+replications use offsets $0$ to $\RepsEstimand-1$; the analysts' one panel is
+offset $0$; the endpoint recheck, the Foil~2 gate and the repeated panels of
+amendment A2 each use their own disjoint block (A2's starts at
+$\TradeoffOffsetBase$). The pipeline is deterministic: a rerun reproduces every
+digit.
+
+\paragraph{History-matching waves} Figure~\ref{fig:waves} shows the waves. The
+minimum implausibility in the three waves is $\WaveMinIOne$, $\WaveMinITwo$ and
+$\WaveMinIThree$, and the median is $\WaveMedIOne$, $\WaveMedITwo$ and
+$\WaveMedIThree$, against $\tau=\Tau$. Later waves concentrate on the kept region,
+and the threshold does not move. The min-I point is the kept point with the
+smallest $I$; the median-I point is the point at position
+$\lfloor|\NROY|/2\rfloor$ when NROY is sorted by $I$.
+
+\begin{figure}[ht]
+\centering
+\includefigure[width=\linewidth]{waves.png}
+\caption{History matching against the planted targets. Left: the points kept in
+each wave. Right: the minimum and median $I(c)$ in each wave against the threshold
+$\tau$ (log scale).}
+\label{fig:waves}
+\end{figure}
+

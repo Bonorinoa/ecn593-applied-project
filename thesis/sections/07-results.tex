@@ -1,0 +1,331 @@
+%================================================================
+\section{Results}\label{sec:results}
+
+Every number in this section is a macro generated from the committed results in
+\texttt{results/}. The section follows the order of the procedure: what history
+matching kept, the image, the one-panel intervals at the three points, the price
+of allowing for interference over repeated panels, and how the image moves with
+the level tolerance.
+
+\subsection{History matching kept a large set}\label{sec:nroy}
+
+Against the planted targets, the three waves kept $\WaveKeptOne$, $\WaveKeptTwo$
+and $\WaveKeptThree$ of their $\WavePoints$ points, and their union is
+$|\NROY|=\NNroy$ (Figure~\ref{fig:waves} in Appendix~\ref{app:model}). The set
+did not collapse to a point. The closest point has $I=\MinI$, far below
+$\tau=\Tau$, yet it does not recover $\cstar$: its parameters are
+$\alpha=\MinIAlpha$, $\beta=\MinIBeta$, $\gamma=\MinIGamma$, $\kappa=\MinIKappa$
+and $\sigma_\varepsilon=\MinISigma$, against the planted values in
+Table~\ref{tab:box}. A good fit does not pick out the truth. The median-I point has
+$I=\MedI$ and a larger seeding effect, $\kappa=\MedIKappa$.
+
+Which parameters do the targets restrict? For each parameter, the code divides
+its standard deviation over the sampled NROY points by the standard deviation of a
+uniform draw over the box on that axis. A ratio near one means the targets do not
+restrict the parameter. The readout was declared before the run and is not a gate.
+
+\begin{table}[t]
+\centering
+\caption{Spread ratios over the sampled NROY points.}
+\label{tab:spread}
+\begin{zebratabular}{lccccc}
+\toprule
+ & \colhead{$\alpha$} & \colhead{$\beta$} & \colhead{$\gamma$} & \colhead{$\kappa$} & \colhead{$\sigma_\varepsilon$} \\
+\midrule
+spread ratio & \SpreadRatioAlpha & \SpreadRatioBeta & \SpreadRatioGamma & \SpreadRatioKappa & \SpreadRatioSigma \\
+\bottomrule
+\end{zebratabular}
+\tablenote{Standard deviation over the $\ThetaSample$ sampled NROY points divided
+by the standard deviation of a uniform draw over $C$ on the same axis.}
+\end{table}
+
+Only the intercept $\alpha$ is pinned down (Table~\ref{tab:spread}). The ratios for
+$\beta$, $\gamma$ and $\kappa$ are close to one, and $\sigma_\varepsilon$ is in
+between. The pre-registration expected the peer-correlation moment to give a ratio
+below one for $\gamma$. The ratio is $\SpreadRatioGamma$, below one only in the
+third decimal, which is no restriction; that expectation was not met. It also
+expected the pilot moment to restrict the trade-off between $\alpha$ and $\kappa$
+more than the earlier design did. This paper does not rerun the earlier design,
+so it cannot check that comparison; the sampled correlation between $\alpha$ and
+$\kappa$ is $\SpreadCorrAlphaKappa$.
+
+\subsection{The image of the policy effect is wide}\label{sec:image}
+
+At the planted point, $\theta_1(\cstar)=\ThetaOneStar$ and
+$\theta_2(\cstar)=\ThetaTwoStar$, so the premium of targeting is
+$\prem(\cstar)=\PremiumStar$: in this village, seeding the hubs barely beats
+seeding at random. That is a fact about this $\cstar$ and not a theorem about
+targeting. The spillover is $\dspill(\cstar)=\SpillStar$.
+
+Over the $\ThetaSample$ sampled NROY points, the image of the policy effect is
+$\Theta_{\hm}=[\ThetaHmLo,\,\ThetaHmHi]$ and the image of the spillover is
+$\Theta_{\expset}=[\ThetaExpLo,\,\ThetaExpHi]$. The report for $\theta_2$ that
+the targets support is this range. It is neither a sampling distribution nor a
+posterior. Figure~\ref{fig:points} shows every sampled point; for $\theta_2$ the
+pointwise Monte Carlo error bars are smaller than the dots. A fresh recheck of
+the four endpoint candidates moves the ends of $\Theta_{\hm}$ only in the sixth
+decimal and the ends of $\Theta_{\expset}$ by amounts comparable to their Monte
+Carlo errors, and it changes no verdict (Appendix~\ref{app:recheck}).
+
+\begin{figure}[t]
+\centering
+\includefigure[width=0.92\linewidth]{image_points.png}
+\caption{The $\ThetaSample$ sampled NROY points against their implausibility
+$I(c)$. Left: $\theta_2(c)$. Right: $\dspill(c)$. Bars show $\pm1.96$ pointwise
+Monte Carlo standard errors at each fixed $c$; dashed lines mark the image
+endpoints.}
+\label{fig:points}
+\end{figure}
+
+Why is the image wide? Largely because of the assumption $\delta$. With
+$\delta_1=\DeltaOne$ on a level moment, the rule lets each level miss by up to
+about $\sqrt{\tau\delta_1^2}$ on its own. That allowance exceeds
+$\theta_1(\cstar)=\ThetaOneStar$, the very effect the pilot level carries, so the
+pilot cannot pin the seeding effect $\kappa$. The spread ratio for $\kappa$,
+$\SpreadRatioKappa$, is what that reading predicts, and the sensitivity menu of
+Section~\ref{sec:menu} confirms it by tightening $\delta_1$. The peer weight is a
+separate case: a check at $\cstar$ found that the peer-correlation moment hardly
+moves across the box's range of $\gamma$; that check is not a committed result.
+
+\subsection{One panel at each point}\label{sec:onepanel}
+
+Table~\ref{tab:onepanel} reports every interval in the one panel drawn at each
+diagnostic point, with both containment flags and the geometric verdict.
+Figure~\ref{fig:overlay} draws the two foils against their images.
+
+\begin{table}[t]
+\centering
+\caption{One panel at each diagnostic point. The first column is the field
+experimenter; the other two are the calibrator. Each analyst row gives the
+interval, then containment of the truth at the point (a), containment of the truth
+at the village (b), and the verdict against the analyst's own image.}
+\label{tab:onepanel}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{zebratabular}{llll}
+\toprule
+ & \colhead{$\cstar$ (village)} & \colhead{min-I ($I=\MinI$)} & \colhead{median-I ($I=\MedI$)} \\
+\midrule
+\hiderowcolors\multicolumn{4}{l}{\textit{Policy effect $\theta_2$; image $\Theta_{\hm}=[\ThetaHmLo,\,\ThetaHmHi]$}} \\
+truth $\theta_2(c_0)$ & $\ThetaTwoStar$ & $\MinIThetaTwo$ & $\MedIThetaTwo$ \\
+A0 (Foil 1) & $[\StarPtFoilOneLo,\,\StarPtFoilOneHi]$ & $[\MinIFoilOneLo,\,\MinIFoilOneHi]$ & $[\MedIFoilOneLo,\,\MedIFoilOneHi]$ \\
+\quad (a) / (b) / verdict & \StarPtFoilOneCoversTruth{} / \StarPtFoilOneCoversPlanted{} / \StarPtFoilOneVerdict & \MinIFoilOneCoversTruth{} / \MinIFoilOneCoversPlanted{} / \MinIFoilOneVerdict & \MedIFoilOneCoversTruth{} / \MedIFoilOneCoversPlanted{} / \MedIFoilOneVerdict \\
+\rowcolor{zebra}A1 & $[\TradeoffStarAOneOnePanelLo,\,\TradeoffStarAOneOnePanelHi]$ & $[\TradeoffMinIAOneOnePanelLo,\,\TradeoffMinIAOneOnePanelHi]$ & $[\TradeoffMedIAOneOnePanelLo,\,\TradeoffMedIAOneOnePanelHi]$ \\
+\rowcolor{zebra}\quad (a) / (b) / verdict & \TradeoffStarAOneOnePanelCoversTruth{} / \TradeoffStarAOneOnePanelCoversPlanted{} / \TradeoffStarAOneOnePanelVerdict & \TradeoffMinIAOneOnePanelCoversTruth{} / \TradeoffMinIAOneOnePanelCoversPlanted{} / \TradeoffMinIAOneOnePanelVerdict & \TradeoffMedIAOneOnePanelCoversTruth{} / \TradeoffMedIAOneOnePanelCoversPlanted{} / \TradeoffMedIAOneOnePanelVerdict \\
+A2 & $[\TradeoffStarATwoOnePanelLo,\,\TradeoffStarATwoOnePanelHi]$ & $[\TradeoffMinIATwoOnePanelLo,\,\TradeoffMinIATwoOnePanelHi]$ & $[\TradeoffMedIATwoOnePanelLo,\,\TradeoffMedIATwoOnePanelHi]$ \\
+\quad (a) / (b) / verdict & \TradeoffStarATwoOnePanelCoversTruth{} / \TradeoffStarATwoOnePanelCoversPlanted{} / \TradeoffStarATwoOnePanelVerdict & \TradeoffMinIATwoOnePanelCoversTruth{} / \TradeoffMinIATwoOnePanelCoversPlanted{} / \TradeoffMinIATwoOnePanelVerdict & \TradeoffMedIATwoOnePanelCoversTruth{} / \TradeoffMedIATwoOnePanelCoversPlanted{} / \TradeoffMedIATwoOnePanelVerdict \\
+\midrule
+\multicolumn{4}{l}{\textit{Spillover $\dspill$; image $\Theta_{\expset}=[\ThetaExpLo,\,\ThetaExpHi]$}} \\
+truth $\dspill(c_0)$ & $\SpillStar$ & $\MinISpill$ & $\MedISpill$ \\
+Foil 2 & $[\StarPtFoilTwoLo,\,\StarPtFoilTwoHi]$ & $[\MinIFoilTwoLo,\,\MinIFoilTwoHi]$ & $[\MedIFoilTwoLo,\,\MedIFoilTwoHi]$ \\
+\quad (a) / (b) / verdict & \StarPtFoilTwoCoversTruth{} / \StarPtFoilTwoCoversPlanted{} / \StarPtFoilTwoVerdict & \MinIFoilTwoCoversTruth{} / \MinIFoilTwoCoversPlanted{} / \MinIFoilTwoVerdict & \MedIFoilTwoCoversTruth{} / \MedIFoilTwoCoversPlanted{} / \MedIFoilTwoVerdict \\
+\bottomrule
+\end{zebratabular}
+\tablenote{Intervals at nominal level $\ConfidencePct\%$ from the one panel at
+stream offset $0$. The flags describe that one panel; they are not coverage. At
+$\cstar$ the verdict is reported for completeness and is not a test of the field
+experimenter's estimator. Foil~2 targets $\dspill$ and is compared only with
+$\Theta_{\expset}$.}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includefigure[width=0.86\linewidth]{overlay.png}
+\caption{The two foils against their own images at the three diagnostic points
+(rows). Left: $\theta_2$, the image $\Theta_{\hm}$ (band) and the A0 (Foil~1)
+interval. Right: $\dspill$, the image $\Theta_{\expset}$ and the Foil~2 interval.
+A star marks the truth at the point and a triangle the truth at $\cstar$ (omitted
+in the $\cstar$ row). The two columns use different scales and different
+functionals; they are never compared with each other.}
+\label{fig:overlay}
+\end{figure}
+
+\paragraph{The field experimenter, at $\cstar$} Her A0 interval is
+$[\StarPtFoilOneLo,\,\StarPtFoilOneHi]$ and the truth is $\ThetaTwoStar$, so the
+interval misses; the point estimate is $\StarPtFoilOneBelowPct\%$ below the truth.
+This failure needs no calibration. It is layer~(a), and it comes from the
+identification conditions of the estimator: in this panel about
+$\StarPtUnseededShareDisplayedPct\%$ of the gap is the effect of the campaign on
+people who were not seeded, for which A0 has no term (Appendix~\ref{app:gap}). Her A1 and A2 intervals, computed from a pilot panel at
+the same point, both contain $\theta_2(\cstar)$. Her Foil~2 interval contains the
+spillover $\dspill(\cstar)$. Against the images, the A0, A1 and A2 intervals all
+sit strictly inside $\Theta_{\hm}$ and the Foil~2 interval starts below the lower
+end of $\Theta_{\expset}$, so it has no verdict. We report these verdicts and draw
+no charge from them: she worked with the village's own panel.
+
+\paragraph{The calibrator, at min-I and median-I} At both points the A0 interval
+misses the truth at her own point (layer~a) and the truth at the village
+(layer~b), and it lies strictly inside $\Theta_{\hm}$. Her A0 interval is
+therefore wrong about her own world and also overconfident: it is far narrower than
+the range of effects that the targets leave open. The A1 and A2 intervals behave
+differently. At both points they contain the truth at her point. At the min-I
+point they also contain the truth at the village, because the two truths are close
+($\MinIThetaTwo$ and $\ThetaTwoStar$). At the median-I point they do not: the truth
+there, $\MedIThetaTwo$, is far from the village's $\ThetaTwoStar$, and the
+assumption ``my point is the world'' is costly. Even so, the A1 and A2 intervals
+are F-OVERCONF at both points. They are right about her world and still narrower
+than what the targets leave open. Foil~2 tells the same story for the spillover:
+its interval contains both truths at both points and is F-OVERCONF against
+$\Theta_{\expset}$ at both.
+
+\paragraph{Containment and geometry are different tests} The A1, A2 and Foil~2
+rows show why the two checks must be kept apart. An interval answers a question
+about one world; the image answers a question about every world the targets cannot
+rule out. A one-world interval can be right about its world and narrower than the
+image at once. A calibrator who reports such an interval as her uncertainty about
+the village understates what the targets leave open. At the min-I point she happens
+to be right about the village as well; the median-I point shows that membership in
+NROY does not guarantee it, and the image is what warns her.
+
+\subsection{The price of allowing for interference}\label{sec:a2results}
+
+Table~\ref{tab:tradeoff} reports the three analysts of $\theta_2$ over
+$R=\TradeoffR$ fresh panels at each point, and Figure~\ref{fig:tradeoff} plots the
+absolute bias against the mean interval width. No panel left A2 undefined: the
+undefined count is $\TradeoffMinIATwoUndefinedCount$ at the min-I point,
+$\TradeoffMedIATwoUndefinedCount$ at the median-I point and
+$\TradeoffStarATwoUndefinedCount$ at $\cstar$.
+
+\begin{table}[t]
+\centering
+\caption{The three analysts of $\theta_2$ over $\TradeoffR$ repeated panels at each
+point (amendment A2).}
+\label{tab:tradeoff}
+\footnotesize
+\setlength{\tabcolsep}{3.2pt}
+\begin{zebratabular}{lcccccccc}
+\toprule
+ & \colhead{Bias} & \colhead{SD} & \colhead{RMSE} & \colhead{Mean SE} & \colhead{SE/SD}
+ & \colhead{Containment [CP 95\%]} & \colhead{Width} & \colhead{Width/$\Theta_{\hm}$} \\
+\midrule
+\hiderowcolors\multicolumn{9}{l}{\textit{min-I point, $\theta_2=\MinIThetaTwo$}} \\
+A0 & $\TradeoffMinIAZeroBias$ & $\TradeoffMinIAZeroSD$ & $\TradeoffMinIAZeroRMSE$ & $\TradeoffMinIAZeroMeanSE$ & $\TradeoffMinIAZeroSEOverSD$ & $\TradeoffMinIAZeroCoverage$ [$\TradeoffMinIAZeroCoverageLo$, $\TradeoffMinIAZeroCoverageHi$] & $\TradeoffMinIAZeroMeanWidth$ & $\TradeoffMinIAZeroWidthRatio$ \\
+\rowcolor{zebra}A1 & $\TradeoffMinIAOneBias$ & $\TradeoffMinIAOneSD$ & $\TradeoffMinIAOneRMSE$ & $\TradeoffMinIAOneMeanSE$ & $\TradeoffMinIAOneSEOverSD$ & $\TradeoffMinIAOneCoverage$ [$\TradeoffMinIAOneCoverageLo$, $\TradeoffMinIAOneCoverageHi$] & $\TradeoffMinIAOneMeanWidth$ & $\TradeoffMinIAOneWidthRatio$ \\
+A2 & $\TradeoffMinIATwoBias$ & $\TradeoffMinIATwoSD$ & $\TradeoffMinIATwoRMSE$ & $\TradeoffMinIATwoMeanSE$ & $\TradeoffMinIATwoSEOverSD$ & $\TradeoffMinIATwoCoverage$ [$\TradeoffMinIATwoCoverageLo$, $\TradeoffMinIATwoCoverageHi$] & $\TradeoffMinIATwoMeanWidth$ & $\TradeoffMinIATwoWidthRatio$ \\
+\midrule
+\multicolumn{9}{l}{\textit{median-I point, $\theta_2=\MedIThetaTwo$}} \\
+A0 & $\TradeoffMedIAZeroBias$ & $\TradeoffMedIAZeroSD$ & $\TradeoffMedIAZeroRMSE$ & $\TradeoffMedIAZeroMeanSE$ & $\TradeoffMedIAZeroSEOverSD$ & $\TradeoffMedIAZeroCoverage$ [$\TradeoffMedIAZeroCoverageLo$, $\TradeoffMedIAZeroCoverageHi$] & $\TradeoffMedIAZeroMeanWidth$ & $\TradeoffMedIAZeroWidthRatio$ \\
+\rowcolor{zebra}A1 & $\TradeoffMedIAOneBias$ & $\TradeoffMedIAOneSD$ & $\TradeoffMedIAOneRMSE$ & $\TradeoffMedIAOneMeanSE$ & $\TradeoffMedIAOneSEOverSD$ & $\TradeoffMedIAOneCoverage$ [$\TradeoffMedIAOneCoverageLo$, $\TradeoffMedIAOneCoverageHi$] & $\TradeoffMedIAOneMeanWidth$ & $\TradeoffMedIAOneWidthRatio$ \\
+A2 & $\TradeoffMedIATwoBias$ & $\TradeoffMedIATwoSD$ & $\TradeoffMedIATwoRMSE$ & $\TradeoffMedIATwoMeanSE$ & $\TradeoffMedIATwoSEOverSD$ & $\TradeoffMedIATwoCoverage$ [$\TradeoffMedIATwoCoverageLo$, $\TradeoffMedIATwoCoverageHi$] & $\TradeoffMedIATwoMeanWidth$ & $\TradeoffMedIATwoWidthRatio$ \\
+\midrule
+\multicolumn{9}{l}{\textit{$\cstar$ (village), $\theta_2=\ThetaTwoStar$}} \\
+A0 & $\TradeoffStarAZeroBias$ & $\TradeoffStarAZeroSD$ & $\TradeoffStarAZeroRMSE$ & $\TradeoffStarAZeroMeanSE$ & $\TradeoffStarAZeroSEOverSD$ & $\TradeoffStarAZeroCoverage$ [$\TradeoffStarAZeroCoverageLo$, $\TradeoffStarAZeroCoverageHi$] & $\TradeoffStarAZeroMeanWidth$ & $\TradeoffStarAZeroWidthRatio$ \\
+\rowcolor{zebra}A1 & $\TradeoffStarAOneBias$ & $\TradeoffStarAOneSD$ & $\TradeoffStarAOneRMSE$ & $\TradeoffStarAOneMeanSE$ & $\TradeoffStarAOneSEOverSD$ & $\TradeoffStarAOneCoverage$ [$\TradeoffStarAOneCoverageLo$, $\TradeoffStarAOneCoverageHi$] & $\TradeoffStarAOneMeanWidth$ & $\TradeoffStarAOneWidthRatio$ \\
+A2 & $\TradeoffStarATwoBias$ & $\TradeoffStarATwoSD$ & $\TradeoffStarATwoRMSE$ & $\TradeoffStarATwoMeanSE$ & $\TradeoffStarATwoSEOverSD$ & $\TradeoffStarATwoCoverage$ [$\TradeoffStarATwoCoverageLo$, $\TradeoffStarATwoCoverageHi$] & $\TradeoffStarATwoMeanWidth$ & $\TradeoffStarATwoWidthRatio$ \\
+\bottomrule
+\end{zebratabular}
+\tablenote{Bias is the mean estimate minus $\theta_2(c_0)$. SD is the standard
+deviation of the estimates across panels (the sampling dispersion); Mean SE is the
+mean reported standard error; Width is the mean width of the reported interval.
+Containment is the share of panels whose interval contains $\theta_2(c_0)$, with an
+exact Clopper--Pearson $95\%$ interval; for A1 and A2 it reflects conservative
+intervals, not calibration.}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includefigure[width=\linewidth]{tradeoff.png}
+\caption{Absolute bias against mean interval width over $\TradeoffR$ repeated
+panels, one marker per analyst, one panel per diagnostic point. The dashed line
+is the width of $\Theta_{\hm}$. The percentage beside each marker is the
+repeated-sampling rate at which the analyst's interval contains $\theta_2(c_0)$,
+printed as amendment A2 asked; for A1 and A2 it is conservative containment under
+the Young bound and should not be read as calibrated coverage.}
+\label{fig:tradeoff}
+\end{figure}
+
+\paragraph{Bias and spread} Absolute bias falls from A0 to A1 to A2 at every
+point, and the sampling SD rises from A0 to A1 to A2 at every point. A0's bias is
+large relative to its own spread: at $\cstar$ the bias is $\TradeoffStarAZeroBias$
+with a sampling SD of $\TradeoffStarAZeroSD$, so its intervals almost never reach
+the truth. A1 and A2 are biased downward at every point, by much less. The
+amendment's proposed reason is two-hop spillover in the $\Sa$ control: people with
+no seeded neighbor are still lifted by seeds two steps away, which raises the
+control mean; the independent review of the code checked the sign of the bias and
+not this mechanism. Allowing for interference does not remove the bias. It shrinks
+it, and the analyst pays with dispersion. On mean squared error the trade does not
+run all the way down the ladder: A1 has the smallest RMSE at every point, so A2's
+further cut in bias costs more in spread than it saves.
+
+\paragraph{The reported intervals are conservative} A0's reported standard error
+matches its sampling SD closely (SE/SD of $\TradeoffMinIAZeroSEOverSD$,
+$\TradeoffMedIAZeroSEOverSD$ and $\TradeoffStarAZeroSEOverSD$). For A1 and A2 the
+reported SE is between $\TradeoffMinIATwoSEOverSD$ and $\TradeoffMedIAOneSEOverSD$
+times the sampling SD. The A1 and A2 intervals are conservative relative to their
+sampling distributions. On the $\cstar$ panel, a share
+\MISSING{YoungShareAOneStar} of A1's reported variance, and a share
+\MISSING{YoungShareATwoStar} of A2's, is the Young bound on pairs with a zero
+simulated joint exposure probability. The largest piece is the $\Sb$--$\Sa$ pair
+rather than the $\Sone$--$\Sa$ pair. The $\pi>0$ term alone is slightly smaller
+than the design variance of the A1 estimate (fixed noise,
+\MISSING{DesignRedrawsAOneStar} assignment redraws, mean main-term $\mathrm{SE}^2$
+over design variance \MISSING{DesignMainTermRatioAOneStar}; full mean
+$\mathrm{SE}^2$ over design variance \MISSING{DesignFullRatioAOneStar}). These
+decompositions come from the independent review of the code
+(\texttt{reviews/a2-code.md}), not from a committed result file. The Young terms
+are part of the pre-registered variance and are not retuned here; a sharper
+variance would be a new design, written before a new run. The rise in SD from A0
+to A1 to A2 is a real rise in sampling dispersion. The further rise in mean width,
+and the containment rate of one, come from the bound.
+
+\paragraph{Containment over repeated panels} A0's intervals contain
+$\theta_2(c_0)$ in none of the panels at any point. A1's and A2's contain it in
+every panel at every point, so the two are tied. That rate sits above the nominal
+$\ConfidencePct\%$ and reflects the conservative variance; it is not evidence that
+either interval is calibrated. Every repeated-sample mean width is narrower than
+$\Theta_{\hm}$, the widest at $\TradeoffMedIATwoWidthRatio$ of its width. That is
+interval geometry. It is not evidence that the interval is honest about what the
+targets leave open, and it is not a coverage claim.
+
+\begin{table}[t]
+\centering
+\caption{The five expectations of amendment A2, written before any A2 number,
+checked against Table~\ref{tab:tradeoff}.}
+\label{tab:expect}
+\begin{zebratabularx}{\linewidth}{lXl}
+\toprule
+\colhead{} & \colhead{Expectation (at every point)} & \colhead{Finding} \\
+\midrule
+(a) & $|$bias$|$ falls from A0 to A1 to A2 & met at all three points \\
+(b) & sampling SD and width rise from A0 to A1 to A2 & met at all three points \\
+(c) & A0 coverage far below nominal; A2 the closest to nominal & met only as a tie (A1 = A2) \\
+(d) & A1 and A2 biased downward & met at all three points (sign only) \\
+(e) & every interval narrower than $\Theta_{\hm}$ & met at all three points \\
+\bottomrule
+\end{zebratabularx}
+\tablenote{(b): SD is the sampling dispersion and width is the conservative
+interval; both rise, and they are different facts. (c): A0's rate is
+$\TradeoffStarAZeroCoverage$ at every point; A1 and A2 both reach
+$\TradeoffStarAOneCoverage$, so A2 is the closest only jointly with A1, and both
+sit above nominal because their SE is between $\TradeoffMinIATwoSEOverSD$ and
+$\TradeoffMedIAOneSEOverSD$ times the SD. (d): the review checked the sign; the
+two-hop mechanism is the amendment's proposed reason. (e): mean width in
+Table~\ref{tab:tradeoff}; the one-panel intervals are also strictly inside
+$\Theta_{\hm}$ (Table~\ref{tab:onepanel}).}
+\end{table}
+
+Table~\ref{tab:expect} collects the five expectations. Four are met as written at
+every point. Expectation~(c) is met only as a tie: A0's rate is far below nominal,
+and A1 and A2 share the rate closest to nominal. The ladder therefore behaves as
+the amendment predicted in its first-order features, bias down and spread up, and
+it does not deliver a calibrated interval at any rung. More important for the
+paper's question, no rung produces an interval as wide as the image. Even the
+analyst who allows for interference and transports only within degree bins answers
+a question about one world.
+
+\subsection{How the image moves with the level tolerance}\label{sec:menu}
+
+The image is a set under assumptions, and the assumption that appears to bind is
+the level tolerance $\delta_1$. Amendment A1, written after the main results were
+known (Appendix~\ref{app:disclosures}), reruns history matching and the image with
+$\delta_1$ set to $\MenuDeltaMainLevel$ (the main design), $\MenuDeltaHalfLevel$ and
+$\MenuDeltaQuarterLevel$; Appendix~\ref{app:menu} gives the tables. The kept set
+shrinks from $\MenuDeltaMainNNroy$ points to $\MenuDeltaHalfNNroy$ and
+$\MenuDeltaQuarterNNroy$, and at the smallest tolerance the image of the policy
+effect narrows to $[\MenuDeltaQuarterThetaHmLo,\,\MenuDeltaQuarterThetaHmHi]$ while
+the spread ratio for $\kappa$ falls to $\MenuDeltaQuarterSpreadRatioKappa$. That
+supports the reading that the level allowance is what leaves $\kappa$ open. The
+verdicts at $\cstar$ do not move at any entry. A smaller tolerance is a stronger
+assumption, that the kernel matches the targets more closely; it buys a smaller set
+and asks the reader to believe more. The menu is reported, not used to choose
+$\delta$, and the results of this paper stay at the main design.

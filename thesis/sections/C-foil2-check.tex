@@ -1,0 +1,56 @@
+%================================================================
+\section{Foil 2: the estimand and the calibration check}\label{app:foil2}
+
+\paragraph{The H\'ajek target and the kernel truth} The H\'ajek mean in
+Equation~\eqref{eq:hajek} targets the inverse-probability exposure contrast. The
+kernel truth $\dspill$ in Equation~\eqref{eq:spill} averages the unweighted
+realized contrasts. The exposure probabilities vary widely across people in the
+two unseeded strata, so the two functionals weight people differently. On this run
+the two are close enough that no containment flag depends on the difference: in the
+panels we examined, outcomes hardly track the inverse-probability weights. That
+comparison was made offline on paired panels and is not a committed result. It is
+a fact about this kernel, graph and parameter point; we did not run another kernel.
+The exposure map uses neighbors' seeding, whereas the kernel's peer term uses
+neighbors' outcomes and the effect travels more than one step, so the map is not
+exact for the kernel. Foil~2 cannot target $\theta_2$ directly: the policy arm has
+no lottery, so given the graph each person's assignment probability is $0$ or $1$
+and inverse-probability weights are not defined.
+
+\paragraph{The pre-registered calibration check} The script
+\texttt{scripts/check\_foil2\_coverage.py} is a required check of Foil~2's
+interval. Its gate uses outcomes that obey the exposure map exactly, with a true
+spillover of $\GateTruth$, and it draws $\GateAssignments$ pilot assignments. The
+gate rule was written before the run: the gate fails if the ratio of the mean
+estimated variance to the empirical variance, plus $1.645$ bootstrap standard
+errors, is below one. The gate passes, with a mean estimate of $\GateMeanEstimate$
+and a ratio of $\GateRatio$ (bootstrap SE $\GateRatioBootSE$). The result is:
+\begin{quote}
+In a fixed-world repeated-assignment check whose outcomes obey the exposure map
+exactly, the nominal $\ConfidencePct\%$ Foil~2 Wald interval covered
+$\GateCoveragePct\%$ of assignments (exact $95\%$ binomial interval
+$\GateCoverageLoPct\%$--$\GateCoverageHiPct\%$). The average estimated variance
+was $\GateRatio$ times the empirical design variance, so the shortfall is not
+explained by average variance underestimation. It reflects the finite-sample
+behavior of this studentized normal interval, with the implemented H\'ajek
+linearization and simulated joint exposure probabilities.
+\end{quote}
+The check is specific to this implementation and is not a test of the theorem of
+\citet{aronow2017}, whose exact result is for Horvitz--Thompson totals with exact
+joint probabilities. The code uses H\'ajek means, a first-order linearization and
+one simulated table of joint probabilities.
+
+The script also reports the kernel itself, where the exposure map is not exact.
+Over $\CheckPanels$ kernel panels, the nominal $\ConfidencePct\%$ interval
+contains the truth at a rate of $\KernelCovStar$ at $\cstar$, $\KernelCovMinI$ at
+the min-I point and $\KernelCovMedI$ at the median-I point. Redrawing only the
+assignment while holding the noise fixed gives $\DesignCovStar$, $\DesignCovMinI$
+and $\DesignCovMedI$. The code reports these numbers and does not gate on them.
+
+The spillover contrast is the case in which the Young bound matters least. In the
+independent review of amendment A2, the Young share of the spillover contrast's
+variance on the $\cstar$ panel was small, \MISSING{YoungShareSpillStar}, whereas
+the A1 and A2 contrasts include the $\Sb$ stratum and carry a much larger Young
+share (Section~\ref{sec:a2results}). This is consistent with Foil~2's interval
+covering a little under nominal in its check while the A1 and A2 intervals are
+conservative.
+

@@ -1,0 +1,116 @@
+%================================================================
+\section{The village model and the targets}\label{sec:model}
+
+\subsection{The village}
+
+The world is a graph and a matrix of covariates, drawn once with fixed seeds and
+shared by every simulation. The graph follows an edge rule rather than a target
+mean degree: for every ordered pair the code draws
+$A_{ij}\sim\mathrm{Bernoulli}(p)$ with $p=\EdgeRate/N$, symmetrizes the result
+and sets the diagonal to zero. The expected mean degree is \MeanDegreeTheory{},
+and the drawn graph has mean degree \MeanDegree{}. It is close to tree-like
+(Appendix~\ref{app:model}). Each person has three
+covariates $X_i\sim U[0,1]^3$, which stand for education, resources and a
+baseline propensity.
+
+Each person has a level of preventive behavior $Y_{it}\in(0,1)$. Starting from
+$Y_i(0)\sim U[0,1]$, the kernel updates every person at once for
+$t=0,\ldots,T-1$ with $T=\Horizon$:
+\begin{equation}\label{eq:kernel}
+  Y_i(t+1)
+  \;=\;
+  \Lambda\!\Bigl(
+    \alpha + \beta\, Y_i(t)
+    + \gamma\, \frac{(A\,Y(t))_i}{k_i}
+    + \eta^\top X_i
+    + \kappa\, d_i
+    + \sigma_\varepsilon\,\varepsilon_i(t)
+  \Bigr),
+\end{equation}
+where $\Lambda(u)=1/(1+e^{-u})$, $\varepsilon_i(t)\sim N(0,1)$ and seeding acts
+from the first period on. The index is linear in means, passed through a
+logistic link. The update rule is chosen, not derived; its lineage is the
+linear-in-means model of \citet{manski1993}, the row-normalized peer mean on a
+network of \citet{bramoulle2009}, and the logistic link of discrete choice with
+social interactions in \citet{brock2001}. Peers enter through their lagged
+outcomes, not through their seeding status, so the effect of a seed spreads along
+the graph over time. This is the source of the interference that the analysts must
+handle.
+
+Five parameters are free, $c=(\alpha,\beta,\gamma,\kappa,\sigma_\varepsilon)$,
+and they range over a box $C$ fixed before any run (Table~\ref{tab:box}). The
+covariate weights $\eta$ are fixed inside the kernel. The box excludes $\gamma=0$
+on purpose, since the project is about interference. Over the whole box the update
+map is a contraction in the sup norm, so for a fixed assignment the process has a
+unique stationary regime and forgets its starting state at a geometric rate
+(Appendix~\ref{app:model}). The kernel has no tipping points and no multiple
+equilibria; in the language of Section~\ref{sec:pi}, it is complete.
+
+\begin{table}[t]
+\centering
+\caption{The free parameters, their box $C$, and the planted point $\cstar$.}
+\label{tab:box}
+\begin{zebratabular}{llll}
+\toprule
+\colhead{Parameter} & \colhead{Box} & \colhead{Planted value} & \colhead{Role} \\
+\midrule
+$\alpha$ & $[\BoxAlphaLo,\,\BoxAlphaHi]$ & $\CStarAlpha$ & intercept of the index \\
+$\beta$ & $[\BoxBetaLo,\,\BoxBetaHi]$ & $\CStarBeta$ & weight on the own lag \\
+$\gamma$ & $[\BoxGammaLo,\,\BoxGammaHi]$ & $\CStarGamma$ & weight on the peer mean \\
+$\kappa$ & $[\BoxKappaLo,\,\BoxKappaHi]$ & $\CStarKappa$ & effect of being seeded \\
+$\sigma_\varepsilon$ & $[\BoxSigmaLo,\,\BoxSigmaHi]$ & $\CStarSigma$ & SD of the shock \\
+$\eta$ & fixed & $(\EtaOne,\,\EtaTwo,\,\EtaThree)$ & covariate weights \\
+\bottomrule
+\end{zebratabular}
+\tablenote{The planted point is the center of $C$. The box, $\eta$, the graph
+rule, $N$, $K$ and $T$ are exogenous and live in \texttt{config/world.toml}.}
+\end{table}
+
+\subsection{The targets: the status quo and one randomized pilot}\label{sec:targets}
+
+The targets are what a researcher could observe. She sees the village as it is,
+under $\pi_0$, and she can run one randomized pilot, under $\pi_1$. She never sees
+the policy $\pi_2$. That policy is what she wants to predict, so it is never a
+target; if it were, the targets would contain the answer to the planner's
+question.\footnote{An earlier design of this project did exactly that: its targets
+used outcomes under both seeding policies, and their difference was the targeting
+premium. It is archived at the git tag \texttt{v1-worldbank-moments} and plays no
+role here.}
+
+The code uses $\NMoments$ moments in a fixed order (Table~\ref{tab:moments}).
+Each is a mean over $\RepsMoment$ paired replications, and rep $r$ of the
+status-quo arm and of the pilot arm share one state stream. The Monte Carlo
+variance of each moment is the sample variance over the replications divided by
+the number of finite values; the code drops non-finite correlations, and if fewer
+than two values are finite the variance is infinite and the point is rejected.
+
+\begin{table}[t]
+\centering
+\caption{The target moments, in the order the code uses.}
+\label{tab:moments}
+\begin{zebratabularx}{\linewidth}{clllX}
+\toprule
+\colhead{\#} & \colhead{Name} & \colhead{Arm} & \colhead{Target $z$} & \colhead{Definition} \\
+\midrule
+1 & \texttt{sq\_level} & status quo & $\ZOne$ & mean over people of $Y_T$ \\
+2 & \texttt{sq\_corr\_x1} & status quo & $\ZTwo$ & correlation of $Y_T$ with the first covariate \\
+3 & \texttt{sq\_peer\_corr} & status quo & $\ZThree$ & correlation of $Y_{iT}$ with the peer mean $(AY_T)_i/k_i$ \\
+4 & \texttt{pilot\_level} & pilot & $\ZFour$ & mean over people of $Y_T$ \\
+\bottomrule
+\end{zebratabularx}
+\tablenote{Targets are planted: $z=\widehat M(\cstar)$ with $\RepsZ$ replications,
+stored in \texttt{data/planted.json}.}
+\end{table}
+
+The targets are planted: $z=\widehat M(\cstar)$, the simulated moments at the
+planted point, computed with $\RepsZ$ replications together with their Monte Carlo
+variances. Planting gives a known benchmark. It does not guarantee that a finite
+search keeps any point, and it makes the true effect known, which is the only way
+to check an interval against the truth.
+
+Because the status-quo and pilot arms share their state streams, the difference
+$\texttt{pilot\_level}-\texttt{sq\_level}$ at $\cstar$ equals $\theta_1(\cstar)$
+exactly: the two printed values are $\PilotMinusSq$ and $\ThetaOneStar$. This is
+intended. A randomized pilot identifies the effect of its own design. The
+question of the paper is what it says about $\theta_2$, a contrast that no target
+contains.

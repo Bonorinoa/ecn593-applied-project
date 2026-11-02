@@ -1,0 +1,79 @@
+%================================================================
+\section{Foil 1 and the gap decomposition}\label{app:gap}
+
+\paragraph{The OLS coefficient} At $\cstar$ the A0 coefficient is
+$\hat\beta=\StarPtBetaHat$ with interval $[\StarPtBetaLo,\,\StarPtBetaHi]$; at the
+min-I point it is $\MinIBetaHat$ with $[\MinIBetaLo,\,\MinIBetaHi]$, and at the
+median-I point $\MedIBetaHat$ with $[\MedIBetaLo,\,\MedIBetaHi]$. The scale factor
+is $K/N=\SeedShare$. Five statements stay with every report of A0 (Foil~1):
+\begin{enumerate}
+  \item A0 is not an identified estimator of the simulator's $\theta_2$ under the
+        actual interference model. It is the whole-village policy estimate implied
+        by an analyst who assumes no interference, $(K/N)\hat\beta$.
+  \item That reading assumes consistency and no interference, conditional
+        exchangeability and positivity given $X$, a correctly specified additive
+        constant-effect outcome model, and a sampling basis for HC1. The
+        deterministic top-degree assignment does not establish those assumptions.
+  \item After scaling, the A0 intervals lie strictly inside $\Theta_{\hm}$ and
+        exclude the truth at their own point at all three diagnostic points.
+        F-OVERCONF is an assumption-contingent interval-geometry finding and not a
+        coverage claim for $\theta_2$ under interference.
+  \item Across $\RepsEstimand$ paired panels, about $\UnseededShareMeanBetaPct\%$
+        of the gap between $\theta_2$ and $(K/N)$ times the mean OLS coefficient is
+        the policy effect on unseeded people. For the one displayed panel, the
+        shares are about $\StarPtUnseededShareDisplayedPct\%$ at $\cstar$,
+        $\MinIUnseededShareDisplayedPct\%$ at min-I and
+        $\MedIUnseededShareDisplayedPct\%$ at median-I.
+  \item The rescaling by $K/N$ was adopted after the frozen numbers were
+        inspected. Its justification is the aggregation identity that holds under
+        no interference. The post hoc design correction is disclosed
+        (Appendix~\ref{app:disclosures}).
+\end{enumerate}
+
+\paragraph{The decomposition} With paired streams, the policy effect splits
+exactly into a seeded part and an unseeded part. Let $H$ be the seeded set and
+$y_2-y_0$ the effect on one person in one replication. Then
+\begin{equation}\label{eq:gap}
+  \theta_2
+  = \underbrace{\tfrac{1}{N}\textstyle\sum_{i\in H}(y_2-y_0)}_{\text{seeded part}}
+  + \underbrace{\tfrac{1}{N}\textstyle\sum_{i\notin H}(y_2-y_0)}_{\text{unseeded part}},
+\end{equation}
+averaged over replications. The unseeded part is zero under no interference. The
+seeded policy contrast is the mean of $y_2-y_0$ over $H$; under interference it is
+not the effect of own seeding alone. Table~\ref{tab:gap} gives the numbers. The
+gap for the mean coefficient averages over $\RepsEstimand$ panels, whereas the gap
+for the displayed coefficient uses the one panel that A0 sees.
+
+\begin{table}[ht]
+\centering
+\caption{Gap decomposition for A0 (Foil~1), $\RepsEstimand$ paired replications.}
+\label{tab:gap}
+\begin{zebratabularx}{\linewidth}{Xccc}
+\toprule
+ & \colhead{$\cstar$} & \colhead{min-I} & \colhead{median-I} \\
+\midrule
+$\theta_2$ & $\ThetaTwoStar$ & $\MinIThetaTwo$ & $\MedIThetaTwo$ \\
+seeded part & $\StarPtSeededPart$ & $\MinISeededPart$ & $\MedISeededPart$ \\
+unseeded part & $\StarPtUnseededPart$ & $\MinIUnseededPart$ & $\MedIUnseededPart$ \\
+seeded policy contrast & $\StarPtSeededContrast$ & $\MinISeededContrast$ & $\MedISeededContrast$ \\
+mean OLS coefficient & $\StarPtMeanBeta$ & $\MinIMeanBeta$ & $\MedIMeanBeta$ \\
+gap for the mean coefficient & $\StarPtGapMeanBeta$ & $\MinIGapMeanBeta$ & $\MedIGapMeanBeta$ \\
+\quad unseeded share of that gap & $\StarPtUnseededShareMeanBeta$ & $\MinIUnseededShareMeanBeta$ & $\MedIUnseededShareMeanBeta$ \\
+\quad OLS-error part of that gap & $\StarPtOlsErrorPart$ & $\MinIOlsErrorPart$ & $\MedIOlsErrorPart$ \\
+gap for the displayed coefficient & $\StarPtGapDisplayed$ & $\MinIGapDisplayed$ & $\MedIGapDisplayed$ \\
+\quad unseeded share of that gap & $\StarPtUnseededShareDisplayed$ & $\MinIUnseededShareDisplayed$ & $\MedIUnseededShareDisplayed$ \\
+baseline gap (seeded minus unseeded, $Y$ under control) & $\StarPtBaselineGap$ & $\MinIBaselineGap$ & $\MedIBaselineGap$ \\
+\bottomrule
+\end{zebratabularx}
+\end{table}
+
+Most of the gap is the effect on people who were not seeded, and an analyst who
+assumes no interference has no term for it.
+
+\paragraph{Why there is no flexible-regression foil} On the policy arm, seeding is
+a deterministic function of degree and the index tie-break. Conditioning on degree
+leaves almost no overlap: no seeded person has degree below $\DegreeCut$, no
+unseeded person has degree above it, and only one unseeded person has degree
+exactly $\DegreeCut$. Omitting degree leaves the assignment variable unadjusted. A
+forest can differ numerically from OLS, but it keeps the same blind spot to
+interference and does not identify $\theta_2$ from this panel.

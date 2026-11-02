@@ -1,0 +1,154 @@
+%================================================================
+\section{The analysts: a ladder of assumptions}\label{sec:analysts}
+
+Each analyst sees one panel at a diagnostic point $c_0$: the outcomes $Y_T$, the
+assignment, the covariates and the graph, from one draw of the simulation noise.
+None of them sees NROY. Three analysts report an interval for $\theta_2$; one,
+Foil~2, reports an interval for a different contrast, the spillover on the pilot.
+Every interval has nominal level $\ConfidencePct\%$ and uses the two-sided normal
+quantile. Table~\ref{tab:ladder} lists them in order of decreasing assumption
+strength. A0, A1 and A2 are three intervals aimed at $\theta_2$ under different
+assumptions. They do not estimate the same functional, and only A0's needs
+SUTVA to equal $\theta_2$.
+
+\begin{table}[t]
+\centering
+\caption{The analysts. A0, A1 and A2 aim at $\theta_2$; Foil~2 aims at the
+spillover $\dspill$ and is compared only with its own image.}
+\label{tab:ladder}
+\begin{zebratabularx}{\linewidth}{lllX}
+\toprule
+\colhead{Analyst} & \colhead{Panel} & \colhead{Target} & \colhead{Maintained assumptions} \\
+\midrule
+A0 (Foil 1) & policy arm & $\theta_2$ & no interference; unconfoundedness given $X$; linear constant-effect model \\
+A1 & pilot & $\theta_2$ & exposure map; transport from the pilot with the policy's exposure shares \\
+A2 & pilot & $\theta_2$ & exposure map; transport within the hubs and within everyone else \\
+Foil 2 & pilot & $\dspill$ & exposure map; its target is a spillover contrast \\
+\bottomrule
+\end{zebratabularx}
+\tablenote{A0 is compared with $\Theta_{\hm}$, as are A1 and A2; Foil~2 is compared
+with $\Theta_{\expset}$. A0 and Foil~2 are the two foils of the main
+pre-registration; A1 and A2 were added by its amendment A2.}
+\end{table}
+
+\subsection{A0: the analyst who assumes no interference (Foil 1)}\label{sec:foil1}
+
+A0 has one panel from the policy itself, the arm that seeds the hubs. She fits OLS
+of $Y_T$ on $Z_i=(1,d_i,X_i^\top)$ and reads the coefficient on $d_i$,
+$\hat\beta$, with the heteroskedasticity-robust HC1 standard error
+\citep{mackinnon1985},
+\begin{equation}\label{eq:hc1}
+  \widehat{\Var}_{\mathrm{HC1}}(\hat\beta)
+  =\Bigl[\tfrac{n}{n-p}\,(Z^\top Z)^{-1}
+   \Bigl(\textstyle\sum_{i}\hat u_i^2\,Z_iZ_i^\top\Bigr)(Z^\top Z)^{-1}\Bigr]_{dd},
+\end{equation}
+where $p$ is the number of columns of $Z$. Under no interference, the policy effect
+for the whole village is the seeded share times the effect of own seeding, so she
+reports $(K/N)\hat\beta$ with the interval scaled the same way, and we call that
+interval $\Jone$. The scaling by a known positive constant keeps her own coverage
+statement and does not repair her assumptions.
+
+Her interval answers the question it was built for under three conditions: no
+interference, so that a person's outcome depends only on her own seeding;
+unconfoundedness given $X$; and a linear, constant-effect outcome model. The
+village breaks the first by construction. The second is not supported either: on
+the policy arm, seeding is a deterministic function of degree, which the
+regression does not include. A0 is still the natural default, and it is a good
+estimator of what it estimates. Under interference, $(K/N)\hat\beta$ measures
+something close to the effect of being one of the hubs on the hubs, and it has no
+term for the effect of the campaign on everyone else. Appendix~\ref{app:gap}
+decomposes the gap exactly and explains why a flexible regression on the same
+panel would not help.
+
+\subsection{Foil 2: the spillover on the pilot}\label{sec:foil2}
+
+Foil~2 uses the pilot panel and the exposure strata of
+Section~\ref{sec:assumptions}. Because the pilot's lottery is known, the
+probability $p_{i,S}$ that person $i$ lands in stratum $S$ can be computed before
+any outcome is seen. For an unseeded person of degree $k$, the number of seeded
+neighbors under the pilot is hypergeometric, so the first-order probabilities are
+exact. Foil~2 replaces each stratum mean with a H\'ajek mean,
+\begin{equation}\label{eq:hajek}
+  \widehat\mu_S
+  =\frac{\sum_i \mathbf{1}\{i\in S\}\,Y_{iT}/p_{i,S}}{\sum_i \mathbf{1}\{i\in S\}/p_{i,S}},
+\end{equation}
+and estimates the spillover contrast
+$\widehat\mu_{\Sc}-\widehat\mu_{\Sa}$: the outcome of unseeded people with many
+seeded neighbors against unseeded people with none. Its target is
+\begin{equation}\label{eq:spill}
+  \dspill(c)=\overline Y_{\Sc}-\overline Y_{\Sa},
+\end{equation}
+the difference of the realized stratum means of the true outcomes, averaged over
+$\RepsEstimand$ pilot replications. The variance is the linearized estimator of
+\citet{aronow2017}. Its joint exposure probabilities come from $\ExposureDraws$
+simulated pilot assignments, and Young's bound, as used by \citet{aronow2017},
+covers pairs of people who never appear together in a pair of strata. If any
+stratum in a panel holds fewer than $\StratumMinN$ people, the code merges $\Sb$
+into $\Sc$ for that panel. We call the interval $\Jtwo$.
+
+Foil~2 is the analyst who takes interference seriously but answers a different
+question. Its target is $\dspill$, not $\theta_2$, and its interval is compared
+only with $\Theta_{\expset}$, the image of $\dspill$. The H\'ajek mean targets an
+inverse-probability-weighted exposure contrast, while $\dspill$ averages the
+realized contrasts without weights; on this run the two are close enough that no
+containment flag depends on the difference (Appendix~\ref{app:foil2}). Foil~2 is
+the only analyst with a pre-registered calibration check of its interval, also in
+Appendix~\ref{app:foil2}.
+
+\subsection{A1: exposure transport}\label{sec:a1}
+
+A1 uses the same pilot panel, the same strata, the same cut and the same merge
+rule as Foil~2, and the same H\'ajek means with exact first-order probabilities.
+It estimates Equation~\eqref{eq:transport},
+\begin{equation}\label{eq:a1}
+  \widehat\theta_2^{\,\mathrm{A1}}
+  =\sum_{S\neq\Sa} w_S\bigl(\widehat\mu_S-\widehat\mu_{\Sa}\bigr),
+  \qquad w_S=\frac{n_S(\dtwo)}{N},
+\end{equation}
+where $n_S(\dtwo)$ is the number of people in stratum $S$ under the policy vector.
+When a panel is merged, the shares use the merged strata. The estimate is a fixed
+linear combination of H\'ajek means with coefficients $a_S$, so its variance is
+the same linearized covariance summed over all pairs of strata,
+$\sum_S\sum_{S'}a_S a_{S'}\,\widehat{\Cov}(\widehat\mu_S,\widehat\mu_{S'})$, with
+joint probabilities from the same simulated assignments.
+
+A1 maintains the exposure map and transport. It allows interference, but only
+the part that runs through the share of seeded neighbors, and it applies the
+pilot's exposure-specific outcomes to the people who would hold those exposures
+under the policy.
+
+\subsection{A2: degree-binned transport}\label{sec:a2}
+
+A2 splits the village into two bins fixed by the graph: $H$, the $K$ people whom
+$\dtwo$ seeds, and $L$, everyone else. Under $\dtwo$ every person in $H$ is in
+$\Sone$, so
+\begin{equation}\label{eq:a2}
+  \widehat\theta_2^{\,\mathrm{A2}}
+  =\frac{K}{N}\bigl(\widehat\mu_{\Sone,H}-\widehat\mu_{\Sa,H}\bigr)
+   +\sum_{S\neq\Sa}\frac{n_{S,L}(\dtwo)}{N}\bigl(\widehat\mu_{S,L}-\widehat\mu_{\Sa,L}\bigr),
+\end{equation}
+where $\widehat\mu_{S,B}$ is the H\'ajek mean of stratum $S$ within bin $B$. The
+variance uses the same machinery, with each cell's indicators restricted to its
+bin. A2 never merges across bins and never borrows a control mean from the other
+bin. If a cell that Equation~\eqref{eq:a2} needs is empty in a panel, A2 is
+undefined for that panel; the code counts that case and never imputes it.
+
+A2 is the weakest rung of the ladder. The hub term compares the hubs with
+themselves, so it needs the exposure map but no transport across people. The
+remaining terms transport only within $L$. The price is precision: the hubs have
+many neighbors, so in the pilot few of them have no seeded neighbor, and the cells
+that A2 needs are thinner than those of A1.
+
+\subsection{What the ladder predicts, written in advance}\label{sec:expectations}
+
+Amendment A2 of the pre-registration wrote five expectations before any A2
+number existed. At every diagnostic point:
+(a)~the absolute bias falls from A0 to A1 to A2;
+(b)~the sampling SD and the interval width rise from A0 to A1 to A2;
+(c)~A0's coverage is far below nominal, and A2's is the closest to nominal of the
+three;
+(d)~A1 and A2 stay biased downward, because two-hop spillover raises the people
+in $\Sa$ above the true status-quo level;
+(e)~every interval is narrower than $\Theta_{\hm}$.
+Any of them could fail, and a failure is reported as found.
+Section~\ref{sec:a2results} checks each one.

@@ -1,0 +1,43 @@
+%================================================================
+\section{Disclosures}\label{app:disclosures}
+
+\paragraph{The pre-registration and its amendments} The design is
+\texttt{docs/preregistration-v2.md}, frozen before any run of this version of the
+project. Two amendments were written later, and each says what was already known
+when it was written. Amendment A1, the sensitivity menu of
+Appendix~\ref{app:menu}, was written after the main results were known; it tests
+no hypothesis. Amendment A2, the analysts A1 and A2 and the repeated-panel exercise
+of Section~\ref{sec:a2results}, was written after the main and A1 results were
+known, including A0's gap decomposition and Foil~2's calibration check, and before
+any A2 code or number existed. Its five expectations were written then and are
+reported as found. A later erratum to A2 changed wording only: the pilot realizes
+the policy vector with a positive and negligible probability, where the first
+wording had said that it never does.
+
+\paragraph{Post hoc choices in the main design} The rescaling of A0's coefficient
+by $K/N$ was adopted after the frozen numbers were inspected; its justification is
+the aggregation identity under no interference. An earlier version of Foil~2 used a
+first-order variance that dropped the covariance between strata; commit
+\texttt{36ed3e6} replaced it with the Aronow--Samii variance, and no coverage
+number from the earlier version is cited. The analysts' panel is also one of the
+replications that define the targets (Section~\ref{sec:limits}).
+
+\paragraph{Independent checks} The project's rule is that every statistical claim
+is checked by a reviewer running on a model family different from the one that
+produced it. The reviews are in \texttt{reviews/}. The wording of the A1 and A2 results in
+Section~\ref{sec:a2results} follows the required wording of the review of
+amendment A2 (\texttt{reviews/a2-code.md}).
+
+\paragraph{Use of AI assistance (DRAFT for the author to edit)}
+% DRAFT: owner decision. Augusto edits this statement before any circulation.
+\textit{[Draft.]} The author designed the project, chose the questions, the model,
+the targets and the evaluation, and approved every design decision and amendment.
+AI assistants were used extensively under the author's direction: to write and test
+the simulation code, to run the pipeline, to draft and edit the text of this paper,
+and to review code, statistics and text. The producing and reviewing roles were
+assigned to models from different families (Anthropic Claude, OpenAI models through
+Codex, xAI Grok, Google Gemini and DeepSeek), and each review is committed in the
+repository. Every number in the paper is generated from the committed results by a
+script, and the full pipeline replicates with one command. \textit{[The author to
+state here what he reviewed personally, and to confirm the statement against the
+Arizona State University guidance on AI use before the paper is circulated.]}

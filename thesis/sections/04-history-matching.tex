@@ -1,0 +1,108 @@
+%================================================================
+\section{History matching and the image}\label{sec:hm}
+
+\subsection{Ruling points out}
+
+History matching asks which parameter points the targets cannot rule out. Let
+$\widehat M(c)$ be the simulated moments at $c$. The implausibility of $c$ is
+\begin{equation}\label{eq:implaus}
+  I(c)
+  \;=\;
+  \bigl(z-\widehat M(c)\bigr)^{\!\top}
+  V(c)^{-1}
+  \bigl(z-\widehat M(c)\bigr),
+  \qquad
+  V(c)=\mathrm{diag}\bigl(\sigma^2_z+\sigma^2_{\mathrm{MC}}(c)+\delta^{\circ 2}\bigr),
+\end{equation}
+a variance-weighted sum of squared gaps between targets and simulated moments.
+The three terms of $V$ are the Monte Carlo variance of the targets, the Monte
+Carlo variance of the candidate's moments, and a fixed discrepancy $\delta$, the
+allowance for a model that does not match the world exactly
+\citep{kennedy2001,vernon2010}. In this planted exercise $\delta$ is a design
+tolerance rather than an estimated model-error variance:
+$\delta=(\DeltaOne,\,\DeltaTwo,\,\DeltaThree,\,\DeltaFour)$ in the order of
+Table~\ref{tab:moments}, that is, $\DeltaOne$ for the two levels and $\DeltaTwo$
+for the two correlations. A point is kept if $I(c)\le\tau$, where $\tau=\Tau$ is
+the $\Confidence$ quantile of a $\chi^2$ distribution with $\NMoments$ degrees of
+freedom.
+
+The threshold is a rule for ruling out. It is not the critical value of a test,
+and it does not define a credible region: the two level moments share a state
+stream, $V$ is diagonal, and $\delta^2$ rather than sampling noise fills most of
+$V$. Moving $\tau$ or $\delta$ after seeing which points survive would turn a
+filter into a fit, so both are fixed before any run. Appendix~\ref{app:menu}
+reports, as a disclosed sensitivity analysis, how the image changes when the level
+tolerance is tightened.
+
+The search uses no emulator; every point is simulated. Wave~1 is a Latin
+hypercube of $\WavePoints$ points in $C$. Waves~2 and~3 each draw $\WavePoints$
+new points in the bounding box of the points kept by the previous wave, widened
+by $\BoxInflationPct\%$ of its span and clipped to $C$. In the code, NROY is a
+finite set: the union over the three waves of the sampled points with
+$I(c)\le\tau$. It approximates the level set $\{c\in C:I(c)\le\tau\}$ without
+enumerating it. Membership means that the targets cannot rule a point out. It
+does not mean the point is true, and NROY is not a posterior over $c$. An empty
+NROY would be a finding: the pair of kernel and targets would be rejected.
+
+\subsection{The image}
+
+The object we report is the image of the policy effect over the kept points.
+Let $\mathcal S$ be a declared uniform sample of $\ThetaSample$ NROY points. The
+code reports
+\begin{equation}\label{eq:image}
+  \Theta_{\hm}=\bigl[\min_{c\in\mathcal S}\theta_2(c),\;\max_{c\in\mathcal S}\theta_2(c)\bigr],
+  \qquad
+  \Theta_{\expset}=\bigl[\min_{c\in\mathcal S}\dspill(c),\;\max_{c\in\mathcal S}\dspill(c)\bigr],
+\end{equation}
+where $\dspill$ is the spillover contrast defined with Foil~2 in
+Section~\ref{sec:foil2}. Each image is the range over the sample, the declared
+empirical image. It is a set, not a distribution: the range says which values the
+targets leave open and says nothing about how likely each one is.
+
+The endpoints are extrema of noisy estimates, so the code evaluates each endpoint
+candidate again on fresh replications (Appendix~\ref{app:recheck}).
+
+\subsection{The diagnostic points}
+
+The analysts of Section~\ref{sec:analysts} work at three diagnostic points, which
+we write $c_0$. Two belong to the calibrator, who fits the model and works at one
+best-fitting point: the \emph{min-I point}, the NROY point with the smallest
+implausibility, and the \emph{median-I point}, the point at the middle of NROY in
+the order of $I$. Both are selected by $I$ alone, never by $\theta_2$. The third
+is $\cstar$ itself, the real village, which belongs to the field experimenter.
+We use three points rather than all $\ThetaSample$: running an analyst at every
+kept point would hand her the calibration set, and default practice does not do
+that.
+
+Figure~\ref{fig:pipe} summarizes the order of operations. Every exogenous
+quantity is fixed before any wave runs. If $\theta_2$ decided which points to
+keep, the image would be a fit rather than a report.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[ecn, node distance=6mm and 6mm]
+  \node[ecn box, text width=120mm] (freeze)
+    {1~~fix the kernel, $C$, the targets $z$, $\delta$, $\tau$, the estimands and the rule for the points $c_0$};
+  \node[ecn box, text width=120mm, below=of freeze] (hm)
+    {2~~history matching: $I(c)\le\tau$ over three waves $\;\to\;$ NROY\\[0.15em]
+     {\scriptsize not a posterior; an empty NROY is a finding}};
+  \node[ecn box, text width=56mm, below=of hm, xshift=-32mm] (A)
+    {\textbf{3~~image}\\[0.15em]
+     $\Theta_{\hm}$ and $\Theta_{\expset}$ over $\ThetaSample$ sampled NROY points;
+     endpoint recheck};
+  \node[ecn box, text width=56mm, below=of hm, xshift=32mm] (B)
+    {\textbf{4~~analysts}\\[0.15em]
+     one panel at $c_0\in\{$min-I, median-I, $\cstar\}$;
+     $\TradeoffR$ fresh panels for A0--A2};
+  \node[ecn mark, text width=120mm, below=11mm of hm |- A.south] (ov)
+    {each interval against the truth at $c_0$, the truth at $\cstar$, and its own image};
+  \draw[ecn arrow] (freeze) -- (hm);
+  \draw[ecn arrow] (hm.south) -- ++(0,-0.25) -| (A.north);
+  \draw[ecn arrow] (hm.south) -- ++(0,-0.25) -| (B.north);
+  \draw[ecn arrow] (A.south) -- ++(0,-0.3) -| (ov.north);
+  \draw[ecn arrow] (B.south) -- ++(0,-0.3) -| (ov.north);
+\end{tikzpicture}
+\caption{Order of operations. The image and the analysts are two separate reports;
+the evaluation compares them and never merges them into one object.}
+\label{fig:pipe}
+\end{figure}

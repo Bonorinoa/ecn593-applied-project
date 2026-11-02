@@ -1,0 +1,146 @@
+%================================================================
+\section{The estimand}\label{sec:estimand}
+
+\subsection{Policies are assignment vectors}
+
+The village has $N=\NAgents$ people, a fixed undirected graph with adjacency
+matrix $A$, and covariates $X$. An assignment is a vector
+$\dvec\in\{0,1\}^N$, where $d_i=1$ means that person $i$ is seeded. A policy is a
+rule that produces an assignment. We use three:
+\begin{itemize}
+  \item $\pi_0$, the status quo, seeds no one: $\dvec=\dzero$.
+  \item $\pi_1$, the pilot, seeds $K=\KSeeded$ people drawn uniformly at random
+        without replacement, so $K/N=\SeedShare$.
+  \item $\pi_2$, the policy to predict, seeds the $K$ people with the highest
+        degree, with ties broken toward the lower index. Given the graph it is a
+        single fixed vector, which we write $\dtwo$.
+\end{itemize}
+
+A parameter point $c$ indexes a complete data-generating process: for each $c$,
+each draw $\omega$ of the simulation noise, and each assignment $\dvec$, the
+kernel returns the outcomes of everyone at the horizon $T$
+(Section~\ref{sec:model}). Under interference, the outcome of person $i$ depends
+on the whole vector, $Y_{iT}=Y_{iT}(\dvec)$, so the effect of seeding person $i$
+alone is not defined until the assignment of everyone else is named. The
+well-defined object is a contrast of policies,
+\begin{equation}\label{eq:theta}
+  \theta(\pi,\pi';c)
+  \;=\;
+  \mathbb{E}_c\!\left[\bar Y_T(\pi)\right]
+  \;-\;
+  \mathbb{E}_c\!\left[\bar Y_T(\pi')\right],
+\end{equation}
+where $\bar Y_T$ is the mean outcome over people and the expectation is over the
+simulation noise and, for $\pi_1$, over the random assignment. This is an overall
+effect of one assignment rule against another in the sense of
+\citet{halloran1995} and \citet{hudgens2008}. The code defines three such
+contrasts:
+\begin{align}
+  \theta_1(c) &= \theta(\pi_1,\pi_0;c), \label{eq:theta1}\\
+  \theta_2(c) &= \theta(\pi_2,\pi_0;c)
+     = \mathbb{E}_c\bigl[\bar Y_T(\dtwo)\bigr]-\mathbb{E}_c\bigl[\bar Y_T(\dzero)\bigr],
+     \label{eq:theta2}\\
+  \prem(c) &= \theta_2(c)-\theta_1(c). \label{eq:premium}
+\end{align}
+The headline estimand is $\theta_2$, the effect of seeding the hubs against no
+campaign, and $\prem$ is the premium of targeting over random seeding. In the
+code each expectation is a mean over $\RepsEstimand$ paired replications: rep $r$
+of every arm shares one state stream (the starting state and every shock), so the
+contrasts between arms carry little Monte Carlo noise. The estimands are defined
+on the terminal mean $\bar Y_T$.
+
+Equation~\eqref{eq:theta2} makes the main point of this section. The headline
+estimand compares two specific vectors, $\dtwo$ and $\dzero$. It is a property of
+those two vectors, of the graph and of the kernel at $c$. Any data that never
+contain $\dtwo$ can speak to it only through assumptions that connect what they
+do contain to what $\dtwo$ would produce.
+
+\subsection{What a randomized pilot reveals}
+
+A pilot draws one assignment from $\pi_1$. Under that design every vector with
+exactly $K$ ones has the same probability, so the pilot realizes the policy vector
+with probability
+\begin{equation}
+  \Pr_{\pi_1}\!\bigl(\dvec=\dtwo\bigr)=\binom{N}{K}^{-1}
+  =\binom{\NAgents}{\KSeeded}^{-1}.
+\end{equation}
+That probability is positive and negligible. The pilot realizes the policy with
+negligible probability; in practice it never does, and positivity holds for the
+policy vector only in this negligible sense. In practice, therefore, an estimate
+of $\theta_2$ from the pilot needs an exposure map and transport.
+
+What the pilot does reveal is $\theta_1$, the effect of the pilot's own design.
+The difference between the mean outcome in the pilot and the mean outcome in the
+status quo estimates $\theta_1$ without further assumptions. In the planted
+exercise this holds exactly by construction: the pilot and status-quo targets
+share their state streams, so their difference at $\cstar$ equals
+$\theta_1(\cstar)$ (Section~\ref{sec:targets}). The question is whether, and
+under which assumptions, one can go from the pilot to $\theta_2$.
+
+\subsection{What an estimate from the pilot must assume}\label{sec:assumptions}
+
+The standard route goes through exposures \citep{aronow2017,leung2020}. Let
+$k_i=\max(\sum_j A_{ij},1)$ and let $s_i(\dvec)=\sum_j A_{ij}d_j/k_i$ be the
+share of $i$'s neighbors who are seeded. The code uses four exposure strata,
+\begin{align*}
+  \Sone &= \{i: d_i=1\}, &
+  \Sa &= \{i: d_i=0,\ s_i=0\}, \\
+  \Sb &= \{i: d_i=0,\ 0<s_i<\ShareCut\}, &
+  \Sc &= \{i: d_i=0,\ s_i\ge \ShareCut\},
+\end{align*}
+and we write $\Strata=\{\Sone,\Sa,\Sb,\Sc\}$ and $e_i(\dvec)\in\Strata$ for the
+stratum of person $i$ under $\dvec$. Two assumptions take the pilot to
+$\theta_2$.
+
+\begin{assumption}[Exposure map]\label{ass:exposure}
+The expected outcome of each person depends on the assignment only through the
+person's stratum: $\mathbb{E}_c[Y_{iT}(\dvec)]=\mathbb{E}_c[Y_{iT}(\dvec')]$
+whenever $e_i(\dvec)=e_i(\dvec')$.
+\end{assumption}
+
+Let $\mu_S$ be the exposure-$S$ mean outcome that the pilot measures: the
+inverse-probability-weighted (H\'ajek) mean over the people who land in $S$, each
+weighted by the inverse of the probability that the pilot's lottery puts them
+there \citep{horvitz1952,aronow2017}.
+
+\begin{assumption}[Transport]\label{ass:transport}
+For each stratum $S$, the exposure-specific outcome $\mu_S$ measured on the
+pilot's people applies to the people who would hold exposure $S$ under $\dtwo$.
+\end{assumption}
+
+Under the status quo nobody is seeded, so everyone is in $\Sa$. Every person can
+land in $\Sa$ under the pilot, so under Assumption~\ref{ass:exposure} the mean
+$\mu_{\Sa}$ is the status-quo mean of the whole village. Under the policy, a known
+share $w_S=n_S(\dtwo)/N$ of the village holds exposure $S$; the analyst knows the
+graph, so the shares are known constants that sum to one. Under both assumptions,
+\begin{equation}\label{eq:transport}
+  \theta_2(c)
+  \;=\;\sum_{S\in\Strata} w_S\,\mu_S-\mu_{\Sa}
+  \;=\;\sum_{S\neq \Sa} w_S\,\bigl(\mu_S-\mu_{\Sa}\bigr).
+\end{equation}
+Every term on the right can be estimated from the pilot, because the pilot's
+lottery is known and the probability that each person lands in each stratum can
+be computed before any outcome is seen. Equation~\eqref{eq:transport} is the
+target of the analyst A1 in Section~\ref{sec:analysts}.
+
+Neither assumption holds exactly in this village, and the paper does not pretend
+that it does. The kernel's peer term uses neighbors' lagged outcomes, so the
+effect of a seed travels beyond its own neighbors; a person in $\Sa$ in the pilot
+can still be lifted by a seed two steps away. The exposure map therefore misses
+part of the interference. Transport fails in a second way: under $\dtwo$ the
+seeded people are the hubs, while under the pilot they are a random draw, and
+hubs need not respond like a random draw. The analyst A2 relaxes this second
+failure by splitting the village into the hubs and everyone else and transporting
+only within each part; for the hubs, its term compares the hubs' own seeded and
+unexposed outcomes in the pilot. Neither analyst identifies $\theta_2$ from the
+pilot.
+Without assumptions on how outcomes respond to the assignments of others, the
+data from one randomized design bound the effects of other assignment rules only
+loosely \citep{manski2013}. The analysts below differ in which assumptions they
+add, and Section~\ref{sec:results} measures what each assumption costs and buys.
+
+The analyst who assumes no interference at all (A0 below) avoids the exposure map
+and transport, but only by assuming that a person's outcome depends on her own
+seeding alone \citep{rubin1980}. Under that assumption, $\theta_2$ equals the
+seeded share times the effect of own seeding. Under interference it does not, and
+the gap between the two is measurable here (Appendix~\ref{app:gap}).

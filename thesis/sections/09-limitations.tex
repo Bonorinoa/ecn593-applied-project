@@ -1,0 +1,61 @@
+%================================================================
+\section{What the procedure is not, and its limits}\label{sec:limits}
+
+The procedure is easy to over-read, so we list what it does not claim.
+
+\paragraph{It is not a posterior or a confidence set} NROY rules points out; it
+does not weight the points that remain, and $\Theta_{\hm}$ is a range, not a
+distribution of effects. The threshold $\tau$ is the $\Confidence$ quantile of a
+$\chi^2_{\NMoments}$ distribution, but $V$ is diagonal while the two level moments
+share a state stream, and the discrepancy $\delta$ rather than sampling noise
+fills most of $V$. So $\tau$ is a tolerance, not a test level, and the image
+carries no coverage guarantee. Approaches that do weight the parameter space, such
+as Bayesian calibration with an explicit discrepancy term \citep{kennedy2001},
+answer a different question.
+
+\paragraph{It is not a coverage claim for the one-panel intervals} The two flags
+describe one draw. The only coverage evidence is the Foil~2 calibration check
+(Appendix~\ref{app:foil2}) and the repeated panels of Section~\ref{sec:a2results},
+where the A1 and A2 rates reflect conservative intervals rather than calibration.
+
+\paragraph{It does not make A1 or A2 correct} A1 and A2 are biased downward at
+every point; transport shrinks the bias and does not remove it. Neither identifies
+$\theta_2$ from the pilot, and their intervals target $\theta_2$ under assumptions
+that the kernel does not satisfy exactly. They do not estimate the same functional
+as A0, which equals $\theta_2$ only under no interference.
+
+\paragraph{It is not a criticism of standard practice} A regression with robust
+standard errors quantifies uncertainty within one panel under the analyst's stated
+assumptions, and it does that well. An exposure-mapping estimator does the same
+under its own assumptions \citep{aronow2017,leung2020}, and recent work studies
+what such estimators recover when the map is wrong \citep{savje2021} and how to
+test hypotheses about interference directly \citep{athey2018}. The overlay asks a
+different question: whether one parameter point, or one world, is enough for a
+policy report. The failures we document come from applying a one-world tool to a
+question about the set of worlds the targets cannot rule out.
+
+\paragraph{The analysts' panel overlaps the targets} The analysts' one panel is
+stream offset $0$, which is also one of the $\RepsZ$ replications whose mean
+defines $z$. The analysts therefore see data that helped set the targets, with a
+weight of $1/\RepsZ$. We did not rerun the pipeline without it, and we have not
+listed the rejected wave points just above $\tau$, which a small shift in $z$
+could move into NROY.
+
+\paragraph{It is one planted village} The project has one graph, one planted point
+and one set of targets, and the targets are the simulator's own output. It makes
+no claim about any real campaign and claims no external validity. With external
+targets, $\delta$ becomes the allowance for a model that is not the world and must
+be defended; the targets would also need a stated population and a model of how
+they transport to the village of interest.
+
+\paragraph{Who might use it} The composition is useful to anyone who reports a
+policy number from a calibrated agent-based, structural or microsimulation model.
+The one-point Monte Carlo error bar is a statement about one world. The image is a
+statement about the worlds the targets cannot rule out, and its width is measured
+rather than assumed. An empty NROY is also a usable result: it rejects the pair of
+kernel and targets for the declared design. Where interference matters and the
+data come from a randomized pilot, the ladder of Section~\ref{sec:analysts} makes
+explicit what each step from the pilot to the policy assumes, and the planted
+setting makes its cost visible. A design-based answer that relies on fewer of
+these assumptions needs randomization at the level of the policy itself, for
+instance across villages \citep{hudgens2008,baird2018}.

@@ -1,0 +1,75 @@
+%================================================================
+\section{The sensitivity menu for the level tolerance}\label{app:menu}
+
+\emph{This analysis was decided after the main results were known.} Amendment A1
+of the pre-registration was written once the main run had reported
+$\Theta_{\hm}$ and the spread ratios, and once the allowance
+$\sqrt{\tau\delta_1^2}$ had been set beside $\theta_1(\cstar)$. It tests no
+hypothesis and is never used to choose $\delta$.
+
+The menu sets the discrepancy of the two level moments to $\MenuDeltaMainLevel$
+(Main), $\MenuDeltaHalfLevel$ (Half) or $\MenuDeltaQuarterLevel$ (Quarter). The two
+correlation moments keep $\delta=\DeltaTwo$. For each entry the code reruns the
+waves with the same seed, NROY, the $\ThetaSample$-point image sample and the
+spread ratios; $\tau$, $C$, the targets and every seed are unchanged. The Main
+entry reproduces the main run exactly, and the script stops with an error if it
+does not. The analysts are not rerun at the calibrator's points, because those
+points move with $\delta$; the field experimenter's intervals at $\cstar$ do not
+depend on $\delta$, so they are only classified against each entry's images.
+
+\begin{table}[ht]
+\centering
+\caption{The image under three level tolerances (amendment A1).}
+\label{tab:menu}
+\begin{zebratabular}{lcccc}
+\toprule
+\colhead{Entry} & \colhead{$\delta_1$} & \colhead{$|\NROY|$} & \colhead{$\Theta_{\hm}$} & \colhead{$\Theta_{\expset}$} \\
+\midrule
+Main & $\MenuDeltaMainLevel$ & $\MenuDeltaMainNNroy$ & $[\MenuDeltaMainThetaHmLo,\,\MenuDeltaMainThetaHmHi]$ & $[\MenuDeltaMainThetaExpLo,\,\MenuDeltaMainThetaExpHi]$ \\
+Half & $\MenuDeltaHalfLevel$ & $\MenuDeltaHalfNNroy$ & $[\MenuDeltaHalfThetaHmLo,\,\MenuDeltaHalfThetaHmHi]$ & $[\MenuDeltaHalfThetaExpLo,\,\MenuDeltaHalfThetaExpHi]$ \\
+Quarter & $\MenuDeltaQuarterLevel$ & $\MenuDeltaQuarterNNroy$ & $[\MenuDeltaQuarterThetaHmLo,\,\MenuDeltaQuarterThetaHmHi]$ & $[\MenuDeltaQuarterThetaExpLo,\,\MenuDeltaQuarterThetaExpHi]$ \\
+\bottomrule
+\end{zebratabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Spread ratios, the history-matching finding, and the field experimenter's
+verdicts at $\cstar$ under the same entries.}
+\label{tab:menu2}
+\begin{zebratabular}{lcccccc}
+\toprule
+\colhead{Entry} & \colhead{$\alpha$} & \colhead{$\kappa$} & \colhead{$\gamma$} & \colhead{Finding} & \colhead{A0 at $\cstar$} & \colhead{Foil 2 at $\cstar$} \\
+\midrule
+Main & $\MenuDeltaMainSpreadRatioAlpha$ & $\MenuDeltaMainSpreadRatioKappa$ & $\MenuDeltaMainSpreadRatioGamma$ & \MenuDeltaMainFinding & \MenuDeltaMainFoilOneVerdict & \MenuDeltaMainFoilTwoVerdict \\
+Half & $\MenuDeltaHalfSpreadRatioAlpha$ & $\MenuDeltaHalfSpreadRatioKappa$ & $\MenuDeltaHalfSpreadRatioGamma$ & \MenuDeltaHalfFinding & \MenuDeltaHalfFoilOneVerdict & \MenuDeltaHalfFoilTwoVerdict \\
+Quarter & $\MenuDeltaQuarterSpreadRatioAlpha$ & $\MenuDeltaQuarterSpreadRatioKappa$ & $\MenuDeltaQuarterSpreadRatioGamma$ & \MenuDeltaQuarterFinding & \MenuDeltaQuarterFoilOneVerdict & \MenuDeltaQuarterFoilTwoVerdict \\
+\bottomrule
+\end{zebratabular}
+\tablenote{Finding is \texttt{finding\_hm}: ``none'' means neither F-EMPTY nor
+F-SINGLETON. The verdicts at $\cstar$ are reported for completeness and are not a
+test of the field experimenter's estimators.}
+\end{table}
+
+The tolerance matters most for $\kappa$ and $\alpha$. The kept set shrinks as
+$\delta_1$ falls, and at Quarter both images are narrower than at Main. The spread
+ratio for $\kappa$ falls to $\MenuDeltaQuarterSpreadRatioKappa$ and the one for
+$\alpha$ to $\MenuDeltaQuarterSpreadRatioAlpha$, which fits the reading that the
+level allowance is what leaves $\kappa$ open. The ratio for $\gamma$ stays near one
+($\MenuDeltaQuarterSpreadRatioGamma$ at Quarter), but the menu leaves the
+correlation tolerance alone, so it says nothing new about $\gamma$. The entries are
+not nested: the upper end of both images at Half sits above the one at Main,
+because each image is the range over a sample from a different finite NROY set,
+with the waves redrawn. We do not read small moves of an endpoint as a trend. The
+clear change is at Quarter, where the lower end of $\Theta_{\expset}$ is above zero
+($\MenuDeltaQuarterThetaExpLo$); under Main and Half the sign of the spillover is
+open. No entry returns F-EMPTY or F-SINGLETON. The verdicts at $\cstar$ do not
+move, and a smaller $\delta_1$ does not give Foil~2 a verdict at $\cstar$ even at
+Quarter.
+
+This menu is the reporting rule of \citet{tamer2010} applied to $\delta$: a set
+under each of several assumptions, instead of one answer. In this planted exercise
+the targets are the simulator's own output, so the smaller tolerances are not an
+unfounded claim here. With external targets they would have to be defended. We
+adopt none of the entries; the paper's results stay at Main.
+

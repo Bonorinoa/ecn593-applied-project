@@ -1,0 +1,113 @@
+%================================================================
+\section{Introduction}\label{sec:intro}
+
+A planner wants to know what a campaign would do to preventive behavior in a
+village if it seeded the \KSeeded{} best-connected people, compared with no
+campaign at all. Seeding the people with the most contacts is a common proposal
+for network interventions, and field work has studied both its promise and its
+limits \citep{banerjee2013,kim2015}. Before the campaign, the planner can see the
+village as it is, and she may be able to run one randomized pilot. She cannot see
+the policy itself. A common way to answer the question is to build a simulator of
+the village, calibrate it to observable moments, and run the policy inside the
+simulator \citep{kydland1996}. The answer is then one number: the policy effect
+at the calibrated parameter point, perhaps with a Monte Carlo error bar.
+
+That number can mislead for a reason that has little to do with the simulator's
+quality. Calibration chooses one parameter point, but the targets rarely pin one
+down. Many points can match the same moments about equally well, a fact that
+simulation modellers call equifinality \citep{beven2006} and that economists have
+long raised about calibration \citep{hansen1996}. If those points imply different
+policy effects, the single number carries an extra, unstated assumption: that the
+chosen point is the world. History matching takes the opposite stance. It rules
+out the parameter points that the targets reject and keeps the rest, the
+not-ruled-out-yet (NROY) set \citep{craig1997,vernon2010,andrianakis2015}. The
+natural report is then the \emph{image} of the policy effect over that set. This
+is the reporting logic of partial identification \citep{manski2003,tamer2010}:
+when the maintained assumptions leave a set of answers, report the set rather
+than a convenient point.
+
+The policy question has a second difficulty. People in a village influence each
+other, so the outcome of one person depends on who else is seeded. The policy
+effect is then a contrast of two whole assignment vectors, the one that seeds the
+hubs and the one that seeds no one \citep{halloran1995,hudgens2008,manski2013}.
+A randomized pilot seeds people at random. It realizes the hub-seeding vector only
+with negligible probability, so an estimate of the policy effect from the pilot
+needs two further assumptions: an exposure map, under which a person's outcome
+depends on the assignment only through a low-dimensional summary, and transport,
+under which the outcomes measured on the pilot's people apply to the people who
+would hold the same exposures under the policy. An analyst who ignores
+interference avoids both assumptions only by making a stronger one.
+
+This paper puts the two difficulties side by side in a setting where the truth is
+known. The village is an agent-based model with \NAgents{} people on a fixed
+random graph. The targets are planted: they are the model's own moments at a
+chosen point $\cstar$, the real village of the exercise. They are what a
+researcher could observe, the status quo and one randomized pilot; the policy to
+predict is never a target. History matching keeps the points that the targets
+cannot rule out, and we report the image of the policy effect over a declared
+sample of them. We then hand one panel to several analysts, each with an interval
+for the policy effect (or, in one case, for a spillover contrast), and we grade
+each interval in two separate ways: whether it contains the truth, and how it sits
+against the image. The analysts form a ladder of assumptions. The first assumes
+no interference. Two more allow for interference through an exposure map and
+transport from the pilot, the second of them without borrowing control outcomes
+across a split of the village into hubs and everyone else. They work for two
+kinds of researcher: a field experimenter who has one panel from the real village,
+and a calibrator who works at one best-fitting point of the model.
+
+The contribution can be stated in three sentences. First, we write the policy
+effect under interference as a contrast of two assignment vectors and make
+explicit what an estimate of it from a randomized pilot must assume. Second, we
+report the image of that effect over the parameter points that observable targets
+do not rule out, and we grade one-panel intervals against both the truth and the
+image, keeping containment and interval geometry apart. Third, we measure over
+repeated panels what an analyst gains and loses by allowing for interference:
+less bias, more spread, and intervals that are conservative relative to their
+sampling distribution.
+
+% PROPOSED HEADLINE: owner decision
+\begin{statusbox}[Proposed headline (owner decision)]
+In the one panel at the real village, the analyst who assumes no interference
+reports a tight interval that misses the policy effect. At the calibrator's two
+best-fitting points, the same analyst's interval misses again and is
+overconfident: it lies
+strictly inside the range of effects that the targets leave open. Over repeated
+panels, analysts who allow for interference through an exposure map and transport
+from the pilot reduce the absolute bias at every point, at the price of a larger
+sampling spread and intervals that are conservative relative to it; in the one
+panel at the calibrator's
+points, their intervals contain the effect at her point and still lie strictly
+inside that range.
+Report the image, and read any one-point interval against it.
+\end{statusbox}
+% END PROPOSED HEADLINE
+
+Two words in the headline carry precise meanings, and we keep them apart
+throughout. An interval \emph{misses} when it does not contain the true value at
+the point in question; this is a statement about one realized panel and one
+world. An interval is \emph{overconfident}, in the sense of the verdict
+F-OVERCONF (Section~\ref{sec:geometry}), when it lies strictly inside the image:
+it is narrower than the set of effects that the targets leave open. An interval
+can contain the truth and still be overconfident, and it can miss the truth
+without being overconfident. We apply the charge of overconfidence only to the
+calibrator, who adds the assumption that her point is the world. The field
+experimenter works with the real village's panel; we report how her interval sits
+against the image, but that comparison is not a test of her estimator.
+
+None of the pieces is new. History matching, partial identification, exposure
+mappings and robust standard errors are all standard, and the paper treats each
+of them as a well-built tool for the question it was designed to answer. What we
+add is their composition around one named policy contrast, in a planted setting
+that lets every interval be checked. The numbers are the simulator's own, so the
+paper is a methods illustration with no claim about any real campaign.
+
+Section~\ref{sec:estimand} defines the estimand and states what the pilot can and
+cannot reveal about it. Section~\ref{sec:model} describes the village and the
+targets, and Section~\ref{sec:hm} describes history matching and the image.
+Section~\ref{sec:analysts} sets out the ladder of analysts, and
+Section~\ref{sec:evaluation} the evaluation. Section~\ref{sec:results} reports the
+results, Section~\ref{sec:pi} relates the procedure to partial identification,
+Section~\ref{sec:limits} lists what the procedure is not, and
+Section~\ref{sec:conclusion} concludes. The appendix holds the model details,
+the checks behind each analyst, the sensitivity menu, replication and the
+disclosures.

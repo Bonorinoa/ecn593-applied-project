@@ -1,0 +1,35 @@
+%================================================================
+\section{The endpoint recheck}\label{app:recheck}
+
+Each image endpoint is an extremum of $\ThetaSample$ noisy estimates, so the
+standard error attached to the extremizing point is not a standard error for the
+endpoint: it ignores the selection of the extremum. The code evaluates each
+endpoint candidate again with $\RepsEstimand$ fresh replications on separate
+streams (Table~\ref{tab:recheck}).
+
+\begin{table}[ht]
+\centering
+\caption{Independent recheck of the endpoint candidates. SE is the pointwise Monte
+Carlo standard error.}
+\label{tab:recheck}
+\begin{zebratabular}{lccc}
+\toprule
+\colhead{Endpoint} & \colhead{NROY index} & \colhead{Original (SE)} & \colhead{Fresh (SE)} \\
+\midrule
+$\Theta_{\hm}$ lower & $\RecheckHmLoIndex$ & $\RecheckHmLoPilot$ ($\RecheckHmLoPilotSE$) & $\RecheckHmLoFresh$ ($\RecheckHmLoFreshSE$) \\
+$\Theta_{\hm}$ upper & $\RecheckHmHiIndex$ & $\RecheckHmHiPilot$ ($\RecheckHmHiPilotSE$) & $\RecheckHmHiFresh$ ($\RecheckHmHiFreshSE$) \\
+$\Theta_{\expset}$ lower & $\RecheckExpLoIndex$ & $\RecheckExpLoPilot$ ($\RecheckExpLoPilotSE$) & $\RecheckExpLoFresh$ ($\RecheckExpLoFreshSE$) \\
+$\Theta_{\expset}$ upper & $\RecheckExpHiIndex$ & $\RecheckExpHiPilot$ ($\RecheckExpHiPilotSE$) & $\RecheckExpHiFresh$ ($\RecheckExpHiFreshSE$) \\
+\bottomrule
+\end{zebratabular}
+\end{table}
+
+Fresh re-evaluation removes the reuse-of-noise bias for the selected candidates.
+It is not simultaneous inference for the true extrema, and it says nothing about
+extrema that the sample missed. Does the endpoint noise change any verdict? For
+$\Theta_{\hm}$ the fresh values differ from the original ones only in the sixth
+decimal. For $\Theta_{\expset}$, put the fresh values in place of the original
+endpoints: the lower end of each calibrated Foil~2 interval is still above the
+lower endpoint, the upper end is still below the upper endpoint, and the $\cstar$
+interval still starts below the lower endpoint. None of the classifications
+changes. This is a comparison of printed numbers, not a field of the results.

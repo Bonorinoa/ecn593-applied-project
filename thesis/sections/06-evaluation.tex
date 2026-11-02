@@ -1,0 +1,91 @@
+%================================================================
+\section{Interval geometry and the evaluation}\label{sec:evaluation}
+
+\subsection{Two checks that answer different questions}\label{sec:geometry}
+
+Each interval is checked in two ways, and the two checks answer different
+questions. The first is \emph{containment}: does the interval contain the true
+value of its target? The code records two flags. The flag \texttt{covers\_truth}
+says whether the interval contains the truth at the point where the analyst works,
+$\theta_2(c_0)$ or $\dspill(c_0)$. The flag \texttt{covers\_planted\_truth} says
+whether it contains the truth at the real village, $\theta_2(\cstar)$ or
+$\dspill(\cstar)$. At $\cstar$ the two coincide. Both flags describe one realized
+panel. They are containment on one draw and are not estimates of
+repeated-sampling coverage.
+
+The second check is \emph{interval geometry}: how does the interval sit against
+the image of the same functional? Intervals and images are subsets of the real
+line, so a verdict is an inclusion. Let $J=[lo,hi]$ be an analyst's interval at
+one point, let $\Theta=[L,U]$ be the image of its own target, and write
+$\interior(\Theta)=(L,U)$. The function \texttt{classify\_interval} returns
+\begin{align}
+  \text{F-HONEST}
+  &\iff lo\le L\ \text{and}\ hi\ge U
+  \iff \Theta\subseteq J, \label{eq:honest}\\
+  \text{F-OVERCONF}
+  &\iff lo>L\ \text{and}\ hi<U
+  \iff J\subset\interior(\Theta), \label{eq:overconf}
+\end{align}
+and no verdict in every other case, including an interval that overlaps the image
+with neither inclusion. A0, A1 and A2 are compared with $\Theta_{\hm}$; Foil~2 is
+compared with $\Theta_{\expset}$.
+
+F-OVERCONF means that the interval is narrower than the set of values that the
+targets leave open. It does not mean that the interval misses the truth. An
+interval can contain the truth and be F-OVERCONF at the same time: it can be right
+about its own world and still understate how much the targets leave open.
+Conversely, an interval can miss the truth without being F-OVERCONF. We therefore
+never use ``overconfident'' to mean ``misses the truth,'' and we report the two
+checks side by side.
+
+\subsection{Two researchers, two layers}\label{sec:twoanalysts}
+
+The three diagnostic points serve two researchers who know different things.
+
+\paragraph{The field experimenter} She has one panel from the real village, the
+point $\cstar$, and she has calibrated nothing. Her question is whether her
+interval contains the truth there. We call this layer~(a): is the estimator right
+about its own world? The answer depends only on the identification conditions of
+her estimator. The code also places her interval against the image, and we report
+that comparison, but it is not a test of her estimator: she never used the model,
+so a verdict against the image does not charge her with anything.
+
+\paragraph{The calibrator} She fits the model to the targets and works at one
+best-fitting point, the min-I point or the median-I point. Her interval is checked
+three times. Layer~(a) asks whether it contains the truth at her own point. Layer~(b)
+asks whether it contains the truth at the real village; this adds the maintained
+assumption that her point is the world. The geometric verdict asks whether her
+interval is narrower than what the targets leave open. She is the analyst who
+replaces a set of not-ruled-out worlds with one of them, so the charge of
+overconfidence applies to her.
+
+\subsection{What the image maintains}
+
+The image is honest only relative to what it maintains: the kernel, the box $C$,
+the discrepancy $\delta$ and the targets with the threshold $\tau$. Change any of
+them and the image changes. There is also a sampling caveat. The image is a range
+over $\ThetaSample$ points drawn from a finite set of kept points, so it can
+understate the range over the full level set of $I$. A verdict of F-OVERCONF
+survives that error, because a larger image would still contain the interval
+strictly inside. A verdict of F-HONEST would not survive it.
+
+\subsection{Repeated panels for the three analysts of \texorpdfstring{$\theta_2$}{theta2}}\label{sec:repeated}
+
+The flags above describe one panel. For A0, A1 and A2, amendment A2 adds a
+repeated-sampling exercise at each diagnostic point: $R=\TradeoffR$ fresh panels
+on a block of stream offsets that starts at $\TradeoffOffsetBase$ and is disjoint
+from every other block in the project. Each panel redraws the simulation noise and,
+for A1 and A2, the pilot's assignment. For each analyst the code reports the mean
+estimate, the bias (mean minus $\theta_2(c_0)$), the standard deviation of the
+estimates across panels (the sampling SD), the root mean squared error, the mean
+reported standard error and its ratio to the sampling SD, the share of panels whose
+interval contains $\theta_2(c_0)$ with an exact Clopper--Pearson $95\%$ interval
+\citep{clopper1934}, the mean interval width, that width relative to the width of
+$\Theta_{\hm}$, and, for A2, the number of undefined panels.
+
+These quantities measure different things, and we keep them apart. The sampling
+SD is the dispersion of the estimator. The mean reported SE is what the analyst
+believes that dispersion to be, and the mean width is the interval she reports.
+The repeated-sampling containment rate is the only coverage statement in this
+part of the paper, and the truth it uses is $\theta_2(c_0)$, the truth at the
+point that generated the panels.

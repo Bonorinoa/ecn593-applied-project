@@ -1,0 +1,55 @@
+%================================================================
+\section{Relation to partial identification}\label{sec:pi}
+
+The image borrows the reporting logic of partial identification, and it is worth
+being precise about how far the analogy goes.
+
+\paragraph{A menu of answers indexed by assumptions} In the partial-identification
+tradition, an empirical question is answered by the set of values consistent with
+the data and a stated list of assumptions. Weaker assumptions give larger sets and
+more credible answers; stronger assumptions give smaller sets and less credible
+ones, the trade that \citet{manski2003} calls the law of decreasing credibility.
+\citet{tamer2010} describes the resulting practice as reporting a menu: one set
+for each set of assumptions a reader might accept, instead of one point under the
+strongest. This paper reports two such menus. The first is along the calibration
+axis. The image $\Theta_{\hm}$ is the set of policy effects under the kernel, the
+box, the targets, $\tau$ and $\delta$. Adding one more assumption, $c=c_0$,
+collapses it to the single value $\theta_2(c_0)$; that is what the calibrator does
+when she works at one point, and Table~\ref{tab:onepanel} shows the credibility
+cost at the median-I point. The sensitivity menu of Section~\ref{sec:menu} moves
+along the same axis by tightening $\delta$. The second menu is along the
+interference axis. A0, A1 and A2 are three answers to the question of $\theta_2$
+from one design, indexed by how much they assume about the way outcomes respond to
+other people's seeding: no response at all, response through an exposure map with
+transport, and the same with transport restricted to degree bins. Weaker
+assumptions about interference buy less bias and cost precision, which is the same
+trade in a different currency.
+
+\paragraph{Where the set comes from} In much of the literature the set comes from
+an incomplete model. A game with multiple equilibria does not say which outcome
+occurs, so the model is consistent with a set of outcome distributions, and the
+data bound the parameters without pinning them down \citep{tamer2003,tamer2010}.
+Here the source is different. The kernel is complete: for each $c$ and each draw
+of the noise it returns one panel, and the update map is a contraction with a
+unique stationary regime (Appendix~\ref{app:model}). The set arises because the
+targets do not restrict the parameters. Only $\alpha$ is pinned; the level
+tolerance exceeds the pilot's own effect, so $\kappa$ stays open; and the
+peer-correlation moment does not restrict $\gamma$. Many complete worlds fit the
+same targets, and they disagree about the policy.
+
+\paragraph{Where the analogy stops} The image is not an identified set. An
+identified set is a population object: the values of a parameter consistent with
+the distribution of the observables and the assumptions. The image here is a
+finite empirical range produced by thresholding simulated moment discrepancies for
+a fully specified kernel, evaluated on a sample of kept points. Its threshold mixes
+Monte Carlo variance with a design tolerance, so it does not correspond to a
+sampling distribution of the targets. A thresholded criterion resembles the level
+sets of \citet{chernozhukov2007}, and the range of $\theta_2$ over such a set is a
+projection of the kind studied by \citet{imbens2004} and \citet{kaido2019}; see
+\citet{molinari2020} for a survey. Those papers give coverage guarantees under
+their assumptions. Nothing here claims one. Similarly, no analyst on the
+interference ladder reports an identified set for $\theta_2$; each reports a point
+estimate with a standard error under its maintained assumptions. A bounds analysis
+of $\theta_2$ from the pilot in the spirit of \citet{manski2013} would be a
+different and more conservative exercise. What the paper borrows is the rule for
+reporting: do not replace a set by a convenient point.
