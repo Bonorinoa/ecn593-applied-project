@@ -252,21 +252,26 @@ matches its sampling SD closely (SE/SD of $\TradeoffMinIAZeroSEOverSD$,
 $\TradeoffMedIAZeroSEOverSD$ and $\TradeoffStarAZeroSEOverSD$). For A1 and A2 the
 reported SE is between $\TradeoffMinIATwoSEOverSD$ and $\TradeoffMedIAOneSEOverSD$
 times the sampling SD. The A1 and A2 intervals are conservative relative to their
-sampling distributions. On the $\cstar$ panel, a share
-\MISSING{YoungShareAOneStar} of A1's reported variance, and a share
-\MISSING{YoungShareATwoStar} of A2's, is the Young bound on pairs with a zero
-simulated joint exposure probability. The largest piece is the $\Sb$--$\Sa$ pair
-rather than the $\Sone$--$\Sa$ pair. The $\pi>0$ term alone is slightly smaller
-than the design variance of the A1 estimate (fixed noise,
-\MISSING{DesignRedrawsAOneStar} assignment redraws, mean main-term $\mathrm{SE}^2$
-over design variance \MISSING{DesignMainTermRatioAOneStar}; full mean
-$\mathrm{SE}^2$ over design variance \MISSING{DesignFullRatioAOneStar}). These
-decompositions come from the independent review of the code
-(\texttt{reviews/a2-code.md}), not from a committed result file. The Young terms
-are part of the pre-registered variance and are not retuned here; a sharper
-variance would be a new design, written before a new run. The rise in SD from A0
-to A1 to A2 is a real rise in sampling dispersion. The further rise in mean width,
-and the containment rate of one, come from the bound.
+sampling distributions. The split of the reported variance that follows is
+descriptive and is not a pre-registered result. It comes from addendum A2.1, which
+was designed after the A2 results and the independent review of the code were
+seen, states no expectation, and changes no estimator, interval or verdict
+(Appendix~\ref{app:disclosures}). On the $\cstar$ panel, a share
+\YoungShareAOneStar{} of A1's reported variance, and a share
+\YoungShareATwoStar{} of A2's, is the Young bound on pairs with a zero
+simulated joint exposure probability. The independent review of the code
+(\texttt{reviews/a2-code.md}) traced the largest piece to the $\Sb$--$\Sa$ pair
+rather than the $\Sone$--$\Sa$ pair. The $\pi>0$ term alone is smaller than the
+design variance of the A1 estimate (fixed noise, \DesignRedrawsAOneStar{}
+assignment redraws, mean main-term $\mathrm{SE}^2$ over design variance
+\DesignMainTermRatioAOneStar; full mean $\mathrm{SE}^2$ over design variance
+\DesignFullRatioAOneStar). The same pattern holds for both analysts at all three
+points: the Young share runs from \YoungShareATwoMinI{} to \YoungShareAOneMedI,
+the main-term ratio from \DesignMainTermRatioATwoMinI{} to
+\DesignMainTermRatioAOneMinI, and the full ratio from \DesignFullRatioATwoMinI{}
+to \DesignFullRatioAOneMedI. The Young terms are part of the pre-registered
+variance and are not retuned here; a sharper variance would be a new design,
+written before a new run.
 
 \paragraph{Containment over repeated panels} A0's intervals contain
 $\theta_2(c_0)$ in none of the panels at any point. A1's and A2's contain it in
@@ -276,6 +281,23 @@ either interval is calibrated. Every repeated-sample mean width is narrower than
 $\Theta_{\hm}$, the widest at $\TradeoffMedIATwoWidthRatio$ of its width. That is
 interval geometry. It is not evidence that the interval is honest about what the
 targets leave open, and it is not a coverage claim.
+
+\paragraph{A post hoc reading of the trade-off} What follows is an
+interpretation, formed after the A2 results and the A2.1 split were seen; it was
+not pre-registered and it tests nothing. Moving from A0 to A1 and A2 does three
+separate things. (i) It shrinks the bias but does not remove it. (ii) It raises the
+sampling SD. This is a real rise in dispersion, because the SD is measured across
+panels and does not depend on the variance estimator. (iii) It widens the reported interval by more
+than the rise in SD alone would, because of the Young bound. Under the pilot's
+design some pairs of people are never jointly exposed to the conditions that a
+contrast compares, so the design cannot identify the covariance of their outcomes,
+and the variance estimator replaces that covariance with Young's bound
+\citep{aronow2017}. Part~(iii) depends on the exposure map. Foil~2's spillover
+contrast uses the same pilot and the same simulated joint probabilities, yet on the
+$\cstar$ panel only a share \YoungShareSpillStar{} of its variance is the bound
+(Appendix~\ref{app:foil2}); A1 and A2 put weight on the $\Sb$ stratum, where most
+of the bound's mass sits. The intervals that the bound widens are conservative,
+and the containment rate of one comes from the bound. They are not calibrated.
 
 \begin{table}[t]
 \centering
