@@ -1,0 +1,176 @@
+{
+  "git_commit": "1c271a24b3ab6a9b4de000436c9fc160bbf38f1c",
+  "ran_at": "2026-11-02T01:35:32.051676+00:00",
+  "R_design": 400,
+  "offset_base": 3000000,
+  "foil_panel_offset": 0,
+  "points": {
+    "min_I": {
+      "A1": {
+        "one_panel": {
+          "reported_variance": 3.769575165858774e-05,
+          "positive_joint_probability_term": 4.486331001076526e-06,
+          "young_bound_term": 3.320942065751121e-05,
+          "young_share": 0.8809857662022648
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.0022759802391241874,
+          "mean_main_term_se2_over_design_variance": 0.8025349783611642,
+          "mean_full_se2_over_design_variance": 7.54278115245981
+        }
+      },
+      "A2": {
+        "one_panel": {
+          "reported_variance": 4.659245723889567e-05,
+          "positive_joint_probability_term": 8.568259575703324e-06,
+          "young_bound_term": 3.8024197663192347e-05,
+          "young_share": 0.8161020026960397
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.0031136321795082337,
+          "mean_main_term_se2_over_design_variance": 0.7194107782176344,
+          "mean_full_se2_over_design_variance": 5.080367882759504
+        }
+      },
+      "Spill": {
+        "one_panel": {
+          "reported_variance": 2.7700954320729864e-05,
+          "positive_joint_probability_term": 2.4315317989821087e-05,
+          "young_bound_term": 3.385636330908777e-06,
+          "young_share": 0.12222092754310468
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.00521750201592314,
+          "mean_main_term_se2_over_design_variance": 0.916691133069034,
+          "mean_full_se2_over_design_variance": 1.0515125344576917
+        }
+      }
+    },
+    "median_I": {
+      "A1": {
+        "one_panel": {
+          "reported_variance": 4.046394454167899e-05,
+          "positive_joint_probability_term": 4.1890772115607865e-06,
+          "young_bound_term": 3.6274867330118206e-05,
+          "young_share": 0.8964738297511772
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.002242456049422504,
+          "mean_main_term_se2_over_design_variance": 0.7991734288391069,
+          "mean_full_se2_over_design_variance": 8.300306571480338
+        }
+      },
+      "A2": {
+        "one_panel": {
+          "reported_variance": 4.7778244148058055e-05,
+          "positive_joint_probability_term": 6.332419407884047e-06,
+          "young_bound_term": 4.144582474017401e-05,
+          "young_share": 0.8674622828695678
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.0028089425998303837,
+          "mean_main_term_se2_over_design_variance": 0.7327600221195377,
+          "mean_full_se2_over_design_variance": 6.355224557527013
+        }
+      },
+      "Spill": {
+        "one_panel": {
+          "reported_variance": 2.7448143742222676e-05,
+          "positive_joint_probability_term": 2.4069481605424167e-05,
+          "young_bound_term": 3.37866213679851e-06,
+          "young_share": 0.12309255476541435
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.005237800255974407,
+          "mean_main_term_se2_over_design_variance": 0.9157632175383322,
+          "mean_full_se2_over_design_variance": 1.0499782081810363
+        }
+      }
+    },
+    "c_star": {
+      "A1": {
+        "one_panel": {
+          "reported_variance": 3.44795959188716e-05,
+          "positive_joint_probability_term": 3.930871159244462e-06,
+          "young_bound_term": 3.0548724759627136e-05,
+          "young_share": 0.8859942799650679
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.0021484678765366907,
+          "mean_main_term_se2_over_design_variance": 0.8014396362828183,
+          "mean_full_se2_over_design_variance": 7.74157210092708
+        }
+      },
+      "A2": {
+        "one_panel": {
+          "reported_variance": 4.24018358611188e-05,
+          "positive_joint_probability_term": 7.303436318604712e-06,
+          "young_bound_term": 3.5098399542514086e-05,
+          "young_share": 0.8277566013291008
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.002922102768174033,
+          "mean_main_term_se2_over_design_variance": 0.7222199013530176,
+          "mean_full_se2_over_design_variance": 5.258973303481436
+        }
+      },
+      "Spill": {
+        "one_panel": {
+          "reported_variance": 2.359908272685317e-05,
+          "positive_joint_probability_term": 2.059265007005379e-05,
+          "young_bound_term": 3.006432656799383e-06,
+          "young_share": 0.12739616584242877
+        },
+        "design": {
+          "redraws": 400,
+          "n_defined": 400,
+          "sd": 0.004912060392032903,
+          "mean_main_term_se2_over_design_variance": 0.9121039083086928,
+          "mean_full_se2_over_design_variance": 1.0482022030975786
+        }
+      }
+    }
+  },
+  "v3_c_star_a1_check": {
+    "ours": {
+      "design_sd": 0.0021484678765366907,
+      "main_term_ratio": 0.8014396362828183,
+      "full_ratio": 7.74157210092708
+    },
+    "v3_probe": {
+      "design_sd": 0.0023107152043781057,
+      "main_term_ratio": 0.6854749306449316,
+      "full_ratio": 6.779729641563138,
+      "redraws": 400,
+      "assignment_seed_scheme": "20261101 + r"
+    },
+    "relative_difference": {
+      "design_sd": 0.07021519897129919,
+      "main_term_ratio": 0.1691742475961607,
+      "full_ratio": 0.14187032672621125
+    },
+    "relative_tolerance": {
+      "design_sd": 0.15,
+      "main_term_ratio": 0.3,
+      "full_ratio": 0.3
+    },
+    "agrees_within_mc_noise": true,
+    "note": "Different assignment streams; tolerances cover Monte Carlo variation from 400 redraws."
+  }
+}
