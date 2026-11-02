@@ -77,6 +77,10 @@ Amendment A2 asks what changes when an analyst allows interference. A0 is the ex
 
 The script reads the three saved points and truths. It does not rerun the history-matching waves. It runs the declared fresh panel offsets and writes `results/interference/tradeoff.json`. An empty required A2 cell gives an undefined interval. The code never imputes that cell. The figure `figures/planted/tradeoff.png` shows absolute bias against mean interval width. The macro names use `\Tradeoff<Point><Analyst><Item>`.
 
+## Addendum A2.1: descriptive variance split
+
+Addendum A2.1 was written after the A2 results and review. It splits each reported variance into the positive-joint-probability term and Young-bound term. It also holds the noise fixed and redraws assignments. `scripts/a2_variance_split.py` writes the descriptive readout to `results/interference/variance_split.json`. It does not change an A2 estimate, interval, or verdict.
+
 ## How to replicate
 
 One-time setup, then one command:
@@ -85,10 +89,10 @@ One-time setup, then one command:
 uv venv .venv --python 3.14
 uv pip install --python .venv/bin/python -r requirements.txt -r requirements-dev.txt -c locks/freeze-planted.txt
 .venv/bin/python scripts/replicate.py            # everything
-.venv/bin/python scripts/replicate.py --quick    # skip the Foil 2 check and amendments A1/A2
+.venv/bin/python scripts/replicate.py --quick    # skip the Foil 2 check and amendments A1/A2/A2.1
 ```
 
-`replicate.py` has 11 steps. It runs the tests, the z check, the planted run, the Foil 2 check, and amendments A1 and A2. Then it draws and copies the figures, writes both `numbers.tex` files, builds the PDF, and compares each result with git HEAD. The PDF build needs TeX Live with `latexmk`. Without it, upload the project to Overleaf.
+`replicate.py` has 12 steps. It runs the tests, the z check, the planted run, the Foil 2 check, and amendments A1, A2, and A2.1. Then it draws and copies the figures. It writes both `numbers.tex` files, builds the PDF, and compares each result with git HEAD. The PDF build needs TeX Live with `latexmk`. Without it, upload the project to Overleaf.
 
 The steps, one at a time:
 
@@ -98,6 +102,7 @@ python scripts/run_poc.py planted                # the run -> results/planted/, 
 python scripts/check_foil2_coverage.py           # Foil 2 calibration check -> results/checks/foil2_coverage.json
 python scripts/delta_menu.py                     # delta menu (amendment A1) -> results/sensitivity/delta_menu.json
 python scripts/interference_tradeoff.py          # three analysts (amendment A2) -> results/interference/tradeoff.json
+python scripts/a2_variance_split.py              # variance split (addendum A2.1) -> results/interference/variance_split.json
 python scripts/draw_figures.py planted           # redraw figures from saved results (no simulation)
 python scripts/sync_writeup_figures.py           # copy figures into writeup/ and thesis/
 python scripts/write_numbers.py                  # write both numbers.tex files
@@ -110,7 +115,7 @@ Measured runtimes on an Apple-silicon laptop, in the repo at commit `cc01779`:
 - The delta menu (amendment A1) took 1,107 s: three entries of about 366 s each, with another job reading the repo on the same laptop. A full `replicate.py` run after the final paper edits (commit `442aa83`) took 1,793 s, about 30 minutes: tests 6 s, planted run 363 s, Foil 2 check 346 s, delta menu 1,075 s, PDF build 2 s. It printed REPLICATED, and the PDF was byte-identical to the committed one.
 - The standalone interference tradeoff took 92 s. In the final full run, this step took 79 s.
 - The final full A2 replication took 2,590 s. It ran 72 tests in 5 s and printed `REPLICATED: every result is identical to the committed one.`
-- `replicate.py --quick` skips the Foil 2 check, the delta menu, and the interference tradeoff.
+- `replicate.py --quick` skips the Foil 2 check, the delta menu, the interference tradeoff, and the variance split.
 - A second planted run after the commit changed only `ran_at` and `git_commit` in `results/planted/poc_results.json`. The files `image_points.json`, the figures and the lock file were byte-identical. The Foil 2 check file was also byte-identical after a second run. Every random stream is seeded, so a rerun reproduces every number.
 
 Pins: Python 3.14, numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2, pytest 9.1.1. Reproducibility is part of the claim, so a rerun must match to the last digit. The file `locks/freeze-planted.txt` records the full environment of the run. It includes extra packages that the code does not import. The project does not use Mesa, pandas, or GPU libraries. The kernel is vectorized algebra.

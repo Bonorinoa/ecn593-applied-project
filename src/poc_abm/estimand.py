@@ -241,7 +241,7 @@ def _exposure_probs_cached(world: World, k_treat: int, cut: float) -> dict:
     return _EXPOSURE_PROBS_CACHE[key]
 
 
-def ht_cov(a_k, a_l, p_k, p_l, pi_kl, same: bool) -> float:
+def ht_cov(a_k, a_l, p_k, p_l, pi_kl, same: bool, return_parts: bool = False):
     """Aronow-Samii (2017) estimate of Cov(T_k, T_l), with T = sum_i a_i / p_i.
 
     a_k is zero outside exposure k (a_i = 1_i(k) * e_i). same=True gives Var(T_k).
@@ -265,7 +265,15 @@ def ht_cov(a_k, a_l, p_k, p_l, pi_kl, same: bool) -> float:
     main = float((a_k / safe_k) @ W @ (a_l / safe_l))
     zero = ~pos
     young = 0.5 * float((a_k ** 2 / safe_k) @ zero.sum(axis=1) + (a_l ** 2 / safe_l) @ zero.sum(axis=0))
-    return main + young if same else main - young
+    signed_young = young if same else -young
+    total = main + signed_young
+    if return_parts:
+        return {
+            "positive_joint_probability": main,
+            "young_bound": signed_young,
+            "total": total,
+        }
+    return total
 
 
 def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
@@ -304,6 +312,7 @@ def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
 
     def _cov(k1, k2):
         c = ht_cov(a[k1], a[k2], p[k1], p[k2], _pi(k1, k2), same=(k1 == k2))
+        assert isinstance(c, float)
         return c / (n_hat[k1] * n_hat[k2])
 
     d_dir = mu["S1"] - mu["S0a"]
@@ -324,7 +333,16 @@ def hajek_contrasts(world, Y, D, cut=None, min_n=None) -> dict:
     }
 
 
-def hajek_linear_contrast(world, Y, D, cells, coefficients, cut=None, min_n=None) -> dict:
+def hajek_linear_contrast(
+    world,
+    Y,
+    D,
+    cells,
+    coefficients,
+    cut=None,
+    min_n=None,
+    return_variance_parts: bool = False,
+) -> dict:
     """A linear contrast of exposure-cell Hajek means on one random-arm panel.
 
     Each cell is ``{"stratum": name}`` or adds a fixed boolean ``nodes`` mask.
@@ -369,11 +387,18 @@ def hajek_linear_contrast(world, Y, D, cells, coefficients, cut=None, min_n=None
     if any(size == 0 or not np.isfinite(c["mean"]) or c["n_hat"] <= 0
            for size, c in zip(sizes, prepared)):
         nan = float("nan")
-        return {"estimate": nan, "se": nan, "ci": (nan, nan), "merged_s0b": merged,
-                "means": [c["mean"] for c in prepared], "cell_sizes": sizes,
-                "undefined": True}
+        result = {"estimate": nan, "se": nan, "ci": (nan, nan), "merged_s0b": merged,
+                  "means": [c["mean"] for c in prepared], "cell_sizes": sizes,
+                  "undefined": True}
+        if return_variance_parts:
+            result["variance_parts"] = {
+                "positive_joint_probability": nan,
+                "young_bound": nan,
+                "reported": nan,
+            }
+        return result
 
-    def _cov(i, j):
+    def _cov(i, j, with_parts=False):
         left, right = prepared[i], prepared[j]
         joint = pi_base[(left["name"], right["name"])] * np.outer(left["nodes"], right["nodes"])
         if left["name"] == right["name"]:
@@ -384,24 +409,63 @@ def hajek_linear_contrast(world, Y, D, cells, coefficients, cut=None, min_n=None
         # Crop structural zeros before the Young correction in ht_cov.
         rows = left["nodes"] if "nodes" in cells[i] else np.ones(world.n, dtype=bool)
         cols = right["nodes"] if "nodes" in cells[j] else np.ones(world.n, dtype=bool)
-        value = ht_cov(left["a"][rows], right["a"][cols], left["p"][rows], right["p"][cols],
-                       joint[np.ix_(rows, cols)], same=(i == j))
-        return value / (left["n_hat"] * right["n_hat"])
+        value = ht_cov(
+            left["a"][rows],
+            right["a"][cols],
+            left["p"][rows],
+            right["p"][cols],
+            joint[np.ix_(rows, cols)],
+            same=(i == j),
+            return_parts=with_parts,
+        )
+        denominator = left["n_hat"] * right["n_hat"]
+        if with_parts:
+            assert isinstance(value, dict)
+            return {name: part / denominator for name, part in value.items()}
+        assert isinstance(value, float)
+        return value / denominator
 
     # Diagonals first, then twice each upper-triangle covariance. This order
     # makes (+1, -1) exactly identical to hajek_contrasts, not only close.
     variance = 0.0
+    variance_main = 0.0
+    variance_young = 0.0
     for i, coefficient in enumerate(coefficients):
-        variance += float(coefficient) ** 2 * _cov(i, i)
+        scale = float(coefficient) ** 2
+        covariance = _cov(i, i, return_variance_parts)
+        if return_variance_parts:
+            assert isinstance(covariance, dict)
+            variance += scale * covariance["total"]
+            variance_main += scale * covariance["positive_joint_probability"]
+            variance_young += scale * covariance["young_bound"]
+        else:
+            assert isinstance(covariance, float)
+            variance += scale * covariance
     for i in range(len(prepared)):
         for j in range(i + 1, len(prepared)):
-            variance += 2.0 * float(coefficients[i]) * float(coefficients[j]) * _cov(i, j)
+            scale = 2.0 * float(coefficients[i]) * float(coefficients[j])
+            covariance = _cov(i, j, return_variance_parts)
+            if return_variance_parts:
+                assert isinstance(covariance, dict)
+                variance += scale * covariance["total"]
+                variance_main += scale * covariance["positive_joint_probability"]
+                variance_young += scale * covariance["young_bound"]
+            else:
+                assert isinstance(covariance, float)
+                variance += scale * covariance
     estimate = float(sum(float(a) * c["mean"] for a, c in zip(coefficients, prepared)))
     se = float(np.sqrt(max(variance, 0.0)))
     z = float(norm.ppf(0.5 + 0.5 * config.HM_CONFIDENCE))
-    return {"estimate": estimate, "se": se, "ci": (estimate - z * se, estimate + z * se),
-            "merged_s0b": merged, "means": [c["mean"] for c in prepared],
-            "cell_sizes": sizes, "undefined": False}
+    result = {"estimate": estimate, "se": se, "ci": (estimate - z * se, estimate + z * se),
+              "merged_s0b": merged, "means": [c["mean"] for c in prepared],
+              "cell_sizes": sizes, "undefined": False}
+    if return_variance_parts:
+        result["variance_parts"] = {
+            "positive_joint_probability": variance_main,
+            "young_bound": variance_young,
+            "reported": variance_main + variance_young,
+        }
+    return result
 
 
 def evaluate_spill(world: World, c: dict, reps: int | None = None, cut=None, offset0: int = 0) -> dict:

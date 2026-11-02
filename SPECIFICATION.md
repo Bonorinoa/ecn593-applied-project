@@ -4,7 +4,7 @@ This document describes the code in this repo, on the branch `main`. If the docu
 
 The design is frozen in `docs/preregistration-v2.md`. The code implements it. The earlier design is the git tag `v1-worldbank-moments`.
 
-Sections 1 to 5 cover the model, targets, images, foils, non-claims, and `nroy_param_spread`. Section 6 lists outputs and the environment. Sections 7 and 8 describe amendments A1 and A2.
+Sections 1 to 5 cover the model, targets, images, foils, non-claims, and `nroy_param_spread`. Section 6 lists outputs and the environment. Sections 7 to 9 describe amendments A1, A2, and A2.1.
 
 ## 1. The model
 
@@ -81,6 +81,7 @@ The function `kernel.stream_seed(label, offset)` returns the crc32 of the key `"
 | seeds 10,000 and up | in `check_foil2_coverage.py` | the assignment-only redraws of the check |
 | seed 20261020 | `BOOT_SEED` | the bootstrap of the check |
 | offsets 2,000,000 to 2,000,199 | `INTERFERENCE_OFFSET_BASE`, `INTERFERENCE_REPETITIONS` | the A2 repeated panels |
+| offsets from `INTERFERENCE_DESIGN_OFFSET_BASE` | `INTERFERENCE_DESIGN_OFFSET_BASE`, `INTERFERENCE_DESIGN_REDRAWS` | the A2.1 fixed-noise assignment redraws |
 
 ### 1.5 The estimands
 
@@ -379,7 +380,8 @@ Only alpha is strongly restricted. The ratio for gamma is 0.992, so the moments 
 | `python scripts/check_foil2_coverage.py` | `results/planted/poc_results.json` | `results/checks/foil2_coverage.json` |
 | `python scripts/delta_menu.py` | `data/planted.json`, `results/planted/poc_results.json` | `results/sensitivity/delta_menu.json` (amendment A1, section 7) |
 | `python scripts/interference_tradeoff.py` | `results/planted/poc_results.json` | `results/interference/tradeoff.json` (amendment A2, section 8) |
-| `python scripts/replicate.py [--quick]` | everything below | all outputs and a comparison with git HEAD. `--quick` skips the Foil 2 check and amendments A1/A2. |
+| `python scripts/a2_variance_split.py` | `results/planted/poc_results.json`, V3's committed probe | `results/interference/variance_split.json` (addendum A2.1, section 9) |
+| `python scripts/replicate.py [--quick]` | everything below | all outputs and a comparison with git HEAD. `--quick` skips the Foil 2 check and amendments A1/A2/A2.1. |
 | `python scripts/sync_writeup_figures.py` | `figures/` | figure copies in `writeup/figures/` and `thesis/figures/` |
 | `python scripts/write_numbers.py` | `config/`, `results/`, the drawn graph | byte-identical `writeup/numbers.tex` and `thesis/numbers.tex` |
 | `python scripts/draw_figures.py planted` | saved JSON results | all planted figures, including `tradeoff.png`. It runs no simulation. |
@@ -431,3 +433,7 @@ The repeated readout reports the mean, bias, SD, RMSE, mean SE, SE/SD, and cover
 **Output and figure.** The JSON file is `results/interference/tradeoff.json`. The function `figures.draw_tradeoff` reads this file through `scripts/draw_figures.py`. It plots absolute bias against mean width. Coverage appears beside each marker. A vertical line shows the width of Theta_hm.
 
 **Macros.** `scripts/write_numbers.py` uses `\Tradeoff<Point><Analyst><Item>`. Point is MinI, MedI, or Star. Analyst is AZero, AOne, or ATwo. One-panel item names start with OnePanel. The other item names are the repeated-panel readouts. Existing macro names do not change.
+
+## 9. Addendum A2.1: descriptive variance split
+
+Addendum A2.1 was written after the A2 results and V3 review. `scripts/a2_variance_split.py` reuses the existing contrast functions. For A1, A2, and Foil 2 spillover, it separates the reported variance into the positive-joint-probability term and signed Young-bound term. It reports the Young share at each saved point. The design readout fixes the noise at `FOIL_PANEL_OFFSET` and redraws assignments from `INTERFERENCE_DESIGN_OFFSET_BASE`. It reports the design SD and two variance ratios. The script reads V3's committed probe and compares both A1 readouts at `c_star`. The output is `results/interference/variance_split.json`. `scripts/write_numbers.py` writes one macro for every readout cell. This addendum changes no A2 estimate, interval, flag, or verdict.

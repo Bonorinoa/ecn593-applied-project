@@ -41,7 +41,7 @@ def _degree_labels(world, cut, merged):
     return d2, labels
 
 
-def analyst_a1(world, y, d, cut=None, min_n=None):
+def analyst_a1(world, y, d, cut=None, min_n=None, return_variance_parts=False):
     """A1: transport exposure means with the degree-policy exposure shares."""
     cut = config.EXPOSURE_SHARE_CUT if cut is None else cut
     min_n = config.STRATUM_MIN_N if min_n is None else min_n
@@ -57,13 +57,16 @@ def analyst_a1(world, y, d, cut=None, min_n=None):
     baseline_coefficient = -sum(coefficients)
     cells.append({"stratum": "S0a"})
     coefficients.append(baseline_coefficient)
-    result = hajek_linear_contrast(world, y, d, cells, coefficients, cut=cut, min_n=min_n)
+    result = hajek_linear_contrast(
+        world, y, d, cells, coefficients, cut=cut, min_n=min_n,
+        return_variance_parts=return_variance_parts,
+    )
     result["interval"] = result.pop("ci")
     result["weights"] = weights
     return result
 
 
-def analyst_a2(world, y, d, cut=None, min_n=None):
+def analyst_a2(world, y, d, cut=None, min_n=None, return_variance_parts=False):
     """A2: A1 with fixed degree-policy H and L node bins."""
     cut = config.EXPOSURE_SHARE_CUT if cut is None else cut
     min_n = config.STRATUM_MIN_N if min_n is None else min_n
@@ -89,7 +92,10 @@ def analyst_a2(world, y, d, cut=None, min_n=None):
     if low_total > 0:
         cells.append({"stratum": "S0a", "nodes": low})
         coefficients.append(-low_total)
-    result = hajek_linear_contrast(world, y, d, cells, coefficients, cut=cut, min_n=min_n)
+    result = hajek_linear_contrast(
+        world, y, d, cells, coefficients, cut=cut, min_n=min_n,
+        return_variance_parts=return_variance_parts,
+    )
     result["interval"] = result.pop("ci")
     result["weights"] = weights
     return result

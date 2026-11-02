@@ -45,6 +45,8 @@ exposure_mc_seed = 20260817
 [interference]
 repetitions = 200
 offset_base = 2_000_000
+design_redraws = 400
+design_offset_base = 3_000_000
 
 # scripts/check_foil2_coverage.py (declared before its first run; PLAN item 11)
 [foil2_check]

@@ -9,6 +9,7 @@ Sources, in order of the table below:
   F  = results/checks/foil2_coverage.json
   M  = results/sensitivity/delta_menu.json   (amendment A1: the delta menu)
   T  = results/interference/tradeoff.json    (amendment A2: three analysts)
+  V  = results/interference/variance_split.json (addendum A2.1)
 
 Format rule, one for every number: round to `dp` decimals, then drop trailing
 zeros, but keep at least `keep` decimals. Example: fmt(0.9300, 4, 3) = 0.930.
@@ -171,11 +172,62 @@ def tradeoff_rows(tradeoff):
     return rows
 
 
+def variance_split_rows(split):
+    """A2.1 macros use an item, analyst, point naming order.
+
+    Point is MinI, MedI or Star. Analyst is AOne, ATwo or Spill. Every
+    one-panel split and fixed-noise design cell gets one macro.
+    """
+    point_tags = {"min_I": "MinI", "median_I": "MedI", "c_star": "Star"}
+    analyst_tags = {"A1": "AOne", "A2": "ATwo", "Spill": "Spill"}
+
+    def number(value, dp, keep=None):
+        return fmt(value, dp, keep) if math.isfinite(float(value)) else "undefined"
+
+    rows = [
+        ("VarianceSplitRDesign", str(split["R_design"])),
+        ("VarianceSplitOffsetBase", str(split["offset_base"])),
+        ("VarianceSplitFoilPanelOffset", str(split["foil_panel_offset"])),
+    ]
+    for point, point_tag in point_tags.items():
+        for analyst, analyst_tag in analyst_tags.items():
+            suffix = f"{analyst_tag}{point_tag}"
+            one = split["points"][point][analyst]["one_panel"]
+            design = split["points"][point][analyst]["design"]
+            rows += [
+                (f"VarianceReported{suffix}", number(one["reported_variance"], 8)),
+                (f"VarianceMainTerm{suffix}", number(one["positive_joint_probability_term"], 8)),
+                (f"VarianceYoungTerm{suffix}", number(one["young_bound_term"], 8)),
+                (f"YoungShare{suffix}", number(one["young_share"], 3)),
+                (f"DesignRedraws{suffix}", str(design["redraws"])),
+                (f"DesignNDefined{suffix}", str(design["n_defined"])),
+                (f"DesignSD{suffix}", number(design["sd"], 6)),
+                (f"DesignMainTermRatio{suffix}", number(
+                    design["mean_main_term_se2_over_design_variance"], 3
+                )),
+                (f"DesignFullRatio{suffix}", number(
+                    design["mean_full_se2_over_design_variance"], 3
+                )),
+            ]
+    if "v3_c_star_a1_check" in split:
+        check = split["v3_c_star_a1_check"]
+        rows.append(("VThreeAOneStarAgrees", yn(check["agrees_within_mc_noise"])))
+        for source, source_tag in (("ours", "Ours"), ("v3_probe", "VThree")):
+            values = check[source]
+            rows += [
+                (f"VarianceCheck{source_tag}DesignSDAOneStar", number(values["design_sd"], 6)),
+                (f"VarianceCheck{source_tag}MainTermRatioAOneStar", number(values["main_term_ratio"], 3)),
+                (f"VarianceCheck{source_tag}FullRatioAOneStar", number(values["full_ratio"], 3)),
+            ]
+    return rows
+
+
 def table():
     P = load("results/planted/poc_results.json")
     F = load("results/checks/foil2_coverage.json")
     M = load("results/sensitivity/delta_menu.json")
     T = load("results/interference/tradeoff.json")
+    V = load("results/interference/variance_split.json")
     G = graph_facts()
     k = n_treated()
     lo, mi, cs = P["findings"]["min_I"], P["findings"]["median_I"], P["findings"]["c_star"]
@@ -345,6 +397,7 @@ def table():
     ]
     rows += menu_rows(M)
     rows += tradeoff_rows(T)
+    rows += variance_split_rows(V)
     assert all(v in TEXT_VALUES or math.isfinite(float(v.replace(",", ""))) for _, v in rows)
     names = [n for n, _ in rows]
     assert len(names) == len(set(names)), "duplicate macro name"

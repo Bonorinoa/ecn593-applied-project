@@ -68,5 +68,7 @@ SEED_FOIL2_MC = _foils["exposure_mc_seed"]
 _interference = DESIGN["interference"]
 INTERFERENCE_REPETITIONS = _interference["repetitions"]
 INTERFERENCE_OFFSET_BASE = _interference["offset_base"]
+INTERFERENCE_DESIGN_REDRAWS = _interference["design_redraws"]
+INTERFERENCE_DESIGN_OFFSET_BASE = _interference["design_offset_base"]
 
 FOIL2_CHECK = dict(DESIGN["foil2_check"])   # read by scripts/check_foil2_coverage.py

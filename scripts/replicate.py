@@ -2,7 +2,7 @@
 
 Usage, from the repo root (after the one-time setup in README.md):
     .venv/bin/python scripts/replicate.py           # full: see README for the measured time
-    .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check and amendments A1/A2
+    .venv/bin/python scripts/replicate.py --quick   # skips the Foil 2 check and amendments A1/A2/A2.1
 
 Steps, in order. The script stops at the first step that fails.
   1. tests                 pytest tests
@@ -11,11 +11,12 @@ Steps, in order. The script stops at the first step that fails.
   4. Foil 2 check          scripts/check_foil2_coverage.py   (skipped with --quick)
   5. delta menu            scripts/delta_menu.py      (amendment A1; skipped with --quick)
   6. interference tradeoff scripts/interference_tradeoff.py (amendment A2; skipped with --quick)
-  7. draw figures          scripts/draw_figures.py
-  8. sync figures          scripts/sync_writeup_figures.py
-  9. paper numbers         scripts/write_numbers.py   (writes both numbers.tex copies)
- 10. paper PDF             latexmk in writeup/        (skipped if latexmk is not installed)
- 11. report                each result file compared with the committed one (git HEAD)
+  7. variance split        scripts/a2_variance_split.py (addendum A2.1; skipped with --quick)
+  8. draw figures          scripts/draw_figures.py
+  9. sync figures          scripts/sync_writeup_figures.py
+ 10. paper numbers         scripts/write_numbers.py   (writes both numbers.tex copies)
+ 11. paper PDF             latexmk in writeup/        (skipped if latexmk is not installed)
+ 12. report                each result file compared with the committed one (git HEAD)
 
 The runs overwrite results/, figures/, locks/ and writeup/. Git keeps the
 committed versions: `git diff` shows any change, `git checkout .` restores them.
@@ -36,6 +37,7 @@ RESULT_FILES = [
     "results/checks/foil2_coverage.json",
     "results/sensitivity/delta_menu.json",
     "results/interference/tradeoff.json",
+    "results/interference/variance_split.json",
 ]
 RUN_STAMPS = {"ran_at", "git_commit"}   # fields that differ on every run by design
 
@@ -44,7 +46,7 @@ def step(n, name, cmd, cwd=ROOT, live=True):
     """Run one step. Its output streams live (unless live=False), each line prefixed with the seconds
     since the step started; the full text is kept and shown again on failure."""
     shown = " ".join("python" if c == PY else str(c) for c in cmd)
-    print(f"[{n}/11] {name:<20} {shown}", flush=True)
+    print(f"[{n}/12] {name:<20} {shown}", flush=True)
     t0 = time.time()
     env = dict(os.environ, PYTHONUNBUFFERED="1")   # children print as they go, not at exit
     proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -73,7 +75,7 @@ def strip_stamps(obj):
 
 
 def report(quick):
-    print("[11/11] report              each result file vs the committed version (ignoring ran_at, git_commit)")
+    print("[12/12] report              each result file vs the committed version (ignoring ran_at, git_commit)")
     all_same = True
     for path in RESULT_FILES:
         committed = subprocess.run(["git", "show", f"HEAD:{path}"], cwd=ROOT, capture_output=True, text=True)
@@ -104,21 +106,23 @@ def main():
     step(2, "z check", [PY, "scripts/plant_z.py"])
     step(3, "planted run", [PY, "scripts/run_poc.py", "planted"])
     if quick:
-        print("[4/11] Foil 2 check       skipped (--quick): committed result is used")
-        print("[5/11] delta menu         skipped (--quick): committed result is used")
-        print("[6/11] interference      skipped (--quick): committed result is used")
+        print("[4/12] Foil 2 check       skipped (--quick): committed result is used")
+        print("[5/12] delta menu         skipped (--quick): committed result is used")
+        print("[6/12] interference      skipped (--quick): committed result is used")
+        print("[7/12] variance split     skipped (--quick): committed result is used")
     else:
         step(4, "Foil 2 check", [PY, "scripts/check_foil2_coverage.py"])
         step(5, "delta menu", [PY, "scripts/delta_menu.py"])
         step(6, "interference", [PY, "scripts/interference_tradeoff.py"])
-    step(7, "draw figures", [PY, "scripts/draw_figures.py"])
-    step(8, "sync figures", [PY, "scripts/sync_writeup_figures.py"])
-    step(9, "paper numbers", [PY, "scripts/write_numbers.py"])
+        step(7, "variance split", [PY, "scripts/a2_variance_split.py"])
+    step(8, "draw figures", [PY, "scripts/draw_figures.py"])
+    step(9, "sync figures", [PY, "scripts/sync_writeup_figures.py"])
+    step(10, "paper numbers", [PY, "scripts/write_numbers.py"])
     if shutil.which("latexmk"):
-        step(10, "paper PDF", ["latexmk", "-g", "-interaction=nonstopmode"], cwd=ROOT / "writeup", live=False)
+        step(11, "paper PDF", ["latexmk", "-g", "-interaction=nonstopmode"], cwd=ROOT / "writeup", live=False)
         subprocess.run(["latexmk", "-c"], cwd=ROOT / "writeup", capture_output=True)
     else:
-        print("[10/11] paper PDF          skipped: latexmk not found (or upload writeup/ to Overleaf)")
+        print("[11/12] paper PDF          skipped: latexmk not found (or upload writeup/ to Overleaf)")
     report(quick)
     print(f"total {time.time() - t0:.0f} s")
 
