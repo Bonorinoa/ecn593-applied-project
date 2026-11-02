@@ -204,3 +204,20 @@ realizes the policy" overstates: the event has probability 1 / C(800, 80) > 0. R
 pilot realizes the policy with negligible probability; in practice it never does, and positivity
 holds for the policy vector only in this negligible sense." Found by verifier card VV
 (`reviews/video-script.md`, item 3).
+
+**A2.1 (2026-11-01 18:20, written AFTER the A2 results and V3's review): a descriptive variance
+split.** V3 (`reviews/a2-code.md`, item 3b) found that A1's and A2's reported SE is about 2.3–3.1
+times the sampling SD because of the Young bound on pairs with zero joint exposure probability, and
+checked this with a probe for A1 at c_star only. A2.1 turns that probe into a committed, descriptive
+readout so the paper can cite it. It changes no A2 estimator, interval, flag or verdict, and no
+number in `results/interference/tradeoff.json`.
+- **Per point** (`min_I`, `median_I`, `c_star`) and per analyst (A1, A2, and Foil 2's delta_spill
+  for comparison): on the one panel at `FOIL_PANEL_OFFSET`, the reported variance split into the
+  term over pairs with positive joint probability and the Young-bound term, and the Young share.
+- **Fixed-noise design redraw:** noise path at `FOIL_PANEL_OFFSET`; R_design = 400 assignment
+  redraws on a fresh assignment block (3,000,000 + r); report the design SD, the mean main-term SE^2
+  over the design variance, and the mean full SE^2 over the design variance.
+- **Output:** `results/interference/variance_split.json`, written by
+  `scripts/a2_variance_split.py`, run by `scripts/replicate.py` (skipped with `--quick`).
+- No expectation is written: the readout is descriptive and was designed after its answer was seen
+  at one point.
