@@ -1,0 +1,62 @@
+config {'N': 800, 'k': 80, 'cut': 0.25, 'min_n': 20, 'R': 200, 'offset_base': 2000000, 'foil_offset': 0, 'confidence': 0.95, 'mc_draws': 10000}
+json_R 200 json_base 2000000 json_foil 0
+cp min_I A0 k=0 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+cp min_I A1 k=200 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+cp min_I A2 k=200 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+expect min_I a=True b_sd=True b_width=True c_a0_far=True c_a2_closest=True c_tie_a1=True d=True e=True dist={'A0': 0.95, 'A1': 0.050000000000000044, 'A2': 0.050000000000000044} se_over_sd={'A0': 1.0057859537031304, 'A1': 2.9363107173161427, 'A2': 2.264855615919992}
+cp median_I A0 k=0 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+cp median_I A1 k=200 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+cp median_I A2 k=200 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+expect median_I a=True b_sd=True b_width=True c_a0_far=True c_a2_closest=True c_tie_a1=True d=True e=True dist={'A0': 0.95, 'A1': 0.050000000000000044, 'A2': 0.050000000000000044} se_over_sd={'A0': 0.9944623466950941, 'A1': 3.1067089257283333, 'A2': 2.564291250479253}
+cp c_star A0 k=0 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+cp c_star A1 k=200 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+cp c_star A2 k=200 n=200 match=True lo_diff=0.000e+00 hi_diff=0.000e+00
+expect c_star a=True b_sd=True b_width=True c_a0_far=True c_a2_closest=True c_tie_a1=True d=True e=True dist={'A0': 0.95, 'A1': 0.050000000000000044, 'A2': 0.050000000000000044} se_over_sd={'A0': 1.000175613138007, 'A1': 2.973188644960351, 'A2': 2.290747858092631}
+truth_fields_equal_at_cstar True theta2 0.03826272807494016
+dynamics_copy_matches_simulate_panel True
+one_rep_theta2_sign 0.03841674657062896 degree_seeded 80
+random_panel_copy_matches True
+own_weights {'S1': 0.1, 'S0a': 0.24875, 'S0b': 0.385, 'S0c': 0.26625}
+own_low_weights {'S1': 0.0, 'S0a': 0.24875, 'S0b': 0.385, 'S0c': 0.26625}
+own_high_n 80 merged False counts {'S1': 80, 'S0a': 306, 'S0b': 322, 'S0c': 92}
+min_observed_p 0.02973898133898628
+A1_absdiff 0.0
+A2_absdiff 1.3877787807814457e-17
+A1_equal True
+A2_equal False
+A0_absdiff 0.0 A0_equal True
+shipped_A1_matches_own True
+shipped_A2_matches_own False
+A1 interval_halfwidth_minus_zse 1.734723475976807e-18 json_se_absdiff 0.0
+A2 interval_halfwidth_minus_zse -1.734723475976807e-18 json_se_absdiff 0.0
+identity_estimate True identity_se True
+identity_repro_se_absdiff 8.673617379884035e-19
+identity_young_share 0.12739616584242883
+identity_se_if_cross_dropped 0.004399775589601156 shipped_se 0.004857888710834489 cross_changes_se True
+scale_se_absdiff 1.0842021724855044e-19 scale_est_absdiff 0.0
+A1_repro_se_absdiff 0.0
+A1_var_main 3.930871159244462e-06 A1_var_young 3.054872475962714e-05 A1_young_share 0.8859942799650679
+A1_se 0.005871932894615844 A1_se_main_only 0.0019826424688391153
+A1_pair (0, 0) contrib=3.067286e-07 young=0.000000e+00 n_zero=0
+A1_pair (0, 1) contrib=-8.741432e-06 young=-6.885252e+01 n_zero=50338
+A1_pair (0, 2) contrib=4.568255e-07 young=-1.706632e+00 n_zero=800
+A1_pair (0, 3) contrib=3.532363e-06 young=-1.464023e+01 n_zero=7268
+A1_pair (1, 1) contrib=1.679366e-05 young=6.329990e+01 n_zero=95356
+A1_pair (1, 2) contrib=-1.121185e-05 young=-3.957074e+01 n_zero=50339
+A1_pair (1, 3) contrib=2.991915e-05 young=-2.944730e+01 n_zero=50338
+A1_pair (2, 2) contrib=1.199378e-06 young=0.000000e+00 n_zero=2
+A1_pair (2, 3) contrib=8.482976e-07 young=-1.085289e+00 n_zero=810
+A1_pair (3, 3) contrib=1.376480e-06 young=0.000000e+00 n_zero=0
+A1_diagonal_only_se 0.004435791054530788
+starting design redraw R=400
+design first draw 0.38s
+design draws 50/400 elapsed 17.9s
+design draws 100/400 elapsed 38.0s
+design draws 150/400 elapsed 55.9s
+design draws 200/400 elapsed 78.0s
+design draws 250/400 elapsed 95.3s
+design draws 300/400 elapsed 115.2s
+design draws 350/400 elapsed 132.6s
+design draws 400/400 elapsed 152.6s
+DESIGN {"elapsed_s": 152.62451550003607, "main_se2_over_design_var": 0.6854749306449316, "max_abs_own_vs_shipped": 9.020562075079397e-17, "mean_main_se2": 3.6600281046289393e-06, "mean_se": 0.0060098701291433805, "mean_se2": 3.61997206908218e-05, "noise_offset": 0, "own_mean": 0.03751847886042924, "own_sd": 0.0023107152043781057, "reps": 400, "se2_over_design_var": 6.779729641563138, "se_over_design_sd": 2.6008701192412187}
+DESIGN2 skipped, first redraw used the time budget

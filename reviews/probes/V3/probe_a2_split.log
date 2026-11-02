@@ -1,0 +1,48 @@
+flag min_I A0 contains=False json=False match=True planted_match=True vs=F-OVERCONF
+flag min_I A1 contains=True json=True match=True planted_match=True vs=F-OVERCONF
+flag min_I A2 contains=True json=True match=True planted_match=True vs=F-OVERCONF
+flag median_I A0 contains=False json=False match=True planted_match=True vs=F-OVERCONF
+flag median_I A1 contains=True json=True match=True planted_match=True vs=F-OVERCONF
+flag median_I A2 contains=True json=True match=True planted_match=True vs=F-OVERCONF
+flag c_star A0 contains=False json=False match=True planted_match=True vs=F-OVERCONF
+flag c_star A1 contains=True json=True match=True planted_match=True vs=F-OVERCONF
+flag c_star A2 contains=True json=True match=True planted_match=True vs=F-OVERCONF
+A1 se_repro_absdiff 0.0
+A1 shipped_se 0.005871932894615844
+A1 se_main 0.0019826424688391153
+A1 young_share 0.8859942799650679
+A1 var_main 3.930871159244462e-06 var_young 3.054872475962714e-05
+A1 pair S1:S1 contrib=3.067286e-07 scaled_young=0.000000e+00 scaled_main=3.067286e-07 n_zero=0
+A1 pair S1:S0b contrib=-8.741432e-06 scaled_young=-8.752928e-06 scaled_main=1.149612e-08 n_zero=50338
+A1 pair S1:S0c contrib=4.568255e-07 scaled_young=-1.182248e-07 scaled_main=5.750503e-07 n_zero=800
+A1 pair S1:S0a contrib=3.532363e-06 scaled_young=3.659396e-06 scaled_main=-1.270326e-07 n_zero=7268
+A1 pair S0b:S0b contrib=1.679366e-05 scaled_young=1.636779e-05 scaled_main=4.258655e-07 n_zero=95356
+A1 pair S0b:S0c contrib=-1.121185e-05 scaled_young=-1.115132e-05 scaled_main=-6.053394e-08 n_zero=50339
+A1 pair S0b:S0a contrib=2.991915e-05 scaled_young=2.994266e-05 scaled_main=-2.351103e-08 n_zero=50338
+A1 pair S0c:S0c contrib=1.199378e-06 scaled_young=0.000000e+00 scaled_main=1.199378e-06 n_zero=2
+A1 pair S0c:S0a contrib=8.482976e-07 scaled_young=6.013476e-07 scaled_main=2.469500e-07 n_zero=810
+A1 pair S0a:S0a contrib=1.376480e-06 scaled_young=0.000000e+00 scaled_main=1.376480e-06 n_zero=0
+A2 se_repro_absdiff 0.0
+A2 shipped_se 0.006511669206979022
+A2 se_main 0.00270248706169053
+A2 young_share 0.8277566013291009
+A2 var_main 7.303436318604713e-06 var_young 3.509839954251409e-05
+A2 pair S1,H:S1,H contrib=3.337519e-06 scaled_young=0.000000e+00 scaled_main=3.337519e-06 n_zero=0
+A2 pair S1,H:S0a,H contrib=1.625781e-06 scaled_young=1.418232e-06 scaled_main=2.075488e-07 n_zero=232
+A2 pair S1,H:S0b,L contrib=-1.001350e-05 scaled_young=-1.028197e-05 scaled_main=2.684758e-07 n_zero=4960
+A2 pair S1,H:S0c,L contrib=3.116543e-07 scaled_young=-0.000000e+00 scaled_main=3.116543e-07 n_zero=0
+A2 pair S1,H:S0a,L contrib=4.576085e-06 scaled_young=4.692882e-06 scaled_main=-1.167974e-07 n_zero=914
+A2 pair S0a,H:S0a,H contrib=2.506993e-07 scaled_young=0.000000e+00 scaled_main=2.506993e-07 n_zero=0
+A2 pair S0a,H:S0b,L contrib=3.475791e-06 scaled_young=3.497521e-06 scaled_main=-2.172953e-08 n_zero=4960
+A2 pair S0a,H:S0c,L contrib=1.953967e-07 scaled_young=3.018477e-09 scaled_main=1.923783e-07 n_zero=3
+A2 pair S0a,H:S0a,L contrib=1.068242e-07 scaled_young=-0.000000e+00 scaled_main=1.068242e-07 n_zero=0
+A2 pair S0b,L:S0b,L contrib=1.903313e-05 scaled_young=1.852113e-05 scaled_main=5.119981e-07 n_zero=85436
+A2 pair S0b,L:S0c,L contrib=-1.313040e-05 scaled_young=-1.297743e-05 scaled_main=-1.529655e-07 n_zero=45299
+A2 pair S0b,L:S0a,L contrib=2.960342e-05 scaled_young=2.962374e-05 scaled_main=-2.031791e-08 n_zero=45298
+A2 pair S0c,L:S0c,L contrib=1.125842e-06 scaled_young=0.000000e+00 scaled_main=1.125842e-06 n_zero=2
+A2 pair S0c,L:S0a,L contrib=8.472767e-07 scaled_young=6.012873e-07 scaled_main=2.459894e-07 n_zero=727
+A2 pair S0a,L:S0a,L contrib=1.056317e-06 scaled_young=0.000000e+00 scaled_main=1.056317e-06 n_zero=0
+A2_shipped_equals_json True
+A2_shipped_minus_json 0.0
+A2_own_minus_shipped -1.3877787807814457e-17
+one_panel_repeat_identical True
