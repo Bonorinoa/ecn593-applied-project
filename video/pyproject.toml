@@ -1,0 +1,11 @@
+[project]
+name = "ecn593-video"
+version = "0.1.0"
+description = "Manim lecture video for the ECN 593 architecture (scenes, render, mux)."
+requires-python = ">=3.14"
+dependencies = [
+    "manim>=0.22.0",
+]
+
+[tool.uv]
+package = false

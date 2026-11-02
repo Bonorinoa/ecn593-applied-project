@@ -1,0 +1,5 @@
+- step 0 (VV): 9 replacements applied to video/script.md + narration (parity + no-digit check ok); s01 s02 s04 s07 s08 s10 re-voiced (Hadley, voice/tts); durations.json updated
+- step 3 (pilot): S01,S02 at 480p15; stills video/shots/pilot_s0{1,2}_{a,b,c}.png checked; fixed ticker overlap (scroll then add), world card collapses before design card, wider endo card
+- step 3b (pilot all scenes 480p15): fixed lottery/prob overlap, hand-built subscripts (Pango <sub> too small), S07 inset spacing, S08 pin labels
+- step 4a (first full render 619.76 s ok; fixes: header mark top-aligned, captions out-then-in, endo card, S10 arrows; cues anchored to wav pauses via timing.py); re-rendering
+- step 4 (full render): video/build/ecn593-architecture.mp4; one still per scene video/shots/final_sNN.png

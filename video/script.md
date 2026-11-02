@@ -32,7 +32,7 @@ Every number spoken is a configuration constant, cited to its file and line.
 
 ### Narration
 ```text
-Picture a village of eight hundred people. A campaign can seed eighty of them. If we seed the eighty best-connected people, how much does the whole village move, compared with no campaign at all? We call that number theta two. No researcher has data on that policy. So we build a model, and calibrate it to what we can see. Here is the trap. The model has five free parameters, and we match only four summary numbers. Many parameter points fit those numbers about equally well. They can disagree about theta two. And the best-fitting point need not be the true one. So one calibrated point can give a confident answer that is wrong. This project reports the range of answers the data cannot rule out. Then it asks which analysts are honest about that range. Let us go from the top down.
+Picture a village of eight hundred people. A campaign can seed eighty of them. If we seed the eighty best-connected people, how much does the whole village move, compared with no campaign at all? We call that number theta two. In this design, the researcher observes no data from the degree policy. So we build a model, and calibrate it to what we can see. Here is the trap. The model has five free parameters, and we match only four summary numbers. Many parameter points fit those numbers about equally well. They can disagree about theta two. And the best-fitting point need not be the true one. So one calibrated point can give a confident answer that is wrong. This project reports the range of answers the data cannot rule out. Then it asks which analysts are honest about that range. Let us go from the top down.
 ```
 
 ### Visual
@@ -60,7 +60,7 @@ different θ2 tick on a number line; one is labelled "best fit", a different one
 
 ### Narration
 ```text
-Everything starts in two small files. The first is config slash world dot toml. It holds the village and the policy question. Eight hundred people. A random friendship graph, with about eight friends each. Three covariates per person. Twenty time steps. The box C of allowed parameters. And the seed share: ten percent. The second file is config slash design dot toml. It holds the analyst's choices. How many Monte Carlo reps. How many waves of search. The allowances for model error, called delta. And the settings of both foils. Both files are exogenous: we choose them before any run. The code only reads them, and adds two rules: the edge probability, and the planted point c star, the center of the box. Everything the model computes lives elsewhere, in data and results. Never in config.
+Everything starts in two small files. The first is config slash world dot toml. It holds the village and the policy question. Eight hundred people. A random friendship graph, with about eight friends each. Three covariates per person. Twenty time steps. The box C of allowed parameters. And the seed share: ten percent. The second file is config slash design dot toml. It holds the analyst's choices. How many Monte Carlo reps. How many waves of search. The allowances for model error, called delta. And the settings of both foils. Both files are exogenous: we choose them before any run. The code only reads them, and adds two rules: the edge probability, and the planted point c star, the center of the box. The endogenous quantities live elsewhere, in data and results, never in config.
 ```
 
 ### Visual
@@ -123,11 +123,11 @@ brace under all three: "same Y(0), same shocks".
 
 ---
 
-## Scene 4. The estimand theta two, and why a pilot never realizes it
+## Scene 4. The estimand theta two, and why a pilot almost never realizes it
 
 ### Narration
 ```text
-The estimand is theta two. Run the degree arm and the control arm many times. Average the village outcome in each. Theta two is the difference. Theta one is the same contrast for the random arm. The code uses two hundred paired reps per arm. A real researcher can run a randomized pilot: seed eighty people at random, and watch. That pilot identifies theta one. But theta two compares two whole assignment vectors: the degree vector, and nobody. A random pilot draws eighty of eight hundred. The chance that it draws exactly the top eighty is one over eight hundred choose eighty. So no pilot ever realizes the policy. To get from a pilot to theta two, you need two assumptions. An exposure map: your outcome depends on the assignment only through a simple summary, like your treated friends. And transport: what the pilot shows for each exposure also holds under the policy.
+The estimand is theta two. Run the degree arm and the control arm many times. Average the village outcome in each. Theta two is the difference. Theta one is the same contrast for the random arm. The code uses two hundred paired reps per arm. A real researcher can run a randomized pilot: seed eighty people at random, and watch. That pilot identifies theta one. But theta two compares two whole assignment vectors: the degree vector, and nobody. A random pilot draws eighty of eight hundred. The chance that it draws exactly the top eighty is one over eight hundred choose eighty. A randomized pilot therefore has only a vanishingly small chance of realizing the degree policy. To get from a pilot to theta two, you need two assumptions. An exposure map: your outcome depends on the assignment only through a simple summary, like your treated friends. And transport: what the pilot shows for each exposure also holds under the policy.
 ```
 
 ### Visual
@@ -143,7 +143,7 @@ lottery: 800 dots, 80 random picks flash oxblood repeatedly; never the hub set. 
 | 4.2 | 200 paired reps per arm | `config/design.toml:8`; `src/poc_abm/estimand.py:49-61` |
 | 4.3 | a randomized pilot identifies θ1 (pilot_level − sq_level = θ1(c*) with paired reps) | `docs/preregistration-v2.md` §2 (lines 41-43) |
 | 4.4 | θ2 compares two whole assignment vectors, d2 and zero | `docs/preregistration-v2.md` A2, "Why theta2 needs more than a randomized pilot" (lines 149-150) |
-| 4.5 | P(pilot = d2) = 1 / C(800, 80); no pilot ever realizes the policy | same, lines 150-151 |
+| 4.5 | P(pilot = d2) = 1 / C(800, 80): a vanishingly small (negligible) chance, not "never" | same, lines 150-151, and the A2 erratum (lines 202-206); `reviews/video-script.md`, item 3 |
 | 4.6 | needs (i) an exposure map and (ii) transport, as defined | same, lines 151-154 |
 
 ---
@@ -211,7 +211,7 @@ labelled set "NROY". A final card: "empty NROY = F-EMPTY; τ never loosened".
 
 ### Narration
 ```text
-N R O Y is a set of parameter points. But we want answers in policy units. So we draw four hundred N R O Y points at random. At each one, we compute theta two with two hundred reps. The smallest and the largest value give the image, Theta H M. We do the same for a second quantity in the random arm, delta spill. It compares untreated people with at least a quarter of their friends treated against untreated people with no treated friends. Its range is the image Theta E X P. An image is the range of answers the targets cannot rule out. It is not a posterior. And it is not an identified set. Its endpoints are extremes of four hundred noisy estimates, so the code rechecks each endpoint's point with fresh reps. And because delta is an assumption, amendment A one reruns the search with smaller level deltas. It is a menu of answers, never a way to choose delta.
+N R O Y is a set of parameter points. But we want answers in policy units. So we draw four hundred N R O Y points at random. At each one, we compute theta two with two hundred reps. The smallest and the largest value give the image, Theta H M. We do the same for a second quantity in the random arm, delta spill. It compares untreated people with at least a quarter of their friends treated against untreated people with no treated friends. Its range is the image Theta E X P. Here, an image is the range across the declared sample of four hundred N R O Y points. It is not a posterior. And it is not an identified set. Its endpoints are extremes of four hundred noisy estimates, so the code rechecks each endpoint's point with fresh reps. And because delta is an assumption, amendment A one reruns the search with smaller level deltas. It is a menu of answers, never a way to choose delta.
 ```
 
 ### Visual
@@ -240,7 +240,7 @@ from "fresh reps". Final strip: three stacked Θ_hm bars labelled "δ_level = 0.
 
 ### Narration
 ```text
-Now the analysts. Each one sees a single panel and reports an interval. They work at three points. The calibrator takes the N R O Y point with the lowest I, or the median I: chosen by fit alone, never by theta. The field experimenter works at c star, with one panel from the real village. Foil one is the SUTVA analyst. On the degree-arm panel, it runs O L S of the outcome on treatment and covariates, and scales the effect by k over N. With no interference, that would be theta two. Under this model, it is not. Foil two uses the random arm. It estimates delta spill, with Hajek weights and an Aronow-Samii variance. It never targets theta two. Amendment A two adds a ladder of analysts for theta two. Mind the names: amendment A one was the delta menu; analyst A one is a rung here. A zero is Foil one. A one weights the pilot's exposure strata by the shares the degree policy would create. A two also splits people into the top eighty and the rest. Each rung assumes less. The amendment wrote its expectations first: down the ladder, bias should fall, and width should rise.
+Now the analysts. Each one sees a single panel and reports an interval. They work at three points. The calibrator takes the N R O Y point with the lowest I, or the median I: chosen by fit alone, never by theta. The field experimenter works at c star, with one panel from the real village. Foil one is the SUTVA analyst. On the degree-arm panel, it runs O L S of the outcome on treatment and covariates, and scales the effect by k over N. Only under SUTVA, exchangeability and positivity given the covariates, a correctly specified additive constant-effect model, and the usual sampling basis for H C one can that scaled coefficient and interval be read as a report about theta two. Under this model, it is not. Foil two uses the random arm. It estimates delta spill, with Hajek weights and an Aronow-Samii variance. It never targets theta two. Amendment A two adds a ladder of analysts for theta two. Mind the names: amendment A one was the delta menu; analyst A one is a rung here. A zero is Foil one. A one combines the pilot's Hájek exposure means, each relative to S zero a, using the exposure shares the degree policy would create. A two also splits people into the top eighty and the rest. Each rung assumes less. The amendment wrote its expectations first: down the ladder, bias should fall, and width should rise.
 ```
 
 ### Visual
@@ -304,11 +304,11 @@ coverage".
 
 ### Narration
 ```text
-How do you check all of this yourself? One command: python scripts slash replicate dot py. It runs the tests. It regenerates the targets, and checks them byte for byte. It runs the planted pipeline. Then the Foil two check, and the delta menu. Then it copies the paper's figures, writes every paper number as a macro, and builds the PDF. Last, it compares each result file with the committed one, and prints REPLICATED if they match. Amendment A two adds one more step, for its analysts. Every random draw comes from a named, stable seed, so a rerun reproduces every digit. Where things live. The config folder holds the choices. The source folder holds the kernel, the moments, history matching, the estimands, the foils, and the pipeline. Data holds the targets. Results hold every number, and the paper reads its numbers only from there. Start at the config. Then follow the arrows down.
+How do you check all of this yourself? One command from the repo root, with Python path unset: env dash u Python path, dot venv slash bin slash python, scripts slash replicate dot py. It runs the tests. It regenerates the targets, and checks them byte for byte. It runs the planted pipeline. Then the Foil two check, and the delta menu. Then it copies the paper's figures, writes the paper's result numbers as macros, and builds the PDF when latexmk is available. Last, it compares each result file with the committed one, and prints REPLICATED if they match. Amendment A two adds one more step, for its analysts. Every random draw comes from a named, stable seed, so a rerun reproduces every digit. Where things live. The config folder holds the choices. The source folder holds the kernel, the moments, history matching, the estimands, the foils, and the pipeline. Data holds the targets. Results hold the run outputs, and the paper reads its result numbers through generated macros. Start at the config. Then follow the arrows down.
 ```
 
 ### Visual
-A terminal line typed in sans mono-free style: `python scripts/replicate.py`. Nine numbered steps
+A terminal line typed in sans mono-free style: `env -u PYTHONPATH .venv/bin/python scripts/replicate.py`. Nine numbered steps
 tick down one by one (tests, z check, planted run, Foil 2 check, δ menu, paper figures, paper
 numbers, PDF, report), ending on the word `REPLICATED`. A tenth step slides in dashed: "A2 step
 (per the amendment)". Then the repo tree as a top-down flow: `config/` → `src/poc_abm/`
