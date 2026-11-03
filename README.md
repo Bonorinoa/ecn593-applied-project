@@ -19,7 +19,7 @@ The design is frozen in `docs/preregistration-v2.md`. The code implements it. Th
 - **Three points, two analysts.** The calibrator fits the model and works at one best-fitting point. The code uses the min-I point and the median-I point of NROY. They are chosen by I only, never by the effect. The field experimenter has one panel from the real village, which is the planted point c*.
 - **Two containment flags.** At every point, each foil gets `covers_truth` (the truth at that point) and `covers_planted_truth` (the truth at c*). At c* the two flags are equal. Both are descriptive indicators for one realized panel. They are not repeated-sampling coverage.
 
-The v1 headline is retired. A v2 headline is not adopted yet: that decision is the project owner's. The paper (`thesis/main.pdf`) proposes one, marked as the owner's decision.
+The v1 headline is retired. **The headline (adopted by the owner on 2026-11-01) is in the paper's abstract and introduction (`thesis/main.pdf`):** the analyst who assumes no interference misses the policy effect at all three points and is overconfident at the calibrator's two; analysts who allow for interference shrink the bias at the price of a larger spread and conservative intervals, but answer only for their own world (at the median-I point they contain that point's effect, not the village's); the image contains the effect at all three points. Report the image.
 
 ## Deliverables
 
