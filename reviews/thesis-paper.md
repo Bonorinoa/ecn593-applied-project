@@ -227,3 +227,70 @@ The W4 budget is "about 20" and "about 30". Round 1 accepted 31 pages, and about
 - Fresh-clone `scripts/replicate.py` — exit 0. Log: `reviews/probes/V5/replicate-full.log`. Printed `REPLICATED`.
 
 Premise. The card says commit only `reviews/thesis-paper.md` and `reviews/probes/V5/`. The common-rules progress file would be another path. The card fence wins; this file is the progress record.
+
+## Round 3: the adopted headline
+
+PASS-WITH-WORDING
+
+Independent check of the adopted headline at `a1898ac`. Producer is the PM, as the card states; this round did not re-derive that route. This review: `model=grok-4.7 provider=xai-oauth` (verifier log, session `local-33d11fd41bd6381637a6b865d78b5e0c7f4730b6313ecbcec7d1ca4da3a90c72`, API calls #1–#17 at the checks).
+
+The sentences between `% HEADLINE` and `% END HEADLINE` are true. They do not need to be replaced. The README short form drops two guards the paper keeps, so two forbidden readings are available there that the paper closes. That is the only required replacement. It is not a block: the short form does not assert a false number.
+
+Required replacement, verbatim. In `README.md:22`, replace the short form after the bold lead-in with:
+
+the analyst who assumes no interference misses the policy effect at all three points and, at the calibrator's two, is overconfident: the interval lies strictly inside the range the targets leave open; analysts who allow for interference reduce the absolute bias at every point, at the price of a larger sampling spread and intervals that are conservative relative to that spread, but answer only for their own world (at the median-I point they contain that point's effect, not the village's); the image contains the effect at all three points. Report the image.
+
+Keep the lead-in (`The v1 headline is retired` through `` `thesis/main.pdf`): ``). Do not edit the marked headline in `thesis/main.tex` or `thesis/sections/01-introduction.tex`.
+
+## 1. The marked sentences
+
+The abstract (`thesis/main.tex:70-80`) and the introduction (`thesis/sections/01-introduction.tex:70-80`) are the same five sentences. The introduction adds one prescription, `Report the image, and read any one-point interval against it` (`01-introduction.tex:81`). That sentence states no result.
+
+Clause by clause, recomputed from interval endpoints in `results/interference/tradeoff.json`. Flags were not trusted: each `covers_truth`, `covers_planted_truth`, and strict-inside test was redone from the endpoints and matched the JSON flag. `Theta_hm` matches `results/planted/poc_results.json`.
+
+- One panel at the real village, the analyst who assumes no interference. That analyst is A0 (`05-analysts.tex:23,34`). At `c_star`, A0's interval does not contain `theta2`. The width is a small fraction of the image (the probe prints `width/image` under 0.04 at every A0 cell). "Tight" is that width. It is not the overconfidence charge. The headline does not apply the charge at the village. The next paragraph withholds it (`01-introduction.tex:92-95`; `07-results.tex:151-154`). A0 is F-OVERCONF at `c_star` in the JSON. Not saying so is the paper's rule, not an omission.
+- Calibrator's two points, misses again and is overconfident. The paper's name for those points includes the median-I point, defined as the middle of NROY, not the second-smallest `I` (`04-history-matching.tex:68-71`). At both points A0 does not contain that point's `theta2`, and the interval lies strictly inside `Theta_hm`. The colon defines overconfident as that geometry. "Misses again and is" keeps the two facts apart. The following paragraph says an interval can miss without being overconfident, and can contain the truth and still be overconfident (`01-introduction.tex:85-92`). The headline does not use overconfident to mean misses.
+- Repeated panels, exposure map and transport, absolute bias down at every point. Those analysts are A1 and A2 (`05-analysts.tex:24-25`), not Foil 2. Absolute bias falls A0 to A1 to A2 at `min_I`, `median_I`, and `c_star`. The sentence says "reduce", not "remove", and not "unbiased". Sampling SD rises A0 to A1 to A2 at every point. Mean width also rises, and the sentence does not call the width the sampling spread.
+- Conservative relative to that spread. "It" is the sampling spread. Every A1 and A2 `se_over_sd` is above 1, and every A1 and A2 repeated-sampling rate is 1. A0's rate is 0. The sentence does not say calibrated, does not say nominal 95 percent, and does not say the reported SE is the sampling SD. That is the allowed sentence in `reviews/a2-code.md:126`, not the banned one at line 115.
+- Own world, median-I only. At the median-I one panel, A1 and A2 contain that point's `theta2` and do not contain the village's. The colon restricts that containment claim to that panel. At min-I, A1 and A2 contain both truths. The headline does not deny that. "Answer only for the world" is the estimand point the results section already states (`07-results.tex:171-178`), not a claim that the village effect is never inside the interval.
+- The image contains the effect at the village and at both calibrator points. All three `theta2` values, and the planted value, lie inside `Theta_hm`. The sentence does not call the image an identified set.
+
+## 2. Must not say
+
+Checked against `reviews/a2-code.md:109-120`. None of these are in the marked sentences: bias removed or unbiased; the pilot identifies `theta2`; an identified estimator; an identified set; A0, A1, and A2 estimate the same functional; a one-panel flag is coverage; A1 or A2 is calibrated to 95 percent; A2 is uniquely closest to nominal; the reported SE is the sampling SD; F-OVERCONF means the interval misses; positivity fails; Foil 2 is an interval for `theta2`.
+
+## 3. README short form
+
+`README.md:22` points at the paper and then compresses it. It does not add a result the paper does not state. It does drop two guards, and those drops are the required replacement above.
+
+- "Misses the policy effect at all three points" is the village sentence plus "misses again". A0 fails `covers_truth` at all three points, and also fails `covers_planted_truth` at all three, so both readings are true. Not more than the paper.
+- "Overconfident at the calibrator's two" has no colon. A reader can take overconfident as another word for misses. The paper's colon forbids that reading. The short form does not charge overconfidence at the village, which matches the paper, but the missing definition is why the sentence is replaced.
+- "Shrink the bias" does not say the bias is removed. The replacement uses the paper's verb, "reduce the absolute bias at every point", so the short form does not drift.
+- "Larger spread and conservative intervals" drops "sampling" and "relative to that spread". Bare "conservative" can be read as calibrated coverage. The paper pins it to the sampling spread. That is the second reason for the replacement.
+
+After the replacement, the short form says no more than the marked sentences.
+
+## 4. Build
+
+Scratch copy of `thesis/`, then `latexmk -pdf -g -interaction=nonstopmode main.tex`. Exit 0. `main.log`: 0 lines starting with `!`, 0 `undefined`, 0 `Overfull`, 0 `Underfull`, 0 `Float too large`. Output written: 33 pages, 613792 bytes. `cmp` against the committed `thesis/main.pdf` exited 0. The shipped PDF is that build. The abstract and the introduction box both print the marked sentences (`pdftotext`).
+
+## Non-blocking
+
+- "Tight" is not defined. It is width, not F-OVERCONF. Not a required replacement.
+- "Best-fitting" for the median-I point is the paper's name, defined later as the middle of NROY. Not a new claim, and not a required replacement.
+- The PDF is 33 pages. Round 2 accepted 32. This card has no page budget. No trim required.
+- `thesis/sections/10-conclusion.tex:12-16` restates a shorter form outside the markers. It is not the adopted block. I do not require a change there.
+
+## What I did not verify
+
+- A fresh `replicate.py` or a fresh R = 200 tradeoff run. The checks use the committed JSON.
+- The PM's model route. The card names the producer. This round's route is from the verifier log, above.
+- The conclusion, except to confirm it is outside the markers.
+
+## Commands
+
+- `env -u PYTHONPATH .venv/bin/python -u` the scratch probe (not committed; this card says commit only this file) — exit 0, `FAILS=0`.
+- `latexmk -pdf -g -interaction=nonstopmode main.tex` in the scratch copy — exit 0. Flag counts as in item 4.
+- `cmp` of that PDF against `thesis/main.pdf` — exit 0.
+
+Premise. The card says commit only `reviews/thesis-paper.md`. The common-rules progress file would be another path. The card fence wins; this file is the progress record. The probe stayed in scratch.
